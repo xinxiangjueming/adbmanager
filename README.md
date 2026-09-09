@@ -1,11 +1,17 @@
 # AdbManager
 
-> 基于 WinUI 3 的 Windows 桌面 ADB / Fastboot 管理工具。单文件免安装，内置谷歌官方 platform-tools，支持有线与无线连接、应用管理、文件管理、Fastboot 刷入与镜像提取、反向网络共享等。
+**[简体中文](#简体中文) | [English](#english)**
 
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2B-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0--windows-purple)
 ![WinUI](https://img.shields.io/badge/WinUI%203-WindowsAppSDK%201.7-0078D4)
 ![License](https://img.shields.io/badge/license-MIT-green)
+
+---
+
+# 简体中文
+
+> 基于 WinUI 3 的 Windows 桌面 ADB / Fastboot 管理工具。单文件免安装，内置谷歌官方 platform-tools，支持有线与无线连接、应用管理、文件管理、Fastboot 刷入与镜像提取、反向网络共享等。
 
 ## 特性
 
@@ -162,3 +168,165 @@ repo/
 [MIT](LICENSE)
 
 内置的 Google platform-tools（adb / fastboot）遵循 [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)；Zeroconf、Windows App SDK、.NET 等第三方组件遵循其各自的开源协议。
+
+---
+
+# English
+
+> A Windows desktop ADB / Fastboot manager built with WinUI 3. Ships as a single install-free executable with Google's official platform-tools bundled — wired and wireless connections, app management, file management, Fastboot flashing with partition image extraction, reverse tethering, and more.
+
+## Features
+
+### Device connection
+
+- Device list auto-refreshes every 3 seconds; wired and wireless devices managed in one place
+- Android 11+ wireless debugging: two-step pairing-code flow (pair → connect), with pairing port and connect port handled separately
+- Native mDNS discovery on the LAN (Zeroconf, `_adb-tls-connect` / `_adb-tls-pairing`), independent of the adb server's built-in mDNS backend (which is often broken on Windows)
+- One-click USB-to-Wi-Fi: detects the phone's WLAN IP automatically → `tcpip 5555` → auto-connect, no manual typing
+- Connects to devices in special modes such as Recovery / Sideload
+
+### App management
+
+- Install APK / split APKS bundles (`.apks` / `.xapk` / `.zip` auto-unpacked and installed base → split)
+- Extract APK (including splits) to the PC
+- Uninstall, freeze / unfreeze (`pm disable-user`), force stop, clear data
+- Filter by third-party / system / disabled, with package name search
+
+### File management
+
+- Browse device directories (handles symlinks like `/sdcard` correctly — click to enter)
+- Upload / download, rename / delete / new folder, copy / cut / paste
+
+### Fastboot
+
+- Flash images, erase partitions, full `getvar` dump, reboot to every mode
+- Extract partition images to the PC via adb `dd` (root-only partitions report a clear error)
+
+### Toolbox
+
+- Screenshots saved straight to the PC; screen recording (up to 180 s) pulled back automatically when finished
+- Shell command execution with live output
+- Reverse tethering: HTTP proxy + `adb reverse` + automatic device system-proxy setup
+- One-click Shizuku / Scene activation
+- Wi-Fi check fix (resets captive portal URLs and restarts Wi-Fi)
+- TWRP Recovery utilities: clear the screen lock or skip Google setup (FRP) in one click
+
+### Device info
+
+- Brand / model / codename / Android version / SDK / security patch / fingerprint / ABI
+- Battery (level, health, temperature, voltage, current & design capacity), display, memory, storage, network, kernel, uptime
+- Refreshes automatically when a device connects — no manual clicking
+
+### Interface
+
+- miuix / HyperOS design language: large-radius cards, pill buttons, paired light/dark brushes
+- Theme follows the system, or pin light / dark manually — switches instantly, no restart
+- Animated page transitions, list add/remove animations, and a busy overlay for long operations
+- 7 built-in languages: 简体中文 / English / 日本語 / 한국어 / Deutsch / Français / Español (follows the system, manually selectable in Settings)
+
+## Download
+
+Grab `AdbManager.exe` (~276 MB) from the [Releases](../../releases) page:
+
+- Single file, no installation, just double-click (self-contained .NET 8 + WinUI runtime, no dependencies to install)
+- Bundles Google's official platform-tools (adb 37.0.1 + fastboot), extracted to `%LOCALAPPDATA%\AdbManager\adb\` on first run
+- First launch is slower due to self-extraction — this is normal
+- Some antivirus products may flag single-file self-extracting executables; whitelist it or build from source
+
+## Usage
+
+### Wireless debugging (Android 11+)
+
+1. On the phone: Settings → Developer options → enable "Wireless debugging" → open that menu → "Pair device with pairing code"
+2. In the app's "Devices" page: enter the **pairing address** (IP:port) and the **6-digit pairing code** → "Pair & connect". Note: the port shown in the pairing dialog changes every time — it is not the connect port
+3. Once paired, check "IP address & port" on the phone's wireless debugging main screen, enter it as the connect address → "Connect". Pairing is one-time; afterwards just connect
+4. Or simply click "Scan LAN" to discover devices automatically and click a result to connect
+5. If the phone is plugged into USB, the easiest path is the "USB to Wi-Fi" one-click button
+
+### Wireless debugging (Android 10 and below)
+
+Select the USB-connected device on the Devices page → switch to TCP mode (5555) → unplug the cable → connect to `IP:5555`.
+
+### Fastboot
+
+After rebooting the phone to the Bootloader (Fastboot mode), devices appear on the "Fastboot" page; pick a partition and an image file, then flash. **Flashing is risky — double-check that the partition matches the image before proceeding.**
+
+## Build from source
+
+### Requirements
+
+- Windows 10 17763+
+- [.NET SDK 8.0+](https://dotnet.microsoft.com/download) (Windows App SDK and NuGet packages restore automatically)
+- **No Windows SDK / Visual Studio required**: the entire UI is built in pure C# without XAML files — the XAML compiler never runs
+
+### Prepare the official platform-tools (build prerequisite)
+
+The adb / fastboot binaries are not committed to the repository. Download them from Google and place them in `tools/adb/`:
+
+```powershell
+# Download
+Invoke-WebRequest https://dl.google.com/android/repository/platform-tools-latest-windows.zip -OutFile platform-tools.zip
+# After extracting, copy these 5 files into tools/adb/:
+# adb.exe, AdbWinApi.dll, AdbWinUsbApi.dll, fastboot.exe, libwinpthread-1.dll
+```
+
+### Build
+
+```powershell
+powershell -ExecutionPolicy Bypass -File publish.ps1
+# or manually:
+dotnet publish src/AdbManager -c Release -r win-x64 --self-contained true -o dist
+```
+
+Output: `dist/AdbManager.exe` (single file).
+
+## Project layout
+
+```
+repo/
+├─ src/AdbManager/        App source (WinUI 3, pure C# UI)
+│  ├─ Services/           adb / fastboot invocation, mDNS discovery, localization, reverse-tether proxy, etc.
+│  ├─ Views/              Pages (Devices / Info / Tools / Apps / Files / Fastboot / Logs / Settings)
+│  ├─ Models/             Data models: devices, files, packages
+│  ├─ Ui/                 miuix design system: palette brushes and control factory
+│  └─ Strings/            resw resources for 7 languages
+├─ tools/adb/             Google's official platform-tools (download yourself, see above)
+├─ publish.ps1            One-click publish script
+└─ dist/                  Publish output
+```
+
+## Technical notes
+
+- **No-XAML WinUI 3**: the whole UI is built from C# code (`App` implements `IXamlMetaDataProvider` and attaches `XamlControlsResources` in `OnLaunched`), completely bypassing the XAML compiler and Windows SDK winmd dependencies — any machine with the .NET SDK can build it
+- **Key single-file publish settings**: `WindowsAppSDKSelfContained` + `EnableMsixTooling` (embeds resources.pri into the exe) + `IncludeNativeLibrariesForSelfExtract`; the entry point must set `MICROSOFT_WINDOWSAPPRUNTIME_BASE_DIRECTORY` to the single-file extraction directory, otherwise MRM cannot locate framework resources
+- **Localization**: resw files ship as embedded resources and are parsed at runtime (no PRI/MRT dependency); MSBuild normalizes the folder name `zh-CN` to `zh_CN`, which is converted back at load time; multiple resw files per language are merged key by key
+- **mDNS discovery**: Zeroconf queries `_adb-tls-connect` / `_adb-tls-pairing` directly on the LAN — the same idea as NsdManager on Android; `adb mdns check` returns `0.0.0` (unavailable) on most Windows setups, so it is not used as the primary discovery path
+- **NavigationView pane-flicker workaround**: upstream bug [microsoft-ui-xaml#9370](https://github.com/microsoft/microsoft-ui-xaml/issues/9370) (pane and content width animations out of sync), mitigated by using one opaque background color for the pane, the content area, and the window
+
+## FAQ
+
+**Q: Wireless scan finds nothing?**
+
+The phone's "Wireless debugging" switch must be on (it is a separate switch from USB debugging — no broadcast without it); the PC and phone must be on the same Wi-Fi with no AP isolation on the router; click "Allow" on the first Windows Firewall prompt (mDNS needs UDP 5353 multicast). If the phone is plugged into USB, just use the "USB to Wi-Fi" one-click button.
+
+**Q: Conflicts with Android Studio or another adb?**
+
+On startup, adb version conflicts are detected automatically — stale adb processes are killed and the server restarted (note: this also kills the adb server used by Android Studio).
+
+**Q: Partition image extraction fails?**
+
+`dd` requires root to read some partitions (modem, xbl, etc.), so it fails on non-rooted devices.
+
+**Q: First launch is slow?**
+
+The single-file exe self-extracts the runtime on first start — normal, and subsequent launches are faster.
+
+## Disclaimer
+
+Flashing or erasing partitions can leave a device unbootable; freezing or uninstalling system apps may destabilize the system. Use this tool only if you fully understand the consequences; the author is not liable for any device damage or data loss. For managing devices you are authorized to control only.
+
+## License
+
+[MIT](LICENSE)
+
+The bundled Google platform-tools (adb / fastboot) are licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0); third-party components such as Zeroconf, Windows App SDK, and .NET remain under their respective licenses.
