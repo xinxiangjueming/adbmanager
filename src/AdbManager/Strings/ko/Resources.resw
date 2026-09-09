@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="App_Title" xml:space="preserve"><value>Adb Manager</value></data>
+  <data name="Nav_Devices" xml:space="preserve"><value>기기</value></data>
+  <data name="Nav_Tools" xml:space="preserve"><value>도구</value></data>
+  <data name="Nav_Apps" xml:space="preserve"><value>앱</value></data>
+  <data name="Nav_Files" xml:space="preserve"><value>파일</value></data>
+  <data name="Nav_Logs" xml:space="preserve"><value>로그</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>설정</value></data>
+  <data name="Nav_Info" xml:space="preserve"><value>정보</value></data>
+  <data name="Nav_Fastboot" xml:space="preserve"><value>Fastboot</value></data>
+  <data name="Common_Refresh" xml:space="preserve"><value>새로 고침</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>취소</value></data>
+  <data name="Common_Close" xml:space="preserve"><value>닫기</value></data>
+  <data name="Common_Confirm" xml:space="preserve"><value>확인</value></data>
+  <data name="Common_Delete" xml:space="preserve"><value>삭제</value></data>
+  <data name="Common_Rename" xml:space="preserve"><value>이름 바꾸기</value></data>
+  <data name="Common_Copy" xml:space="preserve"><value>복사</value></data>
+  <data name="Common_Cut" xml:space="preserve"><value>잘라내기</value></data>
+  <data name="Common_Paste" xml:space="preserve"><value>붙여넣기</value></data>
+  <data name="Common_Open" xml:space="preserve"><value>열기</value></data>
+  <data name="Common_Browse" xml:space="preserve"><value>찾아보기</value></data>
+  <data name="Common_Back" xml:space="preserve"><value>위로</value></data>
+  <data name="Devices_Title" xml:space="preserve"><value>기기</value></data>
+  <data name="Devices_Empty" xml:space="preserve"><value>기기가 없습니다. USB 디버깅을 켜고 연결하거나 무선 디버깅을 사용하세요.</value></data>
+  <data name="Devices_Serial" xml:space="preserve"><value>일련번호</value></data>
+  <data name="Devices_State" xml:space="preserve"><value>상태</value></data>
+  <data name="Devices_Link" xml:space="preserve"><value>연결 방식</value></data>
+  <data name="Devices_RestartServer" xml:space="preserve"><value>adb 서버 재시작</value></data>
+  <data name="Devices_KillServer" xml:space="preserve"><value>adb 서버 중지</value></data>
+  <data name="Devices_Disconnect" xml:space="preserve"><value>연결 해제</value></data>
+  <data name="Devices_Select" xml:space="preserve"><value>선택</value></data>
+  <data name="Devices_Detail" xml:space="preserve"><value>기기 정보</value></data>
+  <data name="Devices_AdbSource" xml:space="preserve"><value>adb 소스</value></data>
+  <data name="Wireless_Title" xml:space="preserve"><value>무선 디버깅</value></data>
+  <data name="Wireless_PairTitle" xml:space="preserve"><value>Android 11+ 무선 페어링</value></data>
+  <data name="Wireless_Address" xml:space="preserve"><value>연결 주소 IP:포트</value></data>
+  <data name="Wireless_PairAddress" xml:space="preserve"><value>페어링 주소 IP:포트</value></data>
+  <data name="Wireless_PairCode" xml:space="preserve"><value>페어링 코드</value></data>
+  <data name="Wireless_Connect" xml:space="preserve"><value>연결</value></data>
+  <data name="Wireless_Pair" xml:space="preserve"><value>페어링 후 연결</value></data>
+  <data name="Wireless_Scan" xml:space="preserve"><value>LAN 검색</value></data>
+  <data name="Wireless_ScanEmpty" xml:space="preserve"><value>찾을 수 없습니다. 휴대전화에서 무선 디버깅을 켜고 PC와 같은 Wi-Fi에 연결하세요.</value></data>
+  <data name="Wireless_Tcpip" xml:space="preserve"><value>TCP 모드로 전환(5555)</value></data>
+  <data name="Wireless_Hint" xml:space="preserve"><value>참고: 페어링 포트와 연결 포트는 다릅니다. 페어링은 한 번만 하면 됩니다.</value></data>
+  <data name="Wireless_Ip" xml:space="preserve"><value>IP 주소</value></data>
+  <data name="Wireless_PairPort" xml:space="preserve"><value>페어링 포트</value></data>
+  <data name="Wireless_ConnectPort" xml:space="preserve"><value>연결 포트(기본 5555)</value></data>
+  <data name="Wireless_ScanTrouble" xml:space="preserve"><value>점검: ① 휴대전화에서 무선 디버깅을 켜고 같은 Wi-Fi 연결 ② 공유기 AP 격리 해제 ③ Windows 방화벽에서 허용 ④ mdns check 불가 시 adb 서버 재시작 후 재시도.</value></data>
+  <data name="Wireless_UsbToWireless" xml:space="preserve"><value>USB→무선 전환({0})</value></data>
+  <data name="Wireless_KindPair" xml:space="preserve"><value>페어링</value></data>
+  <data name="Wireless_KindConnect" xml:space="preserve"><value>연결</value></data>
+  <data name="Tools_Title" xml:space="preserve"><value>자주 쓰는 도구</value></data>
+  <data name="Tools_Screenshot" xml:space="preserve"><value>화면 캡처 저장</value></data>
+  <data name="Tools_Record" xml:space="preserve"><value>녹화 시작</value></data>
+  <data name="Tools_StopRecord" xml:space="preserve"><value>중지 후 저장</value></data>
+  <data name="Tools_Shell" xml:space="preserve"><value>셸 명령 실행</value></data>
+  <data name="Tools_ShellPlaceholder" xml:space="preserve"><value>예: pm list packages, dumpsys battery</value></data>
+  <data name="Tools_Run" xml:space="preserve"><value>실행</value></data>
+  <data name="Tools_Reboot" xml:space="preserve"><value>재시작 대상</value></data>
+  <data name="Tools_RebootNormal" xml:space="preserve"><value>시스템</value></data>
+  <data name="Tools_RebootRecovery" xml:space="preserve"><value>Recovery</value></data>
+  <data name="Tools_RebootBootloader" xml:space="preserve"><value>Bootloader(Fastboot)</value></data>
+  <data name="Tools_RebootFastbootd" xml:space="preserve"><value>Fastbootd</value></data>
+  <data name="Tools_Output" xml:space="preserve"><value>출력</value></data>
+  <data name="Tools_WifiFix" xml:space="preserve"><value>Wi-Fi 검사 수정</value></data>
+  <data name="Tools_Shizuku" xml:space="preserve"><value>Shizuku 활성화</value></data>
+  <data name="Tools_Scene" xml:space="preserve"><value>Scene 활성화</value></data>
+  <data name="Tools_ActivateHint" xml:space="preserve"><value>Shizuku/Scene 활성화하려면 해당 앱이 기기에 설치되고 한 번 실행되어(스크립트 생성) 있어야 합니다.</value></data>
+  <data name="Apps_Title" xml:space="preserve"><value>앱 관리</value></data>
+  <data name="Apps_InstallApk" xml:space="preserve"><value>APK 설치</value></data>
+  <data name="Apps_InstallBundle" xml:space="preserve"><value>APKS 설치</value></data>
+  <data name="Apps_Search" xml:space="preserve"><value>패키지 검색</value></data>
+  <data name="Apps_ThirdParty" xml:space="preserve"><value>서드파티</value></data>
+  <data name="Apps_System" xml:space="preserve"><value>시스템</value></data>
+  <data name="Apps_Disabled" xml:space="preserve"><value>비활성화됨</value></data>
+  <data name="Apps_Uninstall" xml:space="preserve"><value>제거</value></data>
+  <data name="Apps_Freeze" xml:space="preserve"><value>동결</value></data>
+  <data name="Apps_Unfreeze" xml:space="preserve"><value>동결 해제</value></data>
+  <data name="Apps_ForceStop" xml:space="preserve"><value>강제 종료</value></data>
+  <data name="Apps_ClearData" xml:space="preserve"><value>데이터 삭제</value></data>
+  <data name="Apps_KeepData" xml:space="preserve"><value>데이터 유지</value></data>
+  <data name="Apps_ExtractApk" xml:space="preserve"><value>APK 추출</value></data>
+  <data name="Apps_Loading" xml:space="preserve"><value>앱 목록 불러오는 중…</value></data>
+  <data name="Apps_Loaded" xml:space="preserve"><value>총 {0}개 앱</value></data>
+  <data name="Apps_Err_NoApkPath" xml:space="preserve"><value>pm path가 APK 경로를 반환하지 않았습니다.</value></data>
+  <data name="Apps_Err_NoApks" xml:space="preserve"><value>설치할 APK가 없습니다.</value></data>
+  <data name="Apps_Err_NoApkInBundle" xml:space="preserve"><value>번들 내에서 APK를 찾을 수 없습니다.</value></data>
+  <data name="Files_Title" xml:space="preserve"><value>파일</value></data>
+  <data name="Files_Up" xml:space="preserve"><value>위로</value></data>
+  <data name="Files_Home" xml:space="preserve"><value>루트</value></data>
+  <data name="Files_Upload" xml:space="preserve"><value>업로드</value></data>
+  <data name="Files_Download" xml:space="preserve"><value>PC로 다운로드</value></data>
+  <data name="Files_NewFolder" xml:space="preserve"><value>새 폴더</value></data>
+  <data name="Files_Empty" xml:space="preserve"><value>이 디렉터리는 비어 있습니다.</value></data>
+  <data name="Files_Path" xml:space="preserve"><value>현재 경로</value></data>
+  <data name="Logs_Title" xml:space="preserve"><value>로그</value></data>
+  <data name="Logs_Clear" xml:space="preserve"><value>지우기</value></data>
+  <data name="Logs_Empty" xml:space="preserve"><value>로그가 아직 없습니다.</value></data>
+  <data name="Logs_Copy" xml:space="preserve"><value>전체 복사</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>설정 및 정보</value></data>
+  <data name="Settings_AdbSource" xml:space="preserve"><value>adb 소스</value></data>
+  <data name="Settings_AdbPath" xml:space="preserve"><value>adb 경로</value></data>
+  <data name="Settings_OpenAdbFolder" xml:space="preserve"><value>adb 폴더 열기</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>언어</value></data>
+  <data name="Settings_Theme" xml:space="preserve"><value>테마</value></data>
+  <data name="Settings_ThemeFollow" xml:space="preserve"><value>시스템 설정</value></data>
+  <data name="Settings_ThemeLight" xml:space="preserve"><value>라이트</value></data>
+  <data name="Settings_ThemeDark" xml:space="preserve"><value>다크</value></data>
+  <data name="Settings_FollowSystem" xml:space="preserve"><value>시스템 설정</value></data>
+  <data name="Msg_NoDevice" xml:space="preserve"><value>기기 없음</value></data>
+  <data name="Msg_SelectDevice" xml:space="preserve"><value>먼저 「기기」 페이지에서 기기를 선택하세요.</value></data>
+  <data name="Msg_Connected" xml:space="preserve"><value>연결됨</value></data>
+  <data name="Msg_ConnectFailed" xml:space="preserve"><value>연결 실패</value></data>
+  <data name="Msg_PairOk" xml:space="preserve"><value>페어링 성공</value></data>
+  <data name="Msg_PairFailed" xml:space="preserve"><value>페어링 실패</value></data>
+  <data name="Msg_Disconnected" xml:space="preserve"><value>연결 해제됨</value></data>
+  <data name="Msg_InstallOk" xml:space="preserve"><value>설치 완료</value></data>
+  <data name="Msg_InstallFailed" xml:space="preserve"><value>설치 실패</value></data>
+  <data name="Msg_UninstallOk" xml:space="preserve"><value>제거됨</value></data>
+  <data name="Msg_FreezeOk" xml:space="preserve"><value>동결됨</value></data>
+  <data name="Msg_UnfreezeOk" xml:space="preserve"><value>동결 해제됨</value></data>
+  <data name="Msg_ScreenshotSaved" xml:space="preserve"><value>스크린샷 저장됨:</value></data>
+  <data name="Msg_RecordSaved" xml:space="preserve"><value>녹화 저장됨:</value></data>
+  <data name="Msg_Done" xml:space="preserve"><value>완료</value></data>
+  <data name="Msg_Failed" xml:space="preserve"><value>실패</value></data>
+  <data name="Msg_ConfirmUninstall" xml:space="preserve"><value>이 앱을 제거하시겠습니까?</value></data>
+  <data name="Msg_ConfirmDelete" xml:space="preserve"><value>선택한 파일/폴더를 삭제하시겠습니까?</value></data>
+  <data name="Msg_ConfirmFreeze" xml:space="preserve"><value>이 앱을 동결하시겠습니까? 런처 아이콘이 사라집니다.</value></data>
+  <data name="Msg_Ready" xml:space="preserve"><value>준비됨</value></data>
+  <data name="Msg_Working" xml:space="preserve"><value>실행 중…</value></data>
+  <data name="Msg_RefreshDone" xml:space="preserve"><value>새로 고침 완료</value></data>
+  <data name="Msg_NoSelection" xml:space="preserve"><value>먼저 항목을 선택하세요.</value></data>
+  <data name="Msg_MdnsEmpty" xml:space="preserve"><value>PC adb의 mDNS 검색을 사용할 수 없습니다. 수동으로 주소를 입력해 연결하세요.</value></data>
+  <data name="Msg_ExtractOk" xml:space="preserve"><value>APK 추출됨:</value></data>
+  <data name="Msg_LanguageRestart" xml:space="preserve"><value>언어 변경은 앱 재시작 후 적용됩니다.</value></data>
+  <data name="Msg_RecordStarted" xml:space="preserve"><value>녹화를 시작했습니다(최대 180초).</value></data>
+  <data name="Status_DeviceCount" xml:space="preserve"><value>{0}대 기기</value></data>
+  <data name="Status_CurrentDevice" xml:space="preserve"><value>현재: {0}({1})</value></data>
+  <data name="Fastboot_Title" xml:space="preserve"><value>Fastboot 플래시</value></data>
+  <data name="Fastboot_Devices" xml:space="preserve"><value>Fastboot 기기</value></data>
+  <data name="Fastboot_NoDevice" xml:space="preserve"><value>Fastboot 기기가 없습니다. 먼저 휴대전화를 Bootloader(Fastboot) 모드로 재시작하고 케이블을 연결한 뒤 새로 고치세요.</value></data>
+  <data name="Fastboot_GetvarAll" xml:space="preserve"><value>기기 정보 가져오기(getvar all)</value></data>
+  <data name="Fastboot_Flash" xml:space="preserve"><value>플래시</value></data>
+  <data name="Fastboot_Partition" xml:space="preserve"><value>파티션</value></data>
+  <data name="Fastboot_SelectImg" xml:space="preserve"><value>이미지 선택</value></data>
+  <data name="Fastboot_FlashConfirm" xml:space="preserve"><value>플래시하시겠습니까? 잘못된 이미지는 기기 부팅 불가를 초래할 수 있습니다!</value></data>
+  <data name="Fastboot_Erase" xml:space="preserve"><value>지우기</value></data>
+  <data name="Fastboot_EraseConfirm" xml:space="preserve"><value>이 파티션을 지우시겠습니까? 데이터가 손실되며 복구할 수 없습니다!</value></data>
+  <data name="Fastboot_RebootSystem" xml:space="preserve"><value>시스템으로 재시작</value></data>
+  <data name="Fastboot_RebootBootloader" xml:space="preserve"><value>Bootloader(Fastboot)</value></data>
+  <data name="Fastboot_RebootFastbootd" xml:space="preserve"><value>Fastbootd</value></data>
+  <data name="Fastboot_RebootRecovery" xml:space="preserve"><value>Recovery</value></data>
+  <data name="Fastboot_ExtractTitle" xml:space="preserve"><value>이미지를 PC로 추출(adb 온라인; 일부 root 필요)</value></data>
+  <data name="Fastboot_ExtractHint" xml:space="preserve"><value>먼저 「파티션 표 읽기」 후 파티션을 선택하고 「PC로 추출」。이미지가 크면 시간이 걸립니다.</value></data>
+  <data name="Fastboot_ReadPartitions" xml:space="preserve"><value>파티션 표 읽기</value></data>
+  <data name="Fastboot_Extract" xml:space="preserve"><value>PC로 추출</value></data>
+  <data name="Fastboot_Err_Dd" xml:space="preserve"><value>dd 실패(일부 파티션은 root 필요): {0}</value></data>
+  <data name="Scan_ZeroconfFound" xml:space="preserve"><value>네이티브 mDNS(Zeroconf): {0}개 서비스 발견.</value></data>
+  <data name="Scan_ZeroconfFail" xml:space="preserve"><value>네이티브 mDNS(Zeroconf) 실패: {0}</value></data>
+  <data name="Scan_MdnsNew" xml:space="preserve"><value>adb mdns services: {0}개 추가.</value></data>
+  <data name="Scan_NoOutput" xml:space="preserve"><value>출력 없음</value></data>
+  <data name="Tether_Title" xml:space="preserve"><value>PC 네트워크 역공유(HTTP 프록시)</value></data>
+  <data name="Tether_Start" xml:space="preserve"><value>공유 시작</value></data>
+  <data name="Tether_Stop" xml:space="preserve"><value>공유 중지</value></data>
+  <data name="Tether_Port" xml:space="preserve"><value>유효한 포트(1024-65535)를 입력하세요</value></data>
+  <data name="Tether_Hint" xml:space="preserve"><value>adb reverse + HTTP 프록시로 PC 네트워크를 기기에 공유(root 불필요). 시스템 프록시를 쓰는 앱(브라우저 등)에서 사용 가능. 중지 시 기기 프록시 설정을 자동 해제.</value></data>
+  <data name="Tether_Err_Start" xml:space="preserve"><value>프록시 시작 실패: {0}</value></data>
+  <data name="Tether_ProxySet" xml:space="preserve"><value>프록시 설정됨: {0}(PC는 127.0.0.1:{1} 대기)</value></data>
+  <data name="Tether_Stopped" xml:space="preserve"><value>공유를 중지하고 기기 프록시를 해제했습니다.</value></data>
+  <data name="Recovery_Title" xml:space="preserve"><value>Recovery(TWRP) 고급 작업</value></data>
+  <data name="Recovery_NeedTwrp" xml:space="preserve"><value>TWRP 계열 Recovery로 연결되어 있어야 합니다. 암호화(FBE) 기기에서는 무효일 수 있습니다. 작업 전 반드시 백업!</value></data>
+  <data name="Recovery_ClearLock" xml:space="preserve"><value>화면 잠금 삭제</value></data>
+  <data name="Recovery_ClearLockConfirm" xml:space="preserve"><value>화면 잠금 자격 파일(gesture.key/locksettings 등)을 삭제합니다. 재부팅 후 잠금 없이 진입합니다. 암호화 기기에서는 무효일 수 있습니다. 계속할까요?</value></data>
+  <data name="Recovery_FrpSkip" xml:space="preserve"><value>Google 인증 건너뛰기(FRP)</value></data>
+  <data name="Recovery_FrpConfirm" xml:space="preserve"><value>Google 계정 데이터(accounts.db)를 삭제해 FRP를 건너뜁니다. 기종별로 효과가 다릅니다. 계속할까요?</value></data>
+  <data name="Info_Title" xml:space="preserve"><value>기기 정보</value></data>
+  <data name="Info_Basic" xml:space="preserve"><value>기본 정보</value></data>
+  <data name="Info_Battery" xml:space="preserve"><value>배터리</value></data>
+  <data name="Info_Display" xml:space="preserve"><value>화면</value></data>
+  <data name="Info_Memory" xml:space="preserve"><value>메모리</value></data>
+  <data name="Info_Storage" xml:space="preserve"><value>저장 공간</value></data>
+  <data name="Info_Network" xml:space="preserve"><value>네트워크</value></data>
+  <data name="Info_System" xml:space="preserve"><value>시스템</value></data>
+  <data name="Info_Brand" xml:space="preserve"><value>브랜드</value></data>
+  <data name="Info_Model" xml:space="preserve"><value>모델</value></data>
+  <data name="Info_Codename" xml:space="preserve"><value>코드명</value></data>
+  <data name="Info_AndroidVersion" xml:space="preserve"><value>Android 버전</value></data>
+  <data name="Info_Sdk" xml:space="preserve"><value>SDK 버전</value></data>
+  <data name="Info_Patch" xml:space="preserve"><value>보안 패치</value></data>
+  <data name="Info_BuildId" xml:space="preserve"><value>빌드 ID</value></data>
+  <data name="Info_Fingerprint" xml:space="preserve"><value>지문</value></data>
+  <data name="Info_Abi" xml:space="preserve"><value>CPU(ABI)</value></data>
+  <data name="Bt_Level" xml:space="preserve"><value>잔량</value></data>
+  <data name="Bt_Status" xml:space="preserve"><value>상태</value></data>
+  <data name="Bt_Health" xml:space="preserve"><value>건강 상태</value></data>
+  <data name="Bt_HealthGood" xml:space="preserve"><value>양호</value></data>
+  <data name="Bt_Temp" xml:space="preserve"><value>온도</value></data>
+  <data name="Bt_Voltage" xml:space="preserve"><value>전압</value></data>
+  <data name="Bt_Type" xml:space="preserve"><value>배터리 유형</value></data>
+  <data name="Bt_Capacity" xml:space="preserve"><value>현재 최대 용량</value></data>
+  <data name="Bt_Design" xml:space="preserve"><value>설계 용량</value></data>
+  <data name="Bt_Charging" xml:space="preserve"><value>충전 중</value></data>
+  <data name="Bt_Discharging" xml:space="preserve"><value>방전 중</value></data>
+  <data name="Bt_NotCharging" xml:space="preserve"><value>충전 안 함</value></data>
+  <data name="Bt_Full" xml:space="preserve"><value>완충</value></data>
+  <data name="Disp_Physical" xml:space="preserve"><value>물리 해상도</value></data>
+  <data name="Disp_Current" xml:space="preserve"><value>현재 해상도</value></data>
+  <data name="Disp_Density" xml:space="preserve"><value>화면 밀도</value></data>
+  <data name="Mem_Total" xml:space="preserve"><value>총 메모리</value></data>
+  <data name="Mem_Avail" xml:space="preserve"><value>가용 메모리</value></data>
+  <data name="Sto_Data" xml:space="preserve"><value>/data 파티션</value></data>
+  <data name="Net_WlanIp" xml:space="preserve"><value>WLAN IP</value></data>
+  <data name="Sys_Kernel" xml:space="preserve"><value>커널</value></data>
+  <data name="Sys_Uptime" xml:space="preserve"><value>가동 시간</value></data>
+  <data name="Pick_Png" xml:space="preserve"><value>PNG 이미지</value></data>
+  <data name="Model_ConnectionWireless" xml:space="preserve"><value>무선</value></data>
+  <data name="Model_ConnectionUsb" xml:space="preserve"><value>유선</value></data>
+  <data name="Model_StateConnected" xml:space="preserve"><value>연결됨</value></data>
+  <data name="Model_StateUnauthorized" xml:space="preserve"><value>승인되지 않음(휴대전화에서 허용)</value></data>
+  <data name="Model_StateOffline" xml:space="preserve"><value>오프라인</value></data>
+  <data name="Model_StateRecovery" xml:space="preserve"><value>Recovery</value></data>
+  <data name="Model_StateSideload" xml:space="preserve"><value>Sideload</value></data>
+  <data name="Model_StateFastboot" xml:space="preserve"><value>Fastboot</value></data>
+  <data name="Model_KindDir" xml:space="preserve"><value>폴더</value></data>
+  <data name="Model_KindFile" xml:space="preserve"><value>파일</value></data>
+  <data name="Model_PkgSystem" xml:space="preserve"><value>시스템</value></data>
+  <data name="Model_PkgThirdParty" xml:space="preserve"><value>서드파티</value></data>
+  <data name="Model_PkgDisabled" xml:space="preserve"><value>동결됨</value></data>
+  <data name="Model_PkgNormal" xml:space="preserve"><value>정상</value></data>
+  <data name="Log_LevelCommand" xml:space="preserve"><value>명령</value></data>
+  <data name="Log_LevelOutput" xml:space="preserve"><value>출력</value></data>
+  <data name="Log_LevelError" xml:space="preserve"><value>오류</value></data>
+  <data name="Log_LevelSuccess" xml:space="preserve"><value>성공</value></data>
+  <data name="Log_LevelInfo" xml:space="preserve"><value>정보</value></data>
+  <data name="Adb_SourceBundled" xml:space="preserve"><value>내장 공식 adb {0}</value></data>
+  <data name="Adb_SourcePath" xml:space="preserve"><value>시스템 PATH의 adb</value></data>
+  <data name="Adb_SourceLog" xml:space="preserve"><value>adb 소스: {0}({1})</value></data>
+  <data name="Adb_Err_Resource" xml:space="preserve"><value>내장 리소스를 찾을 수 없음: {0}</value></data>
+  <data name="Adb_Err_Extract" xml:space="preserve"><value>내장 adb 압축 해제 실패: {0}</value></data>
+  <data name="Adb_Err_Start" xml:space="preserve"><value>adb를 시작할 수 없습니다: {0}</value></data>
+  <data name="Adb_Err_Canceled" xml:space="preserve"><value>작업이 시간 초과되었거나 취소되었습니다.</value></data>
+  <data name="Adb_Err_Timeout" xml:space="preserve"><value>작업 시간이 초과되었습니다.</value></data>
+  <data name="Adb_Err_NoData" xml:space="preserve"><value>데이터를 가져오지 못했습니다.</value></data>
+  <data name="Adb_RestartDetect" xml:space="preserve"><value>adb 서버 버전 충돌 감지, 잔여 프로세스 정리 중…</value></data>
+  <data name="Adb_ServerStarted" xml:space="preserve"><value>adb 서버가 시작되었습니다.</value></data>
+  <data name="Adb_ServerStartError" xml:space="preserve"><value>adb 서버 시작 오류: {0}</value></data>
+  <data name="Adb_Err_PairAddrEmpty" xml:space="preserve"><value>페어링 주소(IP:포트)를 입력하세요.</value></data>
+  <data name="Adb_Err_PairCodeEmpty" xml:space="preserve"><value>페어링 코드를 입력하세요.</value></data>
+  <data name="Adb_Err_ConnectAddrEmpty" xml:space="preserve"><value>기기 주소(IP:포트)를 입력하세요.</value></data>
+  <data name="Adb_Err_NoRecording" xml:space="preserve"><value>진행 중인 녹화가 없습니다.</value></data>
+  <data name="Adb_Err_RecordPull" xml:space="preserve"><value>녹화 파일 가져오기 실패: {0}</value></data>
+  <data name="Adb_Err_ScreenshotEmpty" xml:space="preserve"><value>스크린샷 실패: 이미지 데이터를 가져오지 못했습니다.</value></data>
+  <data name="Adb_Err_Refresh" xml:space="preserve"><value>기기 새로 고침 실패: {0}</value></data>
+  <data name="Adb_Err_Pull" xml:space="preserve"><value>가져오기 실패: {0}</value></data>
+  <data name="Adb_Err_NoWlanIp" xml:space="preserve"><value>기기의 WLAN IP를 가져오지 못했습니다(Wi-Fi 미연결 가능).</value></data>
+  <data name="Adb_Err_Unhandled" xml:space="preserve"><value>처리되지 않은 예외: {0}</value></data>
+  <data name="Busy_Installing" xml:space="preserve"><value>설치 중…</value></data>
+  <data name="Busy_ExtractingApk" xml:space="preserve"><value>APK 추출 중…</value></data>
+  <data name="Busy_Screenshot" xml:space="preserve"><value>화면 캡처 중…</value></data>
+  <data name="Busy_SavingRecording" xml:space="preserve"><value>녹화 저장 중…</value></data>
+  <data name="Busy_Uploading" xml:space="preserve"><value>파일 업로드 중…</value></data>
+  <data name="Busy_Downloading" xml:space="preserve"><value>ファイル 다운로드 중…</value></data>
+  <data name="Busy_Transferring" xml:space="preserve"><value>파일 전송 중…</value></data>
+  <data name="Busy_Flashing" xml:space="preserve"><value>이미지 플래싱 중…</value></data>
+  <data name="Busy_Erasing" xml:space="preserve"><value>파티션 지우는 중…</value></data>
+  <data name="Busy_ExtractingImage" xml:space="preserve"><value>이미지 추출 중…</value></data>
+  <data name="Busy_Working" xml:space="preserve"><value>작업 중…</value></data>
+  <data name="Busy_LoadingPartitions" xml:space="preserve"><value>파티션 테이블 읽는 중…</value></data>
+  <data name="Busy_LoadingFiles" xml:space="preserve"><value>폴더 읽는 중…</value></data>
+</root>

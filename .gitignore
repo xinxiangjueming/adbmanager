@@ -1,0 +1,19 @@
+# 构建输出
+dist/
+bin/
+obj/
+
+# 谷歌官方 platform-tools 二进制（构建前按 README 自行下载）
+tools/adb/
+
+# 下载缓存与 SDK 安装器
+tools/dl/
+tools/sdk/
+
+# 工作区私有数据
+.workbuddy/
+
+# 临时文件与诊断日志
+*.log
+*.user
+*.suo

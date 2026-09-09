@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>AdbManager</RootNamespace>
+    <AssemblyName>AdbManager</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+
+    <!-- WinUI 3 -->
+    <UseWinUI>true</UseWinUI>
+    <!-- 纯代码构建 UI（不使用 XAML 编译器，因此不依赖 Windows SDK / winmd） -->
+    <StartupObject>AdbManager.Program</StartupObject>
+    <!-- 应用图标（exe 资源管理器 / 任务栏图标） -->
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+    <!-- 单文件发布必须开启：把 resources.pri 嵌入 exe，否则运行时找不到 XAML 资源 -->
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <SelfContained>true</SelfContained>
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishReadyToRun>false</PublishReadyToRun>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250909003" />
+    <PackageReference Include="Zeroconf" Version="3.7.16" />
+  </ItemGroup>
+
+  <!-- 谷歌官方 adb（platform-tools）作为嵌入资源，运行时释放到 %LOCALAPPDATA% -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\tools\adb\adb.exe" LogicalName="adb-bundle.adb.exe" />
+    <EmbeddedResource Include="..\..\tools\adb\AdbWinApi.dll" LogicalName="adb-bundle.AdbWinApi.dll" />
+    <EmbeddedResource Include="..\..\tools\adb\AdbWinUsbApi.dll" LogicalName="adb-bundle.AdbWinUsbApi.dll" />
+    <EmbeddedResource Include="..\..\tools\adb\fastboot.exe" LogicalName="adb-bundle.fastboot.exe" />
+    <EmbeddedResource Include="..\..\tools\adb\libwinpthread-1.dll" LogicalName="adb-bundle.libwinpthread-1.dll" />
+  </ItemGroup>
+
+  <!-- 多语言资源：Strings\<语言>\Resources.resw（SDK 默认自动包含，无需显式声明） -->
+  <!-- 同时作为嵌入资源，运行时直接解析，避免依赖 PRI / MRT 运行环境 -->
+  <ItemGroup>
+    <EmbeddedResource Include="Strings\**\*.resw" />
+  </ItemGroup>
+
+  <!-- 窗口 / 任务栏图标（运行时释放后由 AppWindow.SetIcon 使用） -->
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\AppIcon.ico" LogicalName="app.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="app.manifest" CopyToOutputDirectory="Never" />
+  </ItemGroup>
+
+</Project>

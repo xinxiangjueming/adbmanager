@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="App_Title" xml:space="preserve"><value>Adb Manager</value></data>
+  <data name="Nav_Devices" xml:space="preserve"><value>Appareils</value></data>
+  <data name="Nav_Tools" xml:space="preserve"><value>Outils</value></data>
+  <data name="Nav_Apps" xml:space="preserve"><value>Applications</value></data>
+  <data name="Nav_Files" xml:space="preserve"><value>Fichiers</value></data>
+  <data name="Nav_Logs" xml:space="preserve"><value>Journal</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Paramètres</value></data>
+  <data name="Nav_Info" xml:space="preserve"><value>Infos</value></data>
+  <data name="Nav_Fastboot" xml:space="preserve"><value>Fastboot</value></data>
+  <data name="Common_Refresh" xml:space="preserve"><value>Actualiser</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Annuler</value></data>
+  <data name="Common_Close" xml:space="preserve"><value>Fermer</value></data>
+  <data name="Common_Confirm" xml:space="preserve"><value>OK</value></data>
+  <data name="Common_Delete" xml:space="preserve"><value>Supprimer</value></data>
+  <data name="Common_Rename" xml:space="preserve"><value>Renommer</value></data>
+  <data name="Common_Copy" xml:space="preserve"><value>Copier</value></data>
+  <data name="Common_Cut" xml:space="preserve"><value>Couper</value></data>
+  <data name="Common_Paste" xml:space="preserve"><value>Coller</value></data>
+  <data name="Common_Open" xml:space="preserve"><value>Ouvrir</value></data>
+  <data name="Common_Browse" xml:space="preserve"><value>Parcourir</value></data>
+  <data name="Common_Back" xml:space="preserve"><value>Dossier parent</value></data>
+  <data name="Devices_Title" xml:space="preserve"><value>Appareils</value></data>
+  <data name="Devices_Empty" xml:space="preserve"><value>Aucun appareil. Activez le débogage USB et connectez-le, ou utilisez le débogage sans fil.</value></data>
+  <data name="Devices_Serial" xml:space="preserve"><value>Numéro de série</value></data>
+  <data name="Devices_State" xml:space="preserve"><value>État</value></data>
+  <data name="Devices_Link" xml:space="preserve"><value>Connexion</value></data>
+  <data name="Devices_RestartServer" xml:space="preserve"><value>Redémarrer le serveur adb</value></data>
+  <data name="Devices_KillServer" xml:space="preserve"><value>Arrêter le serveur adb</value></data>
+  <data name="Devices_Disconnect" xml:space="preserve"><value>Déconnecter</value></data>
+  <data name="Devices_Select" xml:space="preserve"><value>Sélectionner</value></data>
+  <data name="Devices_Detail" xml:space="preserve"><value>Détails de l’appareil</value></data>
+  <data name="Devices_AdbSource" xml:space="preserve"><value>Source adb</value></data>
+  <data name="Wireless_Title" xml:space="preserve"><value>Débogage sans fil</value></data>
+  <data name="Wireless_PairTitle" xml:space="preserve"><value>Jumelage sans fil Android 11+</value></data>
+  <data name="Wireless_Address" xml:space="preserve"><value>Adresse de connexion IP:port</value></data>
+  <data name="Wireless_PairAddress" xml:space="preserve"><value>Adresse de jumelage IP:port</value></data>
+  <data name="Wireless_PairCode" xml:space="preserve"><value>Code de jumelage</value></data>
+  <data name="Wireless_Connect" xml:space="preserve"><value>Connecter</value></data>
+  <data name="Wireless_Pair" xml:space="preserve"><value>Jumeler et connecter</value></data>
+  <data name="Wireless_Scan" xml:space="preserve"><value>Scanner le LAN</value></data>
+  <data name="Wireless_ScanEmpty" xml:space="preserve"><value>Rien trouvé. Activez le débogage sans fil sur le téléphone sur le même Wi-Fi.</value></data>
+  <data name="Wireless_Tcpip" xml:space="preserve"><value>Passer en mode TCP (5555)</value></data>
+  <data name="Wireless_Hint" xml:space="preserve"><value>Astuce : le port de jumelage diffère du port de connexion. Le jumelage ne se fait qu’une fois.</value></data>
+  <data name="Wireless_Ip" xml:space="preserve"><value>Adresse IP</value></data>
+  <data name="Wireless_PairPort" xml:space="preserve"><value>Port de jumelage</value></data>
+  <data name="Wireless_ConnectPort" xml:space="preserve"><value>Port de connexion (défaut 5555)</value></data>
+  <data name="Wireless_ScanTrouble" xml:space="preserve"><value>Vérifications : ① activez le débogage sans fil sur le même Wi-Fi ② désactivez l’isolation AP du routeur ③ autorisez l’app dans le pare-feu Windows ④ si mdns check est indisponible, redémarrez le serveur adb.</value></data>
+  <data name="Wireless_UsbToWireless" xml:space="preserve"><value>USB vers sans fil ({0})</value></data>
+  <data name="Wireless_KindPair" xml:space="preserve"><value>Jumelage</value></data>
+  <data name="Wireless_KindConnect" xml:space="preserve"><value>Connexion</value></data>
+  <data name="Tools_Title" xml:space="preserve"><value>Outils courants</value></data>
+  <data name="Tools_Screenshot" xml:space="preserve"><value>Capture d’écran vers le PC</value></data>
+  <data name="Tools_Record" xml:space="preserve"><value>Démarrer l’enregistrement</value></data>
+  <data name="Tools_StopRecord" xml:space="preserve"><value>Arrêter et enregistrer</value></data>
+  <data name="Tools_Shell" xml:space="preserve"><value>Exécuter une commande shell</value></data>
+  <data name="Tools_ShellPlaceholder" xml:space="preserve"><value>ex. : pm list packages, dumpsys battery</value></data>
+  <data name="Tools_Run" xml:space="preserve"><value>Exécuter</value></data>
+  <data name="Tools_Reboot" xml:space="preserve"><value>Redémarrer vers</value></data>
+  <data name="Tools_RebootNormal" xml:space="preserve"><value>Système</value></data>
+  <data name="Tools_RebootRecovery" xml:space="preserve"><value>Recovery</value></data>
+  <data name="Tools_RebootBootloader" xml:space="preserve"><value>Bootloader (Fastboot)</value></data>
+  <data name="Tools_RebootFastbootd" xml:space="preserve"><value>Fastbootd</value></data>
+  <data name="Tools_Output" xml:space="preserve"><value>Sortie</value></data>
+  <data name="Tools_WifiFix" xml:space="preserve"><value>Réparer la détection Wi-Fi</value></data>
+  <data name="Tools_Shizuku" xml:space="preserve"><value>Activer Shizuku</value></data>
+  <data name="Tools_Scene" xml:space="preserve"><value>Activer Scene</value></data>
+  <data name="Tools_ActivateHint" xml:space="preserve"><value>L’activation de Shizuku/Scene exige l’application installée et ouverte une fois (script présent).</value></data>
+  <data name="Apps_Title" xml:space="preserve"><value>Gestion des applications</value></data>
+  <data name="Apps_InstallApk" xml:space="preserve"><value>Installer un APK</value></data>
+  <data name="Apps_InstallBundle" xml:space="preserve"><value>Installer un bundle APKS</value></data>
+  <data name="Apps_Search" xml:space="preserve"><value>Rechercher un paquet</value></data>
+  <data name="Apps_ThirdParty" xml:space="preserve"><value>Tierces</value></data>
+  <data name="Apps_System" xml:space="preserve"><value>Système</value></data>
+  <data name="Apps_Disabled" xml:space="preserve"><value>Désactivées</value></data>
+  <data name="Apps_Uninstall" xml:space="preserve"><value>Désinstaller</value></data>
+  <data name="Apps_Freeze" xml:space="preserve"><value>Geler</value></data>
+  <data name="Apps_Unfreeze" xml:space="preserve"><value>Dégeler</value></data>
+  <data name="Apps_ForceStop" xml:space="preserve"><value>Forcer l’arrêt</value></data>
+  <data name="Apps_ClearData" xml:space="preserve"><value>Effacer les données</value></data>
+  <data name="Apps_KeepData" xml:space="preserve"><value>Conserver les données</value></data>
+  <data name="Apps_ExtractApk" xml:space="preserve"><value>Extraire l’APK</value></data>
+  <data name="Apps_Loading" xml:space="preserve"><value>Chargement de la liste…</value></data>
+  <data name="Apps_Loaded" xml:space="preserve"><value>{0} applications</value></data>
+  <data name="Apps_Err_NoApkPath" xml:space="preserve"><value>pm path n’a renvoyé aucun chemin d’APK.</value></data>
+  <data name="Apps_Err_NoApks" xml:space="preserve"><value>Aucun APK à installer.</value></data>
+  <data name="Apps_Err_NoApkInBundle" xml:space="preserve"><value>Aucun APK trouvé dans l’archive.</value></data>
+  <data name="Files_Title" xml:space="preserve"><value>Fichiers</value></data>
+  <data name="Files_Up" xml:space="preserve"><value>Dossier parent</value></data>
+  <data name="Files_Home" xml:space="preserve"><value>Racine</value></data>
+  <data name="Files_Upload" xml:space="preserve"><value>Téléverser</value></data>
+  <data name="Files_Download" xml:space="preserve"><value>Télécharger vers le PC</value></data>
+  <data name="Files_NewFolder" xml:space="preserve"><value>Nouveau dossier</value></data>
+  <data name="Files_Empty" xml:space="preserve"><value>Ce dossier est vide.</value></data>
+  <data name="Files_Path" xml:space="preserve"><value>Chemin actuel</value></data>
+  <data name="Logs_Title" xml:space="preserve"><value>Journal</value></data>
+  <data name="Logs_Clear" xml:space="preserve"><value>Effacer</value></data>
+  <data name="Logs_Empty" xml:space="preserve"><value>Aucun journal pour l’instant.</value></data>
+  <data name="Logs_Copy" xml:space="preserve"><value>Tout copier</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Paramètres et infos</value></data>
+  <data name="Settings_AdbSource" xml:space="preserve"><value>Source adb</value></data>
+  <data name="Settings_AdbPath" xml:space="preserve"><value>Chemin adb</value></data>
+  <data name="Settings_OpenAdbFolder" xml:space="preserve"><value>Ouvrir le dossier adb</value></data>
+  <data name="Settings_Language" xml:space="preserve"><value>Langue</value></data>
+  <data name="Settings_Theme" xml:space="preserve"><value>Thème</value></data>
+  <data name="Settings_ThemeFollow" xml:space="preserve"><value>Suivre le système</value></data>
+  <data name="Settings_ThemeLight" xml:space="preserve"><value>Clair</value></data>
+  <data name="Settings_ThemeDark" xml:space="preserve"><value>Sombre</value></data>
+  <data name="Settings_FollowSystem" xml:space="preserve"><value>Suivre le système</value></data>
+  <data name="Msg_NoDevice" xml:space="preserve"><value>Aucun appareil</value></data>
+  <data name="Msg_SelectDevice" xml:space="preserve"><value>Sélectionnez d’abord un appareil sur la page Appareils.</value></data>
+  <data name="Msg_Connected" xml:space="preserve"><value>Connecté</value></data>
+  <data name="Msg_ConnectFailed" xml:space="preserve"><value>Échec de la connexion</value></data>
+  <data name="Msg_PairOk" xml:space="preserve"><value>Jumelage réussi</value></data>
+  <data name="Msg_PairFailed" xml:space="preserve"><value>Échec du jumelage</value></data>
+  <data name="Msg_Disconnected" xml:space="preserve"><value>Déconnecté</value></data>
+  <data name="Msg_InstallOk" xml:space="preserve"><value>Installé</value></data>
+  <data name="Msg_InstallFailed" xml:space="preserve"><value>Échec de l’installation</value></data>
+  <data name="Msg_UninstallOk" xml:space="preserve"><value>Désinstallé</value></data>
+  <data name="Msg_FreezeOk" xml:space="preserve"><value>Gelé</value></data>
+  <data name="Msg_UnfreezeOk" xml:space="preserve"><value>Dégelé</value></data>
+  <data name="Msg_ScreenshotSaved" xml:space="preserve"><value>Capture enregistrée :</value></data>
+  <data name="Msg_RecordSaved" xml:space="preserve"><value>Enregistrement enregistré :</value></data>
+  <data name="Msg_Done" xml:space="preserve"><value>Terminé</value></data>
+  <data name="Msg_Failed" xml:space="preserve"><value>Échec</value></data>
+  <data name="Msg_ConfirmUninstall" xml:space="preserve"><value>Désinstaller cette application ?</value></data>
+  <data name="Msg_ConfirmDelete" xml:space="preserve"><value>Supprimer les éléments sélectionnés ?</value></data>
+  <data name="Msg_ConfirmFreeze" xml:space="preserve"><value>Geler cette application ? Son icône disparaîtra du lanceur.</value></data>
+  <data name="Msg_Ready" xml:space="preserve"><value>Prêt</value></data>
+  <data name="Msg_Working" xml:space="preserve"><value>En cours…</value></data>
+  <data name="Msg_RefreshDone" xml:space="preserve"><value>Actualisé</value></data>
+  <data name="Msg_NoSelection" xml:space="preserve"><value>Sélectionnez d’abord un élément.</value></data>
+  <data name="Msg_MdnsEmpty" xml:space="preserve"><value>La découverte mDNS d’adb est indisponible. Saisissez l’adresse manuellement.</value></data>
+  <data name="Msg_ExtractOk" xml:space="preserve"><value>APK extrait vers :</value></data>
+  <data name="Msg_LanguageRestart" xml:space="preserve"><value>Le changement de langue prendra effet après redémarrage.</value></data>
+  <data name="Msg_RecordStarted" xml:space="preserve"><value>Enregistrement démarré (max. 180 s).</value></data>
+  <data name="Status_DeviceCount" xml:space="preserve"><value>{0} appareil(s)</value></data>
+  <data name="Status_CurrentDevice" xml:space="preserve"><value>Actuel : {0} ({1})</value></data>
+  <data name="Fastboot_Title" xml:space="preserve"><value>Flash Fastboot</value></data>
+  <data name="Fastboot_Devices" xml:space="preserve"><value>Appareils Fastboot</value></data>
+  <data name="Fastboot_NoDevice" xml:space="preserve"><value>Aucun appareil Fastboot. Redémarrez d’abord le téléphone en mode Bootloader (Fastboot), branchez-le et actualisez.</value></data>
+  <data name="Fastboot_GetvarAll" xml:space="preserve"><value>Infos appareil (getvar all)</value></data>
+  <data name="Fastboot_Flash" xml:space="preserve"><value>Flasher</value></data>
+  <data name="Fastboot_Partition" xml:space="preserve"><value>Partition</value></data>
+  <data name="Fastboot_SelectImg" xml:space="preserve"><value>Choisir l’image</value></data>
+  <data name="Fastboot_FlashConfirm" xml:space="preserve"><value>Flasher cette image ? Une mauvaise image peut rendre l’appareil inamorçable !</value></data>
+  <data name="Fastboot_Erase" xml:space="preserve"><value>Effacer</value></data>
+  <data name="Fastboot_EraseConfirm" xml:space="preserve"><value>Effacer cette partition ? Les données seront perdues !</value></data>
+  <data name="Fastboot_RebootSystem" xml:space="preserve"><value>Redémarrer vers le système</value></data>
+  <data name="Fastboot_RebootBootloader" xml:space="preserve"><value>Bootloader (Fastboot)</value></data>
+  <data name="Fastboot_RebootFastbootd" xml:space="preserve"><value>Fastbootd</value></data>
+  <data name="Fastboot_RebootRecovery" xml:space="preserve"><value>Recovery</value></data>
+  <data name="Fastboot_ExtractTitle" xml:space="preserve"><value>Extraire l’image vers le PC (adb en ligne ; certaines partitions exigent root)</value></data>
+  <data name="Fastboot_ExtractHint" xml:space="preserve"><value>Lisez d’abord la table des partitions, choisissez une partition puis extrayez. Les grandes images prennent du temps.</value></data>
+  <data name="Fastboot_ReadPartitions" xml:space="preserve"><value>Lire la table des partitions</value></data>
+  <data name="Fastboot_Extract" xml:space="preserve"><value>Extraire vers le PC</value></data>
+  <data name="Fastboot_Err_Dd" xml:space="preserve"><value>Échec de dd (certaines partitions exigent root) : {0}</value></data>
+  <data name="Scan_ZeroconfFound" xml:space="preserve"><value>mDNS natif (Zeroconf) : {0} services trouvés.</value></data>
+  <data name="Scan_ZeroconfFail" xml:space="preserve"><value>Échec du mDNS natif (Zeroconf) : {0}</value></data>
+  <data name="Scan_MdnsNew" xml:space="preserve"><value>adb mdns services : {0} nouveaux.</value></data>
+  <data name="Scan_NoOutput" xml:space="preserve"><value>aucune sortie</value></data>
+  <data name="Tether_Title" xml:space="preserve"><value>Partager le réseau du PC en sens inverse (proxy HTTP)</value></data>
+  <data name="Tether_Start" xml:space="preserve"><value>Démarrer le partage</value></data>
+  <data name="Tether_Stop" xml:space="preserve"><value>Arrêter le partage</value></data>
+  <data name="Tether_Port" xml:space="preserve"><value>Saisissez un port valide (1024-65535)</value></data>
+  <data name="Tether_Hint" xml:space="preserve"><value>Partage le réseau du PC vers l’appareil via adb reverse + proxy HTTP (sans root). Fonctionne pour les apps utilisant le proxy système. Le proxy est effacé à l’arrêt.</value></data>
+  <data name="Tether_Err_Start" xml:space="preserve"><value>Échec du démarrage du proxy : {0}</value></data>
+  <data name="Tether_ProxySet" xml:space="preserve"><value>Proxy défini : {0} (PC en écoute sur 127.0.0.1:{1})</value></data>
+  <data name="Tether_Stopped" xml:space="preserve"><value>Partage arrêté et proxy de l’appareil effacé.</value></data>
+  <data name="Recovery_Title" xml:space="preserve"><value>Recovery (TWRP) avancé</value></data>
+  <data name="Recovery_NeedTwrp" xml:space="preserve"><value>Nécessite un recovery de type TWRP. Peut être sans effet sur les appareils chiffrés (FBE). Sauvegardez d’abord !</value></data>
+  <data name="Recovery_ClearLock" xml:space="preserve"><value>Supprimer le verrouillage d’écran</value></data>
+  <data name="Recovery_ClearLockConfirm" xml:space="preserve"><value>Supprime les fichiers d’identification (gesture.key/locksettings…). Après redémarrage, accès sans verrouillage. Peut être sans effet si chiffré. Continuer ?</value></data>
+  <data name="Recovery_FrpSkip" xml:space="preserve"><value>Passer la vérification Google (FRP)</value></data>
+  <data name="Recovery_FrpConfirm" xml:space="preserve"><value>Supprime les données de compte Google (accounts.db) pour passer la FRP. L’effet varie selon le modèle. Continuer ?</value></data>
+  <data name="Info_Title" xml:space="preserve"><value>Infos de l’appareil</value></data>
+  <data name="Info_Basic" xml:space="preserve"><value>Général</value></data>
+  <data name="Info_Battery" xml:space="preserve"><value>Batterie</value></data>
+  <data name="Info_Display" xml:space="preserve"><value>Affichage</value></data>
+  <data name="Info_Memory" xml:space="preserve"><value>Mémoire</value></data>
+  <data name="Info_Storage" xml:space="preserve"><value>Stockage</value></data>
+  <data name="Info_Network" xml:space="preserve"><value>Réseau</value></data>
+  <data name="Info_System" xml:space="preserve"><value>Système</value></data>
+  <data name="Info_Brand" xml:space="preserve"><value>Marque</value></data>
+  <data name="Info_Model" xml:space="preserve"><value>Modèle</value></data>
+  <data name="Info_Codename" xml:space="preserve"><value>Nom de code</value></data>
+  <data name="Info_AndroidVersion" xml:space="preserve"><value>Version d’Android</value></data>
+  <data name="Info_Sdk" xml:space="preserve"><value>Version SDK</value></data>
+  <data name="Info_Patch" xml:space="preserve"><value>Correctif de sécurité</value></data>
+  <data name="Info_BuildId" xml:space="preserve"><value>ID de build</value></data>
+  <data name="Info_Fingerprint" xml:space="preserve"><value>Empreinte</value></data>
+  <data name="Info_Abi" xml:space="preserve"><value>CPU (ABI)</value></data>
+  <data name="Bt_Level" xml:space="preserve"><value>Niveau</value></data>
+  <data name="Bt_Status" xml:space="preserve"><value>État</value></data>
+  <data name="Bt_Health" xml:space="preserve"><value>Santé</value></data>
+  <data name="Bt_HealthGood" xml:space="preserve"><value>Bonne</value></data>
+  <data name="Bt_Temp" xml:space="preserve"><value>Température</value></data>
+  <data name="Bt_Voltage" xml:space="preserve"><value>Tension</value></data>
+  <data name="Bt_Type" xml:space="preserve"><value>Technologie</value></data>
+  <data name="Bt_Capacity" xml:space="preserve"><value>Capacité actuelle</value></data>
+  <data name="Bt_Design" xml:space="preserve"><value>Capacité de conception</value></data>
+  <data name="Bt_Charging" xml:space="preserve"><value>En charge</value></data>
+  <data name="Bt_Discharging" xml:space="preserve"><value>En décharge</value></data>
+  <data name="Bt_NotCharging" xml:space="preserve"><value>Ne charge pas</value></data>
+  <data name="Bt_Full" xml:space="preserve"><value>Pleine</value></data>
+  <data name="Disp_Physical" xml:space="preserve"><value>Résolution physique</value></data>
+  <data name="Disp_Current" xml:space="preserve"><value>Résolution actuelle</value></data>
+  <data name="Disp_Density" xml:space="preserve"><value>Densité d’écran</value></data>
+  <data name="Mem_Total" xml:space="preserve"><value>Mémoire totale</value></data>
+  <data name="Mem_Avail" xml:space="preserve"><value>Mémoire disponible</value></data>
+  <data name="Sto_Data" xml:space="preserve"><value>Partition /data</value></data>
+  <data name="Net_WlanIp" xml:space="preserve"><value>IP WLAN</value></data>
+  <data name="Sys_Kernel" xml:space="preserve"><value>Noyau</value></data>
+  <data name="Sys_Uptime" xml:space="preserve"><value>Temps de fonctionnement</value></data>
+  <data name="Pick_Png" xml:space="preserve"><value>Image PNG</value></data>
+  <data name="Model_ConnectionWireless" xml:space="preserve"><value>Sans fil</value></data>
+  <data name="Model_ConnectionUsb" xml:space="preserve"><value>USB</value></data>
+  <data name="Model_StateConnected" xml:space="preserve"><value>Connecté</value></data>
+  <data name="Model_StateUnauthorized" xml:space="preserve"><value>Non autorisé (autorisez sur le téléphone)</value></data>
+  <data name="Model_StateOffline" xml:space="preserve"><value>Hors ligne</value></data>
+  <data name="Model_StateRecovery" xml:space="preserve"><value>Recovery</value></data>
+  <data name="Model_StateSideload" xml:space="preserve"><value>Sideload</value></data>
+  <data name="Model_StateFastboot" xml:space="preserve"><value>Fastboot</value></data>
+  <data name="Model_KindDir" xml:space="preserve"><value>Dossier</value></data>
+  <data name="Model_KindFile" xml:space="preserve"><value>Fichier</value></data>
+  <data name="Model_PkgSystem" xml:space="preserve"><value>Système</value></data>
+  <data name="Model_PkgThirdParty" xml:space="preserve"><value>Tierces</value></data>
+  <data name="Model_PkgDisabled" xml:space="preserve"><value>Gelé</value></data>
+  <data name="Model_PkgNormal" xml:space="preserve"><value>Normale</value></data>
+  <data name="Log_LevelCommand" xml:space="preserve"><value>Commande</value></data>
+  <data name="Log_LevelOutput" xml:space="preserve"><value>Sortie</value></data>
+  <data name="Log_LevelError" xml:space="preserve"><value>Erreur</value></data>
+  <data name="Log_LevelSuccess" xml:space="preserve"><value>Succès</value></data>
+  <data name="Log_LevelInfo" xml:space="preserve"><value>Info</value></data>
+  <data name="Adb_SourceBundled" xml:space="preserve"><value>adb officiel intégré {0}</value></data>
+  <data name="Adb_SourcePath" xml:space="preserve"><value>adb du PATH système</value></data>
+  <data name="Adb_SourceLog" xml:space="preserve"><value>Source adb : {0} ({1})</value></data>
+  <data name="Adb_Err_Resource" xml:space="preserve"><value>Ressource intégrée introuvable : {0}</value></data>
+  <data name="Adb_Err_Extract" xml:space="preserve"><value>Échec de l’extraction de l’adb intégré : {0}</value></data>
+  <data name="Adb_Err_Start" xml:space="preserve"><value>Impossible de démarrer adb : {0}</value></data>
+  <data name="Adb_Err_Canceled" xml:space="preserve"><value>Opération annulée ou expirée.</value></data>
+  <data name="Adb_Err_Timeout" xml:space="preserve"><value>Délai dépassé.</value></data>
+  <data name="Adb_Err_NoData" xml:space="preserve"><value>Aucune donnée reçue.</value></data>
+  <data name="Adb_RestartDetect" xml:space="preserve"><value>Conflit de version du serveur adb détecté, nettoyage…</value></data>
+  <data name="Adb_ServerStarted" xml:space="preserve"><value>Serveur adb démarré.</value></data>
+  <data name="Adb_ServerStartError" xml:space="preserve"><value>Erreur de démarrage du serveur adb : {0}</value></data>
+  <data name="Adb_Err_PairAddrEmpty" xml:space="preserve"><value>Saisissez l’adresse de jumelage (IP:port).</value></data>
+  <data name="Adb_Err_PairCodeEmpty" xml:space="preserve"><value>Saisissez le code de jumelage.</value></data>
+  <data name="Adb_Err_ConnectAddrEmpty" xml:space="preserve"><value>Saisissez l’adresse de l’appareil (IP:port).</value></data>
+  <data name="Adb_Err_NoRecording" xml:space="preserve"><value>Aucun enregistrement en cours.</value></data>
+  <data name="Adb_Err_RecordPull" xml:space="preserve"><value>Échec de récupération de la vidéo : {0}</value></data>
+  <data name="Adb_Err_ScreenshotEmpty" xml:space="preserve"><value>Échec de la capture : aucune donnée d’image.</value></data>
+  <data name="Adb_Err_Refresh" xml:space="preserve"><value>Échec de l’actualisation : {0}</value></data>
+  <data name="Adb_Err_Pull" xml:space="preserve"><value>Échec de la récupération : {0}</value></data>
+  <data name="Adb_Err_NoWlanIp" xml:space="preserve"><value>IP WLAN de l’appareil introuvable (peut-être pas de Wi-Fi).</value></data>
+  <data name="Adb_Err_Unhandled" xml:space="preserve"><value>Exception non gérée : {0}</value></data>
+  <data name="Busy_Installing" xml:space="preserve"><value>Installation…</value></data>
+  <data name="Busy_ExtractingApk" xml:space="preserve"><value>Extraction de l'APK…</value></data>
+  <data name="Busy_Screenshot" xml:space="preserve"><value>Capture d'écran…</value></data>
+  <data name="Busy_SavingRecording" xml:space="preserve"><value>Enregistrement de la vidéo…</value></data>
+  <data name="Busy_Uploading" xml:space="preserve"><value>Téléversement du fichier…</value></data>
+  <data name="Busy_Downloading" xml:space="preserve"><value>Téléchargement du fichier…</value></data>
+  <data name="Busy_Transferring" xml:space="preserve"><value>Transfert du fichier…</value></data>
+  <data name="Busy_Flashing" xml:space="preserve"><value>Flash de l'image…</value></data>
+  <data name="Busy_Erasing" xml:space="preserve"><value>Effacement de la partition…</value></data>
+  <data name="Busy_ExtractingImage" xml:space="preserve"><value>Extraction de l'image…</value></data>
+  <data name="Busy_Working" xml:space="preserve"><value>Traitement…</value></data>
+  <data name="Busy_LoadingPartitions" xml:space="preserve"><value>Lecture de la table de partitions…</value></data>
+  <data name="Busy_LoadingFiles" xml:space="preserve"><value>Lecture du dossier…</value></data>
+</root>
