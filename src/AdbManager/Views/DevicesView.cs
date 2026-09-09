@@ -4,6 +4,7 @@ using AdbManager.Ui;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 
 namespace AdbManager.Views;
 
@@ -65,8 +66,14 @@ public sealed class DevicesView : PageBase
                 result.Success ? InfoBarSeverity.Success : InfoBarSeverity.Error);
         };
 
-        var killButton = Miuix.SecondaryButton(L("Devices_KillServer"));
-        killButton.Click += async (_, _) => await AppState.Adb.KillServerAsync();
+        var killButton = Miuix.DangerButton(L("Devices_KillServer"));
+        killButton.Click += async (_, _) =>
+        {
+            var result = await AppState.Adb.KillServerAsync();
+            await AppState.RefreshDevicesAsync();
+            MainWindow.Notify(result.Success ? L("Msg_Done") : result.Message,
+                result.Success ? InfoBarSeverity.Success : InfoBarSeverity.Error);
+        };
 
         root.Children.Add(Miuix.Horizontal(refreshButton, restartButton, killButton));
 
@@ -90,7 +97,7 @@ public sealed class DevicesView : PageBase
         _pairPort.MinWidth = 130;
         _pairCode.MinWidth = 130;
 
-        var connectButton = Miuix.PrimaryButton(L("Wireless_Connect"));
+        var connectButton = Miuix.SuccessButton(L("Wireless_Connect"));
         connectButton.Click += async (_, _) => await ConnectAsync();
 
         var scanButton = Miuix.SecondaryButton(L("Wireless_Scan"));
@@ -163,19 +170,23 @@ public sealed class DevicesView : PageBase
 
             var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
 
-            var selectButton = Miuix.SecondaryButton(L("Devices_Select"));
-            selectButton.Height = 36;
-            selectButton.Click += (_, _) =>
+            // 已连上并自动成为当前设备时不再显示「选中」
+            if (!ReferenceEquals(AppState.CurrentDevice, device))
             {
-                AppState.CurrentDevice = device;
-                MainWindow.Notify(device.DisplayName, InfoBarSeverity.Success);
-                RenderDevices();
-            };
-            actions.Children.Add(selectButton);
+                var selectButton = Miuix.SuccessButton(L("Devices_Select"));
+                selectButton.Height = 36;
+                selectButton.Click += (_, _) => FadeOutThen(selectButton, () =>
+                {
+                    AppState.CurrentDevice = device;
+                    MainWindow.Notify(device.DisplayName, InfoBarSeverity.Success);
+                    RenderDevices();
+                });
+                actions.Children.Add(selectButton);
+            }
 
             if (string.IsNullOrEmpty(device.UsbPort))
             {
-                var disconnect = Miuix.SecondaryButton(L("Devices_Disconnect"));
+                var disconnect = Miuix.DangerButton(L("Devices_Disconnect"));
                 disconnect.Height = 36;
                 disconnect.Click += async (_, _) =>
                 {
@@ -197,6 +208,26 @@ public sealed class DevicesView : PageBase
 
             _deviceList.Children.Add(row);
         }
+    }
+
+    /// <summary>淡出动画结束后再执行动作，避免「选中」按钮硬切消失。</summary>
+    private static void FadeOutThen(FrameworkElement element, Action completed)
+    {
+        if (element.XamlRoot is null) { completed(); return; }
+
+        var animation = new DoubleAnimation
+        {
+            To = 0,
+            Duration = new Duration(TimeSpan.FromMilliseconds(180)),
+            EnableDependentAnimation = true
+        };
+        Storyboard.SetTarget(animation, element);
+        Storyboard.SetTargetProperty(animation, "Opacity");
+
+        var storyboard = new Storyboard();
+        storyboard.Children.Add(animation);
+        storyboard.Completed += (_, _) => completed();
+        storyboard.Begin();
     }
 
     private async Task ConnectAsync()

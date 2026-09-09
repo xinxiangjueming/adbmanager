@@ -245,6 +245,66 @@ public sealed partial class AdbService
         return CleanPartitionNames(items);
     }
 
+    /// <summary>检测设备是否支持 fastboot fetch（getvar max-fetch-size 可取到即支持）。</summary>
+    public async Task<bool> FastbootSupportsFetchAsync(string serial)
+    {
+        var result = await RunAsync($"-s {serial} getvar max-fetch-size", null,
+            TimeSpan.FromSeconds(30), exePath: FastbootPath).ConfigureAwait(false);
+        if (!result.Success) return false;
+
+        var text = result.Combined();
+        return !text.Contains("does not support", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// 在 fastboot 模式下把分区镜像拉到电脑（fastboot fetch）。
+    /// 仅 fastbootd（用户态 fastboot）且设备支持 fetch 时有效，bootloader 下会失败。
+    /// </summary>
+    public async Task<(bool Success, string Message)> FastbootFetchPartitionAsync(
+        string serial, string partition, string localDir, Action<string>? onLine = null)
+    {
+        var localPath = Path.Combine(localDir, $"{partition}.img");
+        var result = await RunAsync($"-s {serial} fetch {partition} \"{localPath}\"",
+            onLine, TimeSpan.FromMinutes(30), exePath: FastbootPath).ConfigureAwait(false);
+        if (!result.Success) return (false, result.Combined().Trim());
+
+        return (File.Exists(localPath), localPath);
+    }
+
+    /// <summary>
+    /// 在 fastboot 模式下读取分区表：解析 getvar all 的 partition-size / partition-type 行。
+    /// 设备停在 bootloader/fastboot 时 adb 不在线，只能走这条路。
+    /// </summary>
+    public async Task<List<string>> FastbootListPartitionsAsync(string serial, Action<string>? onLine = null)
+    {
+        var result = await RunAsync($"-s {serial} getvar all", onLine, TimeSpan.FromMinutes(5), exePath: FastbootPath)
+            .ConfigureAwait(false);
+
+        var names = new List<string>();
+        foreach (var rawLine in result.Combined().Split('\n'))
+        {
+            var line = rawLine.TrimEnd('\r').Trim();
+            if (line.StartsWith("(", StringComparison.Ordinal))
+            {
+                var close = line.IndexOf(')');
+                if (close >= 0) line = line[(close + 1)..].Trim();
+            }
+
+            if (!line.StartsWith("partition-size", StringComparison.OrdinalIgnoreCase) &&
+                !line.StartsWith("partition-type", StringComparison.OrdinalIgnoreCase)) continue;
+
+            // 形如 partition-size:boot_a: 0x6000000 / partition-type: boot_a: raw
+            var parts = line.Split(':');
+            if (parts.Length < 3) continue;
+
+            var name = parts[1].Trim();
+            if (name.Length > 0 && !names.Contains(name)) names.Add(name);
+        }
+
+        names.Sort(StringComparer.OrdinalIgnoreCase);
+        return names;
+    }
+
     private static List<RemoteFileItem> CleanPartitionNames(List<RemoteFileItem> items)
     {
         foreach (var item in items)

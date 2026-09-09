@@ -8,6 +8,26 @@ namespace AdbManager.Views;
 
 public sealed class ToolsView : PageBase
 {
+    // 一键激活：脚本类（adb shell 直跑）
+    private const string CmdShizuku = "sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh";
+    private const string CmdScene = "sh /storage/emulated/0/Android/data/com.omarea.vtools/up.sh";
+    private const string CmdBrevent = "sh /data/data/me.piebridge.brevent/brevent.sh || (output=$(pm path me.piebridge.brevent); export CLASSPATH=${output#*:}; app_process /system/bin me.piebridge.brevent.server.BreventServer bootstrap; /system/bin/sh /data/local/tmp/brevent.sh)";
+    private const string CmdIceBox = "sh /sdcard/Android/data/com.catchingnow.icebox/files/start.sh";
+    private const string CmdStopApp = "sh /storage/emulated/0/Android/data/web1n.stopapp/files/starter.sh";
+    private const string CmdGreenify = "pm grant com.oasisfeng.greenify android.permission.WRITE_SECURE_SETTINGS";
+
+    // 一键激活：dpm（Device Owner）类
+    private const string PkgAirFrozen = "me.yourbay.airfrozen";
+    private const string AirFrozenAdmin = "me.yourbay.airfrozen/.main.core.mgmt.MDeviceAdminReceiver";
+    private const string PkgFreezeYou = "cf.playhi.freezeyou";
+    private const string FreezeYouAdmin = "cf.playhi.freezeyou/.DeviceAdminReceiver";
+    private const string PkgIsland = "com.oasisfeng.island";
+    private const string IslandAdmin = "com.oasisfeng.island/.IslandDeviceAdminReceiver";
+    private const string PkgInstaller = "com.modosa.apkinstaller";
+    private const string InstallerAdmin = "com.modosa.apkinstaller/.receiver.AdminReceiver";
+    private const string PkgBlackHole = "com.hld.apurikakusu";
+    private const string PkgSecondSpace = "com.hld.anzenbokusu";
+
     private readonly TextBox _command = Miuix.Input("");
     private readonly TextBox _output = new()
     {
@@ -144,13 +164,34 @@ public sealed class ToolsView : PageBase
         rebootRecovery.Click += async (_, _) => await RebootAsync("recovery");
         var rebootBootloader = Miuix.SecondaryButton(L("Tools_RebootBootloader"));
         rebootBootloader.Click += async (_, _) => await RebootAsync("bootloader");
-        var rebootFastbootd = Miuix.SecondaryButton(L("Tools_RebootFastbootd"));
-        rebootFastbootd.Click += async (_, _) => await RebootAsync("fastboot");
+        var rebootEdl = Miuix.SecondaryButton(L("Tools_RebootEdl"));
+        rebootEdl.Click += async (_, _) => await RebootAsync("edl");
 
         var rebootCard = Miuix.Card(new StackPanel { Spacing = 10 });
         ((StackPanel)rebootCard.Child).Children.Add(Miuix.SectionTitle(L("Tools_Reboot")));
-        ((StackPanel)rebootCard.Child).Children.Add(Miuix.Horizontal(rebootSystem, rebootRecovery, rebootBootloader, rebootFastbootd));
+        ((StackPanel)rebootCard.Child).Children.Add(Miuix.Horizontal(rebootSystem, rebootRecovery, rebootBootloader, rebootEdl));
         root.Children.Add(rebootCard);
+
+        // 一键激活（常用玩机工具）
+        var activatePanel = new StackPanel { Spacing = 10 };
+        activatePanel.Children.Add(Miuix.SectionTitle(L("Tools_ActivateTitle")));
+        activatePanel.Children.Add(Miuix.Horizontal(
+            ActivateShellButton("Shizuku", CmdShizuku),
+            ActivateShellButton("Scene", CmdScene),
+            ActivateShellButton("黑阈", CmdBrevent),
+            ActivateShellButton("冰箱", CmdIceBox)));
+        activatePanel.Children.Add(Miuix.Horizontal(
+            ActivateShellButton("小黑屋", CmdStopApp),
+            ActivateDpmButton("空调狗", PkgAirFrozen, AirFrozenAdmin),
+            ActivateDpmButton("自冻", PkgFreezeYou, FreezeYouAdmin),
+            ActivateDpmButton("炼妖壶", PkgIsland, IslandAdmin)));
+        activatePanel.Children.Add(Miuix.Horizontal(
+            ActivateDpmButton("安装狮", PkgInstaller, InstallerAdmin),
+            ActivateShellButton("绿色守护", CmdGreenify),
+            ActivateDpmButton("黑洞", PkgBlackHole),
+            ActivateDpmButton("第二空间", PkgSecondSpace)));
+        activatePanel.Children.Add(Miuix.Body(L("Tools_ActivateHint"), true));
+        root.Children.Add(Miuix.Card(activatePanel));
 
         // Shell
         var run = Miuix.PrimaryButton(L("Tools_Run"));
@@ -159,19 +200,9 @@ public sealed class ToolsView : PageBase
         var wifiFix = Miuix.SecondaryButton(L("Tools_WifiFix"));
         wifiFix.Click += async (_, _) => await WifiFixAsync();
 
-        var shizuku = Miuix.SecondaryButton(L("Tools_Shizuku"));
-        shizuku.Click += async (_, _) => await ActivateToolAsync(
-            "sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh");
-
-        var scene = Miuix.SecondaryButton(L("Tools_Scene"));
-        scene.Click += async (_, _) => await ActivateToolAsync(
-            "sh /storage/emulated/0/Android/data/com.omarea.vtools/up.sh");
-
         var shellPanel = new StackPanel { Spacing = 10 };
         shellPanel.Children.Add(Miuix.SectionTitle(L("Tools_Shell")));
         shellPanel.Children.Add(Miuix.Horizontal(_command, run, wifiFix));
-        shellPanel.Children.Add(Miuix.Horizontal(shizuku, scene));
-        shellPanel.Children.Add(Miuix.Body(L("Tools_ActivateHint"), true));
         shellPanel.Children.Add(Miuix.SectionTitle(L("Tools_Output")));
         shellPanel.Children.Add(_output);
         root.Children.Add(Miuix.Card(shellPanel));
@@ -281,7 +312,45 @@ public sealed class ToolsView : PageBase
         if (!streamed && !string.IsNullOrWhiteSpace(result.Message)) AppendText(queue, result.Message);
     }
 
-    /// <summary>执行常用工具激活脚本（Shizuku / Scene），输出实时回显。</summary>
+    private Button ActivateShellButton(string name, string command)
+    {
+        var button = Miuix.SecondaryButton(name);
+        ToolTipService.SetToolTip(button, "adb shell " + command);
+        button.Click += async (_, _) => await ActivateToolAsync(command);
+        return button;
+    }
+
+    /// <summary>Device Owner 激活按钮：receiver 为空时先从 dumpsys 探测管理员组件。</summary>
+    private Button ActivateDpmButton(string name, string package, string? receiver = null)
+    {
+        var admin = string.IsNullOrEmpty(receiver) ? package + "/<自动探测>" : receiver;
+        var button = Miuix.SecondaryButton(name);
+        ToolTipService.SetToolTip(button, $"adb shell dpm set-device-owner {admin}");
+        button.Click += async (_, _) => await ActivateDpmAsync(package, receiver);
+        return button;
+    }
+
+    private async Task ActivateDpmAsync(string package, string? receiver)
+    {
+        if (!TryGetDevice(out var device)) return;
+        var serial = device!.Serial;
+
+        var admin = receiver;
+        if (string.IsNullOrEmpty(admin))
+        {
+            admin = await MainWindow.RunBusyAsync(L("Busy_Working"),
+                () => AppState.Adb.FindDeviceAdminReceiverAsync(serial, package));
+            if (string.IsNullOrEmpty(admin))
+            {
+                MainWindow.Notify(L("Tools_Act_Err_NoAdmin"), InfoBarSeverity.Error);
+                return;
+            }
+        }
+
+        await ActivateToolAsync($"dpm set-device-owner {admin}");
+    }
+
+    /// <summary>执行常用工具激活脚本（Shizuku / Scene 等），输出实时回显。</summary>
     private async Task ActivateToolAsync(string command)
     {
         if (!TryGetDevice(out var device)) return;

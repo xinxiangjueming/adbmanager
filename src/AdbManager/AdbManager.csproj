@@ -48,6 +48,21 @@
     <EmbeddedResource Include="..\..\tools\adb\libwinpthread-1.dll" LogicalName="adb-bundle.libwinpthread-1.dll" />
   </ItemGroup>
 
+  <!-- scrcpy v4.1（Apache 2.0）作为嵌入资源，运行时释放到 %LOCALAPPDATA%；自带的 adb 不嵌入，复用内置官方 adb -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\tools\scrcpy\win64\scrcpy-win64-v4.1\scrcpy.exe" LogicalName="scrcpy-bundle.scrcpy.exe" />
+    <EmbeddedResource Include="..\..\tools\scrcpy\win64\scrcpy-win64-v4.1\scrcpy-server" LogicalName="scrcpy-bundle.scrcpy-server" />
+    <EmbeddedResource Include="..\..\tools\scrcpy\win64\scrcpy-win64-v4.1\SDL3.dll" LogicalName="scrcpy-bundle.SDL3.dll" />
+    <EmbeddedResource Include="..\..\tools\scrcpy\win64\scrcpy-win64-v4.1\avcodec-62.dll" LogicalName="scrcpy-bundle.avcodec-62.dll" />
+    <EmbeddedResource Include="..\..\tools\scrcpy\win64\scrcpy-win64-v4.1\avformat-62.dll" LogicalName="scrcpy-bundle.avformat-62.dll" />
+    <EmbeddedResource Include="..\..\tools\scrcpy\win64\scrcpy-win64-v4.1\avutil-60.dll" LogicalName="scrcpy-bundle.avutil-60.dll" />
+    <EmbeddedResource Include="..\..\tools\scrcpy\win64\scrcpy-win64-v4.1\swresample-6.dll" LogicalName="scrcpy-bundle.swresample-6.dll" />
+    <EmbeddedResource Include="..\..\tools\scrcpy\win64\scrcpy-win64-v4.1\libusb-1.0.dll" LogicalName="scrcpy-bundle.libusb-1.0.dll" />
+    <EmbeddedResource Include="..\..\tools\scrcpy\win64\scrcpy-win64-v4.1\scrcpy.png" LogicalName="scrcpy-bundle.scrcpy.png" />
+    <EmbeddedResource Include="..\..\tools\scrcpy\win64\scrcpy-win64-v4.1\disconnected.png" LogicalName="scrcpy-bundle.disconnected.png" />
+    <EmbeddedResource Include="..\..\tools\scrcpy\win64\scrcpy-win64-v4.1\LICENSE.txt" LogicalName="scrcpy-bundle.LICENSE.txt" />
+  </ItemGroup>
+
   <!-- 多语言资源：Strings\<语言>\Resources.resw（SDK 默认自动包含，无需显式声明） -->
   <!-- 同时作为嵌入资源，运行时直接解析，避免依赖 PRI / MRT 运行环境 -->
   <ItemGroup>

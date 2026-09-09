@@ -30,7 +30,8 @@ public static class Miuix
         ("MiuixDivider", Color.FromArgb(255, 238, 239, 242), Color.FromArgb(255, 44, 44, 47)),
         ("MiuixRowHover", Color.FromArgb(255, 248, 249, 251), Color.FromArgb(255, 36, 36, 39)),
         ("MiuixDanger", Color.FromArgb(255, 255, 59, 48), Color.FromArgb(255, 255, 89, 79)),
-        ("MiuixSuccess", Color.FromArgb(255, 52, 199, 89), Color.FromArgb(255, 64, 214, 105))
+        ("MiuixSuccess", Color.FromArgb(255, 52, 199, 89), Color.FromArgb(255, 64, 214, 105)),
+        ("MiuixSuccessDark", Color.FromArgb(255, 30, 142, 72), Color.FromArgb(255, 26, 118, 62))
     };
 
     private static readonly Dictionary<string, SolidColorBrush> Brushes = new();
@@ -122,6 +123,10 @@ public static class Miuix
 
     public static Button DangerButton(string text) =>
         CreateButton(text, "MiuixDanger", Colors.White);
+
+    /// <summary>暗绿填充按钮（「连接」「选中」等确认类操作）。</summary>
+    public static Button SuccessButton(string text) =>
+        CreateButton(text, "MiuixSuccessDark", Colors.White);
 
     public static Button SecondaryButton(string text)
     {

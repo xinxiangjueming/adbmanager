@@ -37,6 +37,7 @@ public sealed partial class MainWindow : Window
     private static readonly (string Key, string Glyph)[] NavItems =
     {
         ("Nav_Devices", "\uE8EA"),
+        ("Nav_Mirror", "\uE7F4"),
         ("Nav_Tools", "\uE90F"),
         ("Nav_Info", "\uE9D9"),
         ("Nav_Fastboot", "\uE945"),
@@ -251,6 +252,7 @@ public sealed partial class MainWindow : Window
             page = key switch
             {
                 "Nav_Devices" => new DevicesView(),
+                "Nav_Mirror" => new MirrorView(),
                 "Nav_Tools" => new ToolsView(),
                 "Nav_Info" => new InfoView(),
                 "Nav_Fastboot" => new FastbootView(),

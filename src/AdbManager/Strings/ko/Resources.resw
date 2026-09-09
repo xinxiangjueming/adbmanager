@@ -65,12 +65,14 @@
   <data name="Tools_RebootNormal" xml:space="preserve"><value>시스템</value></data>
   <data name="Tools_RebootRecovery" xml:space="preserve"><value>Recovery</value></data>
   <data name="Tools_RebootBootloader" xml:space="preserve"><value>Bootloader(Fastboot)</value></data>
-  <data name="Tools_RebootFastbootd" xml:space="preserve"><value>Fastbootd</value></data>
+  <data name="Tools_RebootEdl" xml:space="preserve"><value>9008(EDL)</value></data>
   <data name="Tools_Output" xml:space="preserve"><value>출력</value></data>
   <data name="Tools_WifiFix" xml:space="preserve"><value>Wi-Fi 검사 수정</value></data>
   <data name="Tools_Shizuku" xml:space="preserve"><value>Shizuku 활성화</value></data>
   <data name="Tools_Scene" xml:space="preserve"><value>Scene 활성화</value></data>
-  <data name="Tools_ActivateHint" xml:space="preserve"><value>Shizuku/Scene 활성화하려면 해당 앱이 기기에 설치되고 한 번 실행되어(스크립트 생성) 있어야 합니다.</value></data>
+  <data name="Tools_ActivateHint" xml:space="preserve"><value>활성화 전 확인: ① 대상 앱이 설치되어 있고 한 번 이상 실행되어 있어야 합니다(시작 스크립트 생성됨) ② dpm(Device Owner) 활성화는 기기의 모든 계정과 추가 사용자를 먼저 삭제해야 합니다 ③ Device Owner 는 한 기기에 하나만 가능합니다. 기존 것을 먼저 해제하세요.</value></data>
+  <data name="Tools_ActivateTitle" xml:space="preserve"><value>원터치 활성화</value></data>
+  <data name="Tools_Act_Err_NoAdmin" xml:space="preserve"><value>이 앱에서 기기 관리 컴포넌트(DeviceAdminReceiver)를 찾지 못했습니다. 앱이 설치되어 한 번 실행되었는지 확인하거나, 앱 자체의 활성화 방법을 사용하세요.</value></data>
   <data name="Apps_Title" xml:space="preserve"><value>앱 관리</value></data>
   <data name="Apps_InstallApk" xml:space="preserve"><value>APK 설치</value></data>
   <data name="Apps_InstallBundle" xml:space="preserve"><value>APKS 설치</value></data>
@@ -153,13 +155,14 @@
   <data name="Fastboot_EraseConfirm" xml:space="preserve"><value>이 파티션을 지우시겠습니까? 데이터가 손실되며 복구할 수 없습니다!</value></data>
   <data name="Fastboot_RebootSystem" xml:space="preserve"><value>시스템으로 재시작</value></data>
   <data name="Fastboot_RebootBootloader" xml:space="preserve"><value>Bootloader(Fastboot)</value></data>
-  <data name="Fastboot_RebootFastbootd" xml:space="preserve"><value>Fastbootd</value></data>
+  <data name="Fastboot_RebootEdl" xml:space="preserve"><value>9008 (EDL)</value></data>
   <data name="Fastboot_RebootRecovery" xml:space="preserve"><value>Recovery</value></data>
   <data name="Fastboot_ExtractTitle" xml:space="preserve"><value>이미지를 PC로 추출(adb 온라인; 일부 root 필요)</value></data>
   <data name="Fastboot_ExtractHint" xml:space="preserve"><value>먼저 「파티션 표 읽기」 후 파티션을 선택하고 「PC로 추출」。이미지가 크면 시간이 걸립니다.</value></data>
   <data name="Fastboot_ReadPartitions" xml:space="preserve"><value>파티션 표 읽기</value></data>
   <data name="Fastboot_Extract" xml:space="preserve"><value>PC로 추출</value></data>
   <data name="Fastboot_Err_Dd" xml:space="preserve"><value>dd 실패(일부 파티션은 root 필요): {0}</value></data>
+  <data name="Fastboot_Err_NoFetch" xml:space="preserve"><value>이 기기는 fastboot fetch를 지원하지 않습니다. 시스템 또는 리커버리로 부팅해 adb를 온라인으로 만든 뒤 다시 추출하거나, 제조사 전용 도구(MiFlash / firehose)를 사용하세요.</value></data>
   <data name="Scan_ZeroconfFound" xml:space="preserve"><value>네이티브 mDNS(Zeroconf): {0}개 서비스 발견.</value></data>
   <data name="Scan_ZeroconfFail" xml:space="preserve"><value>네이티브 mDNS(Zeroconf) 실패: {0}</value></data>
   <data name="Scan_MdnsNew" xml:space="preserve"><value>adb mdns services: {0}개 추가.</value></data>
@@ -261,15 +264,49 @@
   <data name="Adb_Err_Unhandled" xml:space="preserve"><value>처리되지 않은 예외: {0}</value></data>
   <data name="Busy_Installing" xml:space="preserve"><value>설치 중…</value></data>
   <data name="Busy_ExtractingApk" xml:space="preserve"><value>APK 추출 중…</value></data>
-  <data name="Busy_Screenshot" xml:space="preserve"><value>화면 캡처 중…</value></data>
+  <data name="Busy_Screenshot" xml:space="preserve"><value>스크린샷 촬영 중…</value></data>
   <data name="Busy_SavingRecording" xml:space="preserve"><value>녹화 저장 중…</value></data>
-  <data name="Busy_Uploading" xml:space="preserve"><value>파일 업로드 중…</value></data>
-  <data name="Busy_Downloading" xml:space="preserve"><value>ファイル 다운로드 중…</value></data>
-  <data name="Busy_Transferring" xml:space="preserve"><value>파일 전송 중…</value></data>
-  <data name="Busy_Flashing" xml:space="preserve"><value>이미지 플래싱 중…</value></data>
+  <data name="Busy_Uploading" xml:space="preserve"><value>업로드 중…</value></data>
+  <data name="Busy_Downloading" xml:space="preserve"><value>다운로드 중…</value></data>
+  <data name="Busy_Transferring" xml:space="preserve"><value>전송 중…</value></data>
+  <data name="Busy_Flashing" xml:space="preserve"><value>이미지 플래시 중(분리 금지)…</value></data>
   <data name="Busy_Erasing" xml:space="preserve"><value>파티션 지우는 중…</value></data>
   <data name="Busy_ExtractingImage" xml:space="preserve"><value>이미지 추출 중…</value></data>
-  <data name="Busy_Working" xml:space="preserve"><value>작업 중…</value></data>
-  <data name="Busy_LoadingPartitions" xml:space="preserve"><value>파티션 테이블 읽는 중…</value></data>
+  <data name="Busy_Working" xml:space="preserve"><value>실행 중…</value></data>
+  <data name="Busy_LoadingPartitions" xml:space="preserve"><value>파티션 표 읽는 중…</value></data>
   <data name="Busy_LoadingFiles" xml:space="preserve"><value>폴더 읽는 중…</value></data>
+  <data name="Nav_Mirror" xml:space="preserve"><value>미러링</value></data>
+  <data name="Mirror_Title" xml:space="preserve"><value>미러링 및 제어</value></data>
+  <data name="Mirror_Desc" xml:space="preserve"><value>scrcpy로 기기 화면을 실시간 표시하고 마우스·키보드로 제어합니다. 휴대전화와 Wear OS 워치(Android 5.0+)를 모두 지원하며 지연은 약 35~70ms입니다.</value></data>
+  <data name="Mirror_Preset" xml:space="preserve"><value>기기 프리셋</value></data>
+  <data name="Mirror_PresetAuto" xml:space="preserve"><value>자동 감지</value></data>
+  <data name="Mirror_PresetPhone" xml:space="preserve"><value>휴대전화(기본)</value></data>
+  <data name="Mirror_PresetWatch" xml:space="preserve"><value>워치(저해상도)</value></data>
+  <data name="Mirror_MaxSize" xml:space="preserve"><value>최대 해상도</value></data>
+  <data name="Mirror_MaxFps" xml:space="preserve"><value>최대 FPS</value></data>
+  <data name="Mirror_BitRate" xml:space="preserve"><value>비트레이트(Mbps)</value></data>
+  <data name="Mirror_NoAudio" xml:space="preserve"><value>소리 전송 안 함</value></data>
+  <data name="Mirror_ReadOnly" xml:space="preserve"><value>읽기 전용(제어 입력 안 함)</value></data>
+  <data name="Mirror_ScreenOff" xml:space="preserve"><value>미러링 중 기기 화면 끄기</value></data>
+  <data name="Mirror_StayAwake" xml:space="preserve"><value>기기 절전 방지</value></data>
+  <data name="Mirror_Start" xml:space="preserve"><value>미러링 시작</value></data>
+  <data name="Mirror_Stop" xml:space="preserve"><value>미러링 중지</value></data>
+  <data name="Mirror_Running" xml:space="preserve"><value>미러링 실행 중…</value></data>
+  <data name="Mirror_NotRunning" xml:space="preserve"><value>실행 중인 미러링이 없습니다.</value></data>
+  <data name="Mirror_Started" xml:space="preserve"><value>미러링을 시작했습니다.</value></data>
+  <data name="Mirror_Exit" xml:space="preserve"><value>미러링이 종료되었습니다.</value></data>
+  <data name="Mirror_Err_NotFound" xml:space="preserve"><value>내장 scrcpy 구성 요소 압축 해제 실패: {0}</value></data>
+  <data name="Mirror_Err_Start" xml:space="preserve"><value>scrcpy 시작 실패: {0}</value></data>
+  <data name="Mirror_Keys" xml:space="preserve"><value>자주 쓰는 버튼</value></data>
+  <data name="Key_Home" xml:space="preserve"><value>홈</value></data>
+  <data name="Key_Back" xml:space="preserve"><value>뒤로</value></data>
+  <data name="Key_Recents" xml:space="preserve"><value>최근 작업</value></data>
+  <data name="Key_Power" xml:space="preserve"><value>전원</value></data>
+  <data name="Key_VolUp" xml:space="preserve"><value>볼륨+</value></data>
+  <data name="Key_VolDown" xml:space="preserve"><value>볼륨−</value></data>
+  <data name="Mirror_WatchDetected" xml:space="preserve"><value>워치(Wear OS) 감지: 저해상도 프리셋을 적용했습니다.</value></data>
+  <data name="Mem_Used" xml:space="preserve"><value>사용 중 메모리</value></data>
+  <data name="Sto_Total" xml:space="preserve"><value>저장소 총 용량</value></data>
+  <data name="Sto_Used" xml:space="preserve"><value>사용 중 공간</value></data>
+  <data name="Sto_Free" xml:space="preserve"><value>여유 공간</value></data>
 </root>

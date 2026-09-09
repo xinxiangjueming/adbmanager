@@ -3,7 +3,7 @@
 import io, os, re
 
 ROOT = r'D:\Windows-adb\src\AdbManager\Strings'
-ZH_FILES = [os.path.join(ROOT, 'zh-CN', 'Resources.resw'), os.path.join(ROOT, 'zh-CN', 'Strings.generated.resw')]
+ZH_FILES = [os.path.join(ROOT, 'zh-CN', 'Resources.resw')]
 HEADER = [
  '<?xml version="1.0" encoding="utf-8"?>\n<root>',
  '  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>',
@@ -78,12 +78,14 @@ T = [
  ('Tools_RebootNormal','システム','시스템','System','Système','Sistema'),
  ('Tools_RebootRecovery','Recovery','Recovery','Recovery','Recovery','Recovery'),
  ('Tools_RebootBootloader','Bootloader（Fastboot）','Bootloader(Fastboot)','Bootloader (Fastboot)','Bootloader (Fastboot)','Bootloader (Fastboot)'),
- ('Tools_RebootFastbootd','Fastbootd','Fastbootd','Fastbootd','Fastbootd','Fastbootd'),
+ ('Tools_RebootEdl','9008 (EDL)','9008(EDL)','9008 (EDL)','9008 (EDL)','9008 (EDL)'),
  ('Tools_Output','出力','출력','Ausgabe','Sortie','Salida'),
  ('Tools_WifiFix','Wi-Fi 検出修復','Wi-Fi 검사 수정','WLAN-Erkennung reparieren','Réparer la détection Wi-Fi','Reparar detección Wi-Fi'),
  ('Tools_Shizuku','Shizuku を有効化','Shizuku 활성화','Shizuku aktivieren','Activer Shizuku','Activar Shizuku'),
  ('Tools_Scene','Scene を有効化','Scene 활성화','Scene aktivieren','Activer Scene','Activar Scene'),
- ('Tools_ActivateHint','Shizuku / Scene の有効化には、対象アプリが端末にインストールされ一度起動済み（起動スクリプト生成済み）である必要があります。','Shizuku/Scene 활성화하려면 해당 앱이 기기에 설치되고 한 번 실행되어(스크립트 생성) 있어야 합니다.','Für Shizuku/Scene muss die App auf dem Gerät installiert und einmal geöffnet worden sein (Startskript vorhanden).','L’activation de Shizuku/Scene exige l’application installée et ouverte une fois (script présent).','Para activar Shizuku/Scene, la app debe estar instalada y abierta una vez (script generado).'),
+ ('Tools_ActivateHint','有効化前の確認: ① 対象アプリがインストールされ、少なくとも一度起動済み（起動スクリプト生成済み）であること ② dpm（Device Owner）で有効化する場合は、端末のすべてのアカウントと追加ユーザーを先に削除 ③ Device Owner は 1 台につき 1 アプリのみ。他アプリを先に解除してください。','활성화 전 확인: ① 대상 앱이 설치되어 있고 한 번 이상 실행되어 있어야 합니다(시작 스크립트 생성됨) ② dpm(Device Owner) 활성화는 기기의 모든 계정과 추가 사용자를 먼저 삭제해야 합니다 ③ Device Owner 는 한 기기에 하나만 가능합니다. 기존 것을 먼저 해제하세요.','Vor der Aktivierung prüfen: ① Die App muss installiert und mindestens einmal gestartet worden sein (Startskript vorhanden). ② Für dpm (Device Owner) müssen vorher alle Konten und zusätzlichen Nutzer entfernt werden. ③ Nur ein Device Owner pro Gerät – anderen zuerst entfernen.','Avant l’activation : ① l’app cible doit être installée et lancée au moins une fois (script de démarrage généré) ; ② pour dpm (Device Owner), supprimez d’abord tous les comptes et utilisateurs secondaires ; ③ un seul Device Owner par appareil — retirez l’actuel d’abord.','Antes de activar: ① la app debe estar instalada y ejecutada al menos una vez (script de inicio generado); ② para dpm (Device Owner) elimine primero todas las cuentas y usuarios secundarios; ③ solo puede haber un Device Owner: retire el actual primero.'),
+ ('Tools_ActivateTitle','ワンタップ有効化','원터치 활성화','Ein-Klick-Aktivierung','Activation en un clic','Activación con un clic'),
+ ('Tools_Act_Err_NoAdmin','このアプリからデバイス管理コンポーネント（DeviceAdminReceiver）を検出できませんでした。アプリがインストールされ一度起動されているか確認するか、アプリ自身の有効化手順を利用してください。','이 앱에서 기기 관리 컴포넌트(DeviceAdminReceiver)를 찾지 못했습니다. 앱이 설치되어 한 번 실행되었는지 확인하거나, 앱 자체의 활성화 방법을 사용하세요.','Kein Geräteverwaltungs-Empfänger (DeviceAdminReceiver) in dieser App gefunden. Prüfen Sie, ob die App installiert und einmal gestartet wurde, oder nutzen Sie die eigene Aktivierung der App.','Aucun composant DeviceAdminReceiver trouvé dans cette application. Vérifiez qu’elle est installée et a été lancée une fois, ou utilisez sa propre méthode d’activation.','No se encontró ningún DeviceAdminReceiver en esta app. Compruebe que esté instalada y se haya ejecutado una vez, o use el método de activación propio de la app.'),
  ('Apps_Title','アプリ管理','앱 관리','App-Verwaltung','Gestion des applications','Gestión de aplicaciones'),
  ('Apps_InstallApk','APK をインストール','APK 설치','APK installieren','Installer un APK','Instalar APK'),
  ('Apps_InstallBundle','APKS（分割）をインストール','APKS 설치','APKS-Bundle installieren','Installer un bundle APKS','Instalar paquete APKS'),
@@ -166,13 +168,14 @@ T = [
  ('Fastboot_EraseConfirm','このパーティションを消去しますか？データは失われ元に戻せません！','이 파티션을 지우시겠습니까? 데이터가 손실되며 복구할 수 없습니다!','Diese Partition löschen? Daten gehen verloren und sind unwiederbringlich!','Effacer cette partition ? Les données seront perdues !','¿Borrar esta partición? ¡Los datos se perderán irrecuperablemente!'),
  ('Fastboot_RebootSystem','システムへ再起動','시스템으로 재시작','Zum System neu starten','Redémarrer vers le système','Reiniciar al sistema'),
  ('Fastboot_RebootBootloader','Bootloader（Fastboot）','Bootloader(Fastboot)','Bootloader (Fastboot)','Bootloader (Fastboot)','Bootloader (Fastboot)'),
- ('Fastboot_RebootFastbootd','Fastbootd','Fastbootd','Fastbootd','Fastbootd','Fastbootd'),
+ ('Fastboot_RebootEdl','9008 (EDL)','9008 (EDL)','9008 (EDL)','9008 (EDL)','9008 (EDL)'),
  ('Fastboot_RebootRecovery','Recovery','Recovery','Recovery','Recovery','Recovery'),
  ('Fastboot_ExtractTitle','イメージを PC に抽出（adb 在線；一部 root 必要）','이미지를 PC로 추출(adb 온라인; 일부 root 필요)','Image auf PC extrahieren (adb online; teils Root nötig)','Extraire l’image vers le PC (adb en ligne ; certaines partitions exigent root)','Extraer imagen al PC (adb en línea; algunas particiones requieren root)'),
  ('Fastboot_ExtractHint','先に「パーティション表を取得」し、パーティションを選んで「PC へ抽出」。イメージが大きい場合は時間がかかります。','먼저 「파티션 표 읽기」 후 파티션을 선택하고 「PC로 추출」。이미지가 크면 시간이 걸립니다.','Zuerst „Partitionstabelle lesen“, Partition wählen und „Auf PC extrahieren“. Große Images dauern länger.','Lisez d’abord la table des partitions, choisissez une partition puis extrayez. Les grandes images prennent du temps.','Primero «Leer tabla de particiones», elija una partición y extraiga. Las imágenes grandes tardan.'),
  ('Fastboot_ReadPartitions','パーティション表を取得','파티션 표 읽기','Partitionstabelle lesen','Lire la table des partitions','Leer tabla de particiones'),
  ('Fastboot_Extract','PC へ抽出','PC로 추출','Auf PC extrahieren','Extraire vers le PC','Extraer al PC'),
  ('Fastboot_Err_Dd','dd 失敗（一部パーティションは root が必要）：{0}','dd 실패(일부 파티션은 root 필요): {0}','dd fehlgeschlagen (teilweise Root nötig): {0}','Échec de dd (certaines partitions exigent root) : {0}','dd falló (algunas particiones requieren root): {0}'),
+ ('Fastboot_Err_NoFetch','この端末は fastboot fetch に対応していません。システムまたは Recovery を起動して adb をオンラインにしてから抽出するか、メーカー専用ツール（MiFlash / firehose）を使用してください。','이 기기는 fastboot fetch를 지원하지 않습니다. 시스템 또는 리커버리로 부팅해 adb를 온라인으로 만든 뒤 다시 추출하거나, 제조사 전용 도구(MiFlash / firehose)를 사용하세요.','Dieses Gerät unterstützt fastboot fetch nicht. Starten Sie in System oder Recovery, damit adb online ist, und extrahieren Sie erneut, oder nutzen Sie ein Hersteller-Tool (MiFlash / firehose).','Cet appareil ne prend pas en charge fastboot fetch. Démarrez en système ou recovery pour qu’adb soit en ligne, puis réessayez, ou utilisez un outil constructeur (MiFlash / firehose).','Este dispositivo no admite fastboot fetch. Inicie en sistema o recovery para que adb esté en línea y vuelva a extraer, o use una herramienta del fabricante (MiFlash / firehose).'),
  ('Scan_ZeroconfFound','ネイティブ mDNS（Zeroconf）：{0} 件のサービスを発見。','네이티브 mDNS(Zeroconf): {0}개 서비스 발견.','Natives mDNS (Zeroconf): {0} Dienste gefunden.','mDNS natif (Zeroconf) : {0} services trouvés.','mDNS nativo (Zeroconf): {0} servicios encontrados.'),
  ('Scan_ZeroconfFail','ネイティブ mDNS（Zeroconf）失敗：{0}','네이티브 mDNS(Zeroconf) 실패: {0}','Natives mDNS (Zeroconf) fehlgeschlagen: {0}','Échec du mDNS natif (Zeroconf) : {0}','Fallo del mDNS nativo (Zeroconf): {0}'),
  ('Scan_MdnsNew','adb mdns services：新規 {0} 件。','adb mdns services: {0}개 추가.','adb mdns services: {0} neu.','adb mdns services : {0} nouveaux.','adb mdns services: {0} nuevos.'),
@@ -272,6 +275,53 @@ T = [
  ('Adb_Err_Pull','取得失敗：{0}','가져오기 실패: {0}','Abrufen fehlgeschlagen: {0}','Échec de la récupération : {0}','Fallo al obtener: {0}'),
  ('Adb_Err_NoWlanIp','デバイスの WLAN IP を取得できませんでした（Wi-Fi 未接続の可能性）。','기기의 WLAN IP를 가져오지 못했습니다(Wi-Fi 미연결 가능).','WLAN-IP des Geräts nicht ermittelbar (evtl. kein WLAN).','IP WLAN de l’appareil introuvable (peut-être pas de Wi-Fi).','No se obtuvo la IP WLAN (quizá sin Wi-Fi).'),
  ('Adb_Err_Unhandled','未処理の例外：{0}','처리되지 않은 예외: {0}','Unbehandelte Ausnahme: {0}','Exception non gérée : {0}','Excepción no controlada: {0}'),
+ ('Busy_Installing','インストール中…','설치 중…','Installiere…','Installation…','Instalando…'),
+ ('Busy_ExtractingApk','APK を抽出中…','APK 추출 중…','APK wird extrahiert…','Extraction de l’APK…','Extrayendo APK…'),
+ ('Busy_Screenshot','スクリーンショットを撮影中…','스크린샷 촬영 중…','Screenshot wird aufgenommen…','Capture d’écran…','Tomando captura…'),
+ ('Busy_SavingRecording','録画を保存中…','녹화 저장 중…','Aufnahme wird gespeichert…','Enregistrement de la vidéo…','Guardando grabación…'),
+ ('Busy_Uploading','アップロード中…','업로드 중…','Wird hochgeladen…','Téléversement…','Subiendo…'),
+ ('Busy_Downloading','ダウンロード中…','다운로드 중…','Wird heruntergeladen…','Téléchargement…','Descargando…'),
+ ('Busy_Transferring','転送中…','전송 중…','Wird übertragen…','Transfert…','Transfiriendo…'),
+ ('Busy_Flashing','イメージを書き込み中（取り外さないでください）…','이미지 플래시 중(분리 금지)…','Image wird geflasht (nicht trennen)…','Flash de l’image (ne pas déconnecter)…','Flasheando imagen, no desconectes…'),
+ ('Busy_Erasing','パーティションを消去中…','파티션 지우는 중…','Partition wird gelöscht…','Effacement de la partition…','Borrando partición…'),
+ ('Busy_ExtractingImage','イメージを抽出中…','이미지 추출 중…','Image wird extrahiert…','Extraction de l’image…','Extrayendo imagen…'),
+ ('Busy_Working','実行中…','실행 중…','Wird ausgeführt…','En cours…','En curso…'),
+ ('Busy_LoadingPartitions','パーティション表を読み込み中…','파티션 표 읽는 중…','Partitionstabelle wird gelesen…','Lecture de la table de partitions…','Leyendo tabla de particiones…'),
+ ('Busy_LoadingFiles','ディレクトリを読み込み中…','폴더 읽는 중…','Ordner wird gelesen…','Lecture du dossier…','Leyendo carpeta…'),
+ ('Nav_Mirror','ミラーリング','미러링','Mirroring','Mise en miroir','Espejo'),
+ ('Mirror_Title','ミラーリングと操作','미러링 및 제어','Mirroring und Steuerung','Miroir et contrôle','Espejo y control'),
+ ('Mirror_Desc','scrcpy で端末画面をリアルタイム表示し、マウスとキーボードで操作します。スマホと Wear OS 時計（Android 5.0+）の両方に対応、遅延は約 35〜70ms。','scrcpy로 기기 화면을 실시간 표시하고 마우스·키보드로 제어합니다. 휴대전화와 Wear OS 워치(Android 5.0+)를 모두 지원하며 지연은 약 35~70ms입니다.','Spiegelt den Gerätebildschirm in Echtzeit und steuert ihn per Maus und Tastatur. Funktioniert mit Smartphones und Wear-OS-Uhren (Android 5.0+), ca. 35–70 ms Latenz.','Affiche l’écran de l’appareil en temps réel via scrcpy et le contrôle à la souris et au clavier. Compatible téléphones et montres Wear OS (Android 5.0+), latence ~35–70 ms.','Muestra la pantalla del dispositivo en tiempo real con scrcpy y lo controla con ratón y teclado. Compatible con teléfonos y relojes Wear OS (Android 5.0+), latencia de 35–70 ms.'),
+ ('Mirror_Preset','端末プリセット','기기 프리셋','Geräte-Voreinstellung','Préréglage d’appareil','Ajuste del dispositivo'),
+ ('Mirror_PresetAuto','自動判定','자동 감지','Automatisch','Détection auto','Detección automática'),
+ ('Mirror_PresetPhone','スマホ（既定）','휴대전화(기본)','Smartphone (Standard)','Téléphone (défaut)','Teléfono (predeterminado)'),
+ ('Mirror_PresetWatch','時計（低解像度）','워치(저해상도)','Uhr (niedrige Auflösung)','Montre (basse résolution)','Reloj (baja resolución)'),
+ ('Mirror_MaxSize','最大解像度','최대 해상도','Maximale Auflösung','Résolution maximale','Resolución máxima'),
+ ('Mirror_MaxFps','FPS 上限','최대 FPS','Maximale FPS','FPS maximum','FPS máximos'),
+ ('Mirror_BitRate','ビットレート (Mbps)','비트레이트(Mbps)','Bitrate (Mbps)','Débit (Mbit/s)','Tasa de bits (Mbps)'),
+ ('Mirror_NoAudio','音声を転送しない','소리 전송 안 함','Kein Audio übertragen','Ne pas transmettre le son','No transmitir audio'),
+ ('Mirror_ReadOnly','読み取り専用（操作を注入しない）','읽기 전용(제어 입력 안 함)','Nur-Lesen (keine Eingaben)','Lecture seule (aucune entrée)','Solo lectura (sin entradas)'),
+ ('Mirror_ScreenOff','ミラーリング中に端末画面を消す','미러링 중 기기 화면 끄기','Gerätebildschirm während des Mirrorings aus','Éteindre l’écran de l’appareil pendant le miroir','Apagar la pantalla del dispositivo al duplicar'),
+ ('Mirror_StayAwake','端末をスリープさせない','기기 절전 방지','Gerät wachhalten','Garder l’appareil éveillé','Mantener el dispositivo despierto'),
+ ('Mirror_Start','ミラーリング開始','미러링 시작','Mirroring starten','Démarrer le miroir','Iniciar duplicación'),
+ ('Mirror_Stop','ミラーリング停止','미러링 중지','Mirroring stoppen','Arrêter le miroir','Detener duplicación'),
+ ('Mirror_Running','ミラーリング中…','미러링 실행 중…','Mirroring läuft…','Miroir en cours…','Duplicación en curso…'),
+ ('Mirror_NotRunning','実行中のミラーリングはありません。','실행 중인 미러링이 없습니다.','Kein Mirroring aktiv.','Aucun miroir en cours.','No hay duplicación activa.'),
+ ('Mirror_Started','ミラーリングを開始しました。','미러링을 시작했습니다.','Mirroring gestartet.','Miroir démarré.','Duplicación iniciada.'),
+ ('Mirror_Exit','ミラーリングが終了しました。','미러링이 종료되었습니다.','Mirroring beendet.','Miroir terminé.','Duplicación finalizada.'),
+ ('Mirror_Err_NotFound','内蔵 scrcpy コンポーネントの展開に失敗：{0}','내장 scrcpy 구성 요소 압축 해제 실패: {0}','Entpacken der integrierten scrcpy-Komponenten fehlgeschlagen: {0}','Échec de l’extraction des composants scrcpy intégrés : {0}','Fallo al extraer los componentes scrcpy integrados: {0}'),
+ ('Mirror_Err_Start','scrcpy の起動に失敗：{0}','scrcpy 시작 실패: {0}','scrcpy konnte nicht gestartet werden: {0}','Échec du démarrage de scrcpy : {0}','No se pudo iniciar scrcpy: {0}'),
+ ('Mirror_Keys','よく使うキー','자주 쓰는 버튼','Häufige Tasten','Touches courantes','Botones frecuentes'),
+ ('Key_Home','ホーム','홈','Start','Accueil','Inicio'),
+ ('Key_Back','戻る','뒤로','Zurück','Retour','Atrás'),
+ ('Key_Recents','最近のタスク','최근 작업','Letzte Apps','Applications récentes','Recientes'),
+ ('Key_Power','電源','전원','Ein/Aus','Marche/Arrêt','Encendido'),
+ ('Key_VolUp','音量+','볼륨+','Lautstärke+','Volume +','Subir volumen'),
+ ('Key_VolDown','音量−','볼륨−','Lautstärke−','Volume −','Bajar volumen'),
+ ('Mirror_WatchDetected','時計（Wear OS）を検出：低解像度プリセットを適用しました。','워치(Wear OS) 감지: 저해상도 프리셋을 적용했습니다.','Wear-OS-Uhr erkannt: Voreinstellung für niedrige Auflösung angewendet.','Montre (Wear OS) détectée : préréglage basse résolution appliqué.','Reloj (Wear OS) detectado: se aplicó el ajuste de baja resolución.'),
+ ('Mem_Used','使用中メモリ','사용 중 메모리','Belegter Speicher','Mémoire utilisée','Memoria en uso'),
+ ('Sto_Total','ストレージ総容量','저장소 총 용량','Gesamtspeicher','Stockage total','Almacenamiento total'),
+ ('Sto_Used','使用中ストレージ','사용 중 공간','Belegter Speicherplatz','Espace utilisé','Espacio en uso'),
+ ('Sto_Free','空きストレージ','여유 공간','Freier Speicherplatz','Espace libre','Espacio libre'),
 ]
 
 # 读取 zh 键集合（作为全集校验）
@@ -300,22 +350,5 @@ for lang, idx in LANGS:
     io.open(os.path.join(directory, 'Resources.resw'), 'w', encoding='utf-8', newline='').write('\n'.join(out))
     print(lang, 'keys =', len(T))
 
-# zh-CN：合并 generated 到 Resources 并删除 generated，保持单文件
-zh_res = os.path.join(ROOT, 'zh-CN', 'Resources.resw')
-zh_gen = os.path.join(ROOT, 'zh-CN', 'Strings.generated.resw')
-gen_text = io.open(zh_gen, encoding='utf-8').read()
-pairs = re.findall(r'  <data name="[^"]+" xml:space="preserve"><value>.*?</value></data>', gen_text)
-res_text = io.open(zh_res, encoding='utf-8').read()
-res_text = res_text.replace('</root>', '\n'.join(pairs) + '\n</root>')
-io.open(zh_res, 'w', encoding='utf-8', newline='').write(res_text)
-os.remove(zh_gen)
-
-en_res = os.path.join(ROOT, 'en-US', 'Resources.resw')
-en_gen = os.path.join(ROOT, 'en-US', 'Strings.generated.resw')
-gen_text = io.open(en_gen, encoding='utf-8').read()
-pairs = re.findall(r'  <data name="[^"]+" xml:space="preserve"><value>.*?</value></data>', gen_text)
-res_text = io.open(en_res, encoding='utf-8').read()
-res_text = res_text.replace('</root>', '\n'.join(pairs) + '\n</root>')
-io.open(en_res, 'w', encoding='utf-8', newline='').write(res_text)
-os.remove(en_gen)
-print('merged zh/en single-file')
+# zh-CN / en-US 由人工维护（此处仅生成 ja/ko/de/fr/es）
+print('done')

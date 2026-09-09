@@ -99,7 +99,7 @@ public sealed partial class AdbService
                       "echo ==UPTIME==; uptime; " +
                       "echo ==KERNEL==; cat /proc/version; " +
                       "echo ==NET==; ip addr show wlan0 2>/dev/null; settings get secure android_id; " +
-                      "echo ==STORAGE==; df -h /data 2>/dev/null | head -5";
+                      "echo ==STORAGE==; df -k /data 2>/dev/null | head -5";
 
         var result = await RunAsync($"-s \"{serial}\" shell \"{command}\"", null, TimeSpan.FromMinutes(2))
             .ConfigureAwait(false);
@@ -124,6 +124,10 @@ public sealed partial class AdbService
         // 基本信息（getprop）
         var props = ParseProps(sections.GetValueOrDefault("PROPS") ?? new List<string>());
         string Prop(string key) => props.GetValueOrDefault(key, "");
+
+        // 诊断：报告各分段行数与解析出的属性数（日志页可见，用于定位信息采集问题）
+        AppState.Log.Info("device report: " + string.Join(", ",
+            sections.Select(s => $"{s.Key}={s.Value.Count}")) + $", props={props.Count}");
 
         report.Basic[L("Info_Brand")] = Prop("ro.product.manufacturer");
         report.Basic[L("Info_Model")] = Prop("ro.product.model") + (Prop("ro.product.marketname").Length > 0 ? " (" + Prop("ro.product.marketname") + ")" : "");
@@ -190,21 +194,52 @@ public sealed partial class AdbService
                 report.Display[L("Disp_Density")] = text["Physical density:".Length..].Trim();
         }
 
-        // 内存
+        // 内存（运行内存）：总量 / 可用 / 已用（含占用率）
+        // /proc/meminfo 行格式为 "MemTotal:  11785844 kB"，数值需先剥离 kB 后缀再解析
+        long totalKb = 0, availKb = 0;
         foreach (var line in sections.GetValueOrDefault("MEM") ?? new List<string>())
         {
-            if (line.StartsWith("MemTotal", StringComparison.OrdinalIgnoreCase))
-                report.Memory[L("Mem_Total")] = FormatKb(line.Split(':')[1]);
-            if (line.StartsWith("MemAvailable", StringComparison.OrdinalIgnoreCase))
-                report.Memory[L("Mem_Avail")] = FormatKb(line.Split(':')[1]);
+            var colon = line.IndexOf(':');
+            if (colon <= 0) continue;
+            var name = line[..colon].Trim();
+            if (!long.TryParse(line[(colon + 1)..].Replace("kB", "").Trim(), out var kb)) continue;
+
+            if (name.Equals("MemTotal", StringComparison.OrdinalIgnoreCase))
+            {
+                totalKb = kb;
+                report.Memory[L("Mem_Total")] = FormatKb(kb);
+            }
+            else if (name.Equals("MemAvailable", StringComparison.OrdinalIgnoreCase))
+            {
+                availKb = kb;
+                report.Memory[L("Mem_Avail")] = FormatKb(kb);
+            }
         }
 
-        // 存储
+        if (totalKb > 0 && availKb > 0)
+        {
+            var usedKb = Math.Max(0, totalKb - availKb);
+            var percent = (int)Math.Round(usedKb * 100.0 / totalKb);
+            report.Memory[L("Mem_Used")] = $"{FormatKb(usedKb)} ({percent} %)";
+        }
+
+        // 存储：df -k /data → 总容量 / 已用（含占用率）/ 可用，与内存卡同款显示形式
         foreach (var line in sections.GetValueOrDefault("STORAGE") ?? new List<string>())
         {
             var text = line.Trim();
-            if (text.Contains("/data") || text.Contains("Filesystem") || text.StartsWith("/dev"))
-                report.Storage[L("Sto_Data")] = text;
+            if (!text.Contains("/data")) continue;
+
+            var parts = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 5) continue;
+            if (!long.TryParse(parts[1], out var sizeKb)) continue;
+            if (!long.TryParse(parts[2], out var usedKb)) continue;
+            if (!long.TryParse(parts[3], out var freeKb)) continue;
+
+            var percent = sizeKb > 0 ? (int)Math.Round(usedKb * 100.0 / sizeKb) : 0;
+            report.Storage[L("Sto_Total")] = FormatKb(sizeKb);
+            report.Storage[L("Sto_Free")] = FormatKb(freeKb);
+            report.Storage[L("Sto_Used")] = $"{FormatKb(usedKb)} ({percent} %)";
+            break;
         }
         if (report.Storage.Count == 0)
             report.Storage[L("Sto_Data")] = string.Join(" | ", sections.GetValueOrDefault("STORAGE") ?? new List<string>());
@@ -233,29 +268,29 @@ public sealed partial class AdbService
         return report;
     }
 
-    private static string FormatKb(string raw)
-    {
-        var text = raw.Trim();
-        if (long.TryParse(text, out var kb)) return kb / 1024 + " MB";
-        return text;
-    }
+private static string FormatKb(long kb)
+{
+    var mb = kb / 1024.0;
+    return mb >= 1024 ? (mb / 1024).ToString("0.#") + " GB" : ((int)mb) + " MB";
+}
 
-    private static Dictionary<string, string> ParseProps(List<string> lines)
+private static Dictionary<string, string> ParseProps(List<string> lines)
+{
+    var props = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+    foreach (var line in lines)
     {
-        var props = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var line in lines)
-        {
-            var text = line.Trim();
-            if (!text.StartsWith('[')) continue;
-            var closeKey = text.IndexOf(']');
-            if (closeKey <= 0) continue;
-            var key = text[1..closeKey];
-            var rest = text[(closeKey + 1)..].Trim();
-            if (!rest.StartsWith('[')) continue;
-            var closeValue = rest.LastIndexOf(']');
-            if (closeValue < 0) continue;
-            props[key] = rest[1..closeValue];
-        }
-        return props;
+        var text = line.Trim();
+        if (!text.StartsWith('[')) continue;
+        var closeKey = text.IndexOf(']');
+        if (closeKey <= 0) continue;
+        var key = text[1..closeKey];
+        // getprop 行格式为 [key]: [value]，key 的 ] 之后是 ": " 分隔符，必须先跳过
+        var rest = text[(closeKey + 1)..].Trim().TrimStart(':', ' ');
+        if (!rest.StartsWith('[')) continue;
+        var closeValue = rest.LastIndexOf(']');
+        if (closeValue < 0) continue;
+        props[key] = rest[1..closeValue];
     }
+    return props;
+}
 }

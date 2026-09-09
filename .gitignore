@@ -6,6 +6,12 @@ obj/
 # 谷歌官方 platform-tools 二进制（构建前按 README 自行下载）
 tools/adb/
 
+# scrcpy：源压缩包不入库（解压目录为构建必需，随仓库分发）
+tools/scrcpy/*.zip
+
+# 仓库恢复时的损坏备份
+.git-broken/
+
 # 下载缓存与 SDK 安装器
 tools/dl/
 tools/sdk/

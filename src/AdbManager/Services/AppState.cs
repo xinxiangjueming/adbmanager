@@ -7,6 +7,7 @@ namespace AdbManager.Services;
 public static class AppState
 {
     public static AdbService Adb { get; } = new();
+    public static ScrcpyService Scrcpy { get; } = new();
     public static Logger Log { get; } = new();
     public static ObservableCollection<AdbDevice> Devices { get; } = new();
 

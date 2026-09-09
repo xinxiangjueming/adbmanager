@@ -30,6 +30,7 @@ public sealed class FastbootView : PageBase
     private FastbootDevice? _device;
     private readonly DispatcherQueue? _queue;
     private bool _initialized;
+    private bool _polling;
 
     private static readonly string[] CommonPartitions =
     {
@@ -54,6 +55,41 @@ public sealed class FastbootView : PageBase
 
         _emptyDevices.Text = L("Fastboot_NoDevice");
         await RefreshDevicesAsync();
+        StartPolling();
+    }
+
+    /// <summary>轮询 fastboot 设备：插拔/模式切换时自动刷新列表与分区表。</summary>
+    private void StartPolling()
+    {
+        if (_queue is not { } queue) return;
+
+        var timer = queue.CreateTimer();
+        timer.Interval = TimeSpan.FromSeconds(3);
+        timer.Tick += async (_, _) =>
+        {
+            if (XamlRoot is null) { timer.Stop(); return; }  // 页面已切走
+            await PollAsync();
+        };
+        timer.Start();
+    }
+
+    private async Task PollAsync()
+    {
+        if (_polling) return;
+        _polling = true;
+        try
+        {
+            var devices = await AppState.Adb.GetFastbootDevicesAsync();
+            var serial = devices.FirstOrDefault()?.Serial ?? "";
+            if (serial == (_device?.Serial ?? "")) return;
+
+            RenderDevices(devices);
+            if (_device is not null) await LoadPartitionsAsync(notify: false);
+        }
+        finally
+        {
+            _polling = false;
+        }
     }
 
     private UIElement Build()
@@ -94,14 +130,14 @@ public sealed class FastbootView : PageBase
         rebootSystem.Click += async (_, _) => await FastbootRebootAsync("");
         var rebootBootloader = Miuix.SecondaryButton(L("Fastboot_RebootBootloader"));
         rebootBootloader.Click += async (_, _) => await FastbootRebootAsync("bootloader");
-        var rebootFastbootd = Miuix.SecondaryButton(L("Fastboot_RebootFastbootd"));
-        rebootFastbootd.Click += async (_, _) => await FastbootRebootAsync("fastboot");
+        var rebootEdl = Miuix.SecondaryButton(L("Fastboot_RebootEdl"));
+        rebootEdl.Click += async (_, _) => await FastbootRebootAsync("edl");
         var rebootRecovery = Miuix.SecondaryButton(L("Fastboot_RebootRecovery"));
         rebootRecovery.Click += async (_, _) => await FastbootRebootAsync("recovery");
 
         var rebootPanel = new StackPanel { Spacing = 10 };
         rebootPanel.Children.Add(Miuix.SectionTitle(L("Tools_Reboot")));
-        rebootPanel.Children.Add(Miuix.Horizontal(rebootSystem, rebootBootloader, rebootFastbootd, rebootRecovery));
+        rebootPanel.Children.Add(Miuix.Horizontal(rebootSystem, rebootBootloader, rebootEdl, rebootRecovery));
         root.Children.Add(Miuix.Card(rebootPanel));
 
         // 提取镜像（走 adb）
@@ -137,9 +173,18 @@ public sealed class FastbootView : PageBase
     private async Task RefreshDevicesAsync()
     {
         var devices = await AppState.Adb.GetFastbootDevicesAsync().ConfigureAwait(false);
+        RenderDevices(devices);
+    }
 
+    /// <summary>把设备列表渲染到顶部区域（可在任意线程调用，内部切回 UI 线程）。</summary>
+    private void RenderDevices(List<FastbootDevice> devices)
+    {
         void Render()
         {
+            // 当前选中项已不在列表中（拔线/重启到系统/进入 9008）时改为首个设备；列表为空则清空选择
+            if (_device is null || devices.All(d => d.Serial != _device.Serial))
+                _device = devices.FirstOrDefault();
+
             _deviceList.Children.Clear();
             _emptyDevices.Visibility = devices.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
@@ -160,8 +205,6 @@ public sealed class FastbootView : PageBase
 
                 _deviceList.Children.Add(button);
             }
-
-            _device ??= devices.FirstOrDefault();
         }
 
         if (_queue is { } queue && !queue.HasThreadAccess) queue.TryEnqueue(Render);
@@ -170,14 +213,17 @@ public sealed class FastbootView : PageBase
 
     private Task RenderSelection() => RefreshDevicesAsync();
 
-    private async Task<bool> EnsureFastbootDeviceAsync()
+    private async Task<bool> EnsureFastbootDeviceAsync(bool warn = true)
     {
         if (_device is not null) return true;
+
+        // 页面首次渲染时设备可能尚未被 fastboot 枚举到，操作前重新查询并同步顶部列表
         var devices = await AppState.Adb.GetFastbootDevicesAsync();
         _device = devices.FirstOrDefault();
+        RenderDevices(devices);
         if (_device is not null) return true;
 
-        MainWindow.Notify(L("Fastboot_NoDevice"), InfoBarSeverity.Warning);
+        if (warn) MainWindow.Notify(L("Fastboot_NoDevice"), InfoBarSeverity.Warning);
         return false;
     }
 
@@ -255,23 +301,41 @@ public sealed class FastbootView : PageBase
             result.Success ? InfoBarSeverity.Success : InfoBarSeverity.Error);
     }
 
-    private async Task LoadPartitionsAsync()
+    private async Task LoadPartitionsAsync(bool notify = true)
     {
+        // 设备停在 bootloader/fastboot 时 adb 不在线，优先用 fastboot getvar all 解析分区
+        if (_device is null) await EnsureFastbootDeviceAsync(warn: false);
+        if (_device is not null)
+        {
+            var fastbootNames = await MainWindow.RunBusyAsync(L("Busy_LoadingPartitions"),
+                () => AppState.Adb.FastbootListPartitionsAsync(_device!.Serial));
+            if (fastbootNames.Count > 0)
+            {
+                FillPartitions(fastbootNames);
+                if (notify) MainWindow.Notify(L("Msg_Done") + $" ({fastbootNames.Count})", InfoBarSeverity.Success);
+                return;
+            }
+        }
+
+        // 回退：adb 在线时读 /dev/block/by-name
         if (!TryGetDevice(out var adbDevice)) return;
 
         var partitions = await MainWindow.RunBusyAsync(L("Busy_LoadingPartitions"),
             () => AppState.Adb.ListPartitionsAsync(adbDevice!.Serial));
-        _extractPartition.Items.Clear();
-        foreach (var partition in partitions) _extractPartition.Items.Add(partition.Name);
-        if (_extractPartition.Items.Count > 0) _extractPartition.SelectedIndex = 0;
+        FillPartitions(partitions.Select(p => p.Name));
 
         MainWindow.Notify(L("Msg_Done") + $" ({partitions.Count})", InfoBarSeverity.Success);
     }
 
+    private void FillPartitions(IEnumerable<string> names)
+    {
+        _extractPartition.Items.Clear();
+        foreach (var name in names) _extractPartition.Items.Add(name);
+        if (_extractPartition.Items.Count > 0) _extractPartition.SelectedIndex = 0;
+    }
+
     private async Task ExtractAsync()
     {
-        if (!TryGetDevice(out var adbDevice)) return;
-
         var partition = (_extractPartition.SelectedItem as string ?? _extractPartition.Text ?? "").Trim();
         if (partition.Length == 0) { MainWindow.Notify(L("Msg_NoSelection"), InfoBarSeverity.Warning); return; }
 
@@ -279,9 +343,32 @@ public sealed class FastbootView : PageBase
         if (folder is null) return;
 
         _output.Text = "";
-        var (ok, message) = await MainWindow.RunBusyAsync(L("Busy_ExtractingImage"),
-            () => AppState.Adb.ExtractPartitionAsync(adbDevice!.Serial, partition, folder.Path, AppendOutput));
-        MainWindow.Notify(ok ? L("Msg_Done") + " " + message : message,
-            ok ? InfoBarSeverity.Success : InfoBarSeverity.Error);
+
+        // adb 在线（系统 / recovery）：dd + pull，兼容性最好
+        if (TryGetDevice(out var adbDevice, warn: false))
+        {
+            var (ok, message) = await MainWindow.RunBusyAsync(L("Busy_ExtractingImage"),
+                () => AppState.Adb.ExtractPartitionAsync(adbDevice!.Serial, partition, folder.Path, AppendOutput));
+            MainWindow.Notify(ok ? L("Msg_Done") + " " + message : message,
+                ok ? InfoBarSeverity.Success : InfoBarSeverity.Error);
+            return;
+        }
+
+        // adb 不在线：设备停在 fastboot 时用 fastboot fetch（需 fastbootd 且设备支持）
+        if (_device is null) await EnsureFastbootDeviceAsync(warn: false);
+        if (_device is null) { MainWindow.Notify(L("Msg_SelectDevice"), InfoBarSeverity.Warning); return; }
+
+        var (fetched, fetchMessage) = await MainWindow.RunBusyAsync(L("Busy_ExtractingImage"),
+            () => AppState.Adb.FastbootFetchPartitionAsync(_device!.Serial, partition, folder.Path, AppendOutput));
+
+        if (!fetched && fetchMessage.Contains("does not support", StringComparison.OrdinalIgnoreCase))
+        {
+            MainWindow.Notify(L("Fastboot_Err_NoFetch"), InfoBarSeverity.Error);
+            return;
+        }
+
+        var text = string.IsNullOrWhiteSpace(fetchMessage) ? L("Msg_Failed") : fetchMessage;
+        MainWindow.Notify(fetched ? L("Msg_Done") + " " + text : text,
+            fetched ? InfoBarSeverity.Success : InfoBarSeverity.Error);
     }
 }

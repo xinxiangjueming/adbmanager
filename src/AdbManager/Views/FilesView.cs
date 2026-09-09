@@ -10,8 +10,8 @@ namespace AdbManager.Views;
 
 public sealed class FilesView : PageBase
 {
-    private string _path = "/sdcard";
-    private readonly TextBlock _pathText = Miuix.Body("/sdcard");
+    private string _path = "/storage/emulated/0";
+    private readonly TextBlock _pathText = Miuix.Body("/storage/emulated/0");
     private readonly StackPanel _list = new() { Spacing = 6 };
     private RemoteFileItem? _selected;
     private RemoteFileItem? _clipboardItem;

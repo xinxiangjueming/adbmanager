@@ -370,6 +370,33 @@ public sealed partial class AdbService
     public Task<AdbResult> ShellAsync(string serial, string command, Action<string>? onLine = null, TimeSpan? timeout = null) =>
         RunAsync($"-s \"{serial}\" shell {command}", onLine, timeout ?? TimeSpan.FromSeconds(30));
 
+    /// <summary>
+    /// 从 dumpsys package 输出中查找应用的 DeviceAdminReceiver 组件（形如 包名/.XxxReceiver）。
+    /// 用于 dpm set-device-owner 激活；找不到返回 null。
+    /// </summary>
+    public async Task<string?> FindDeviceAdminReceiverAsync(string serial, string package)
+    {
+        var result = await RunAsync($"-s \"{serial}\" shell dumpsys package {package}",
+            null, TimeSpan.FromSeconds(60)).ConfigureAwait(false);
+
+        var lines = result.Combined().Split('\n');
+        for (var i = 0; i < lines.Length; i++)
+        {
+            if (!lines[i].Contains("android.app.action.DEVICE_ADMIN_ENABLED", StringComparison.Ordinal)) continue;
+
+            for (var j = i + 1; j < Math.Min(i + 8, lines.Length); j++)
+            {
+                var start = lines[j].IndexOf(package + "/", StringComparison.Ordinal);
+                if (start < 0) continue;
+
+                var token = lines[j][start..].Split(' ', '\t', '\r', '\n')[0];
+                if (token.Length > package.Length + 1) return token;
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>启动录屏（后台持续运行，需调用 StopRecordingAsync 结束）。</summary>
     public async Task<(bool Success, string Message)> StartRecordingAsync(string serial, string remotePath, int seconds)
     {

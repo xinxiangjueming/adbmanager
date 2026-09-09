@@ -11,6 +11,8 @@ public sealed class InfoView : PageBase
 {
     private string _loadedSerial = "";
     private bool _hasLoaded;
+    /// <summary>设备掉线后置为 true，重新连上（同序列号）时也要重新加载信息。</summary>
+    private bool _stale = true;
 
     public InfoView()
     {
@@ -29,9 +31,9 @@ public sealed class InfoView : PageBase
         var queue = DispatcherQueue ?? Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         void Apply()
         {
-            // 仅在设备在线且序列号变化时自动加载，避免循环刷新
-            if (device is null || !device.IsOnline || device.Serial == _loadedSerial) return;
-            _ = LoadAsync(auto: true);
+            // 设备消失或掉线：标记待刷新
+            if (device is null || !device.IsOnline) { _stale = true; return; }
+            if (!_hasLoaded || _stale || device.Serial != _loadedSerial) _ = LoadAsync(auto: true);
         }
 
         if (queue is { } q && !q.HasThreadAccess) q.TryEnqueue(Apply);
@@ -56,13 +58,29 @@ public sealed class InfoView : PageBase
         _networkCard = Miuix.Card(BuildGroup(L("Info_Network")));
         _systemCard = Miuix.Card(BuildGroup(L("Info_System")));
 
-        root.Children.Add(_basicCard);
-        root.Children.Add(_batteryCard);
-        root.Children.Add(_displayCard);
-        root.Children.Add(_memoryCard);
-        root.Children.Add(_storageCard);
-        root.Children.Add(_networkCard);
-        root.Children.Add(_systemCard);
+        // 左右两列：左=基本信息/显示/存储，右=电池/内存/网络/系统
+        var columns = new Grid { ColumnSpacing = 16 };
+        columns.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        columns.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+        var left = new StackPanel { Spacing = 16 };
+        var right = new StackPanel { Spacing = 16 };
+
+        left.Children.Add(_basicCard);
+        left.Children.Add(_displayCard);
+        left.Children.Add(_storageCard);
+
+        right.Children.Add(_batteryCard);
+        right.Children.Add(_memoryCard);
+        right.Children.Add(_networkCard);
+        right.Children.Add(_systemCard);
+
+        Grid.SetColumn(left, 0);
+        Grid.SetColumn(right, 1);
+        columns.Children.Add(left);
+        columns.Children.Add(right);
+
+        root.Children.Add(columns);
 
         return root;
     }
@@ -108,9 +126,10 @@ public sealed class InfoView : PageBase
     {
         if (!TryGetDevice(out var device, warn: !auto)) return;
 
-        if (auto && device!.Serial == _loadedSerial && _hasLoaded) return;
+        if (auto && _hasLoaded && !_stale && device!.Serial == _loadedSerial) return;
         _loadedSerial = device!.Serial;
         _hasLoaded = true;
+        _stale = false;
 
         if (!auto) MainWindow.Notify(L("Msg_Working"), InfoBarSeverity.Informational);
         var report = await AppState.Adb.GetDeviceInfoReportAsync(device.Serial);

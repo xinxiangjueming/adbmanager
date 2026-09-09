@@ -57,7 +57,9 @@
   <data name="Tools_WifiFix" xml:space="preserve"><value>WiFi 检测修复</value></data>
   <data name="Tools_Shizuku" xml:space="preserve"><value>Shizuku 激活</value></data>
   <data name="Tools_Scene" xml:space="preserve"><value>Scene 激活</value></data>
-  <data name="Tools_ActivateHint" xml:space="preserve"><value>Shizuku / Scene 激活需先在手机上安装对应应用，并打开过一次应用（生成启动脚本）。</value></data>
+  <data name="Tools_ActivateHint" xml:space="preserve"><value>激活前请确认：① 目标应用已安装并至少启动过一次（需生成启动脚本）；② dpm（Device Owner）类激活必须先移除设备上的所有账户和除主用户外的其他用户；③ 一台设备同时只能有一个 Device Owner，需先取消其他应用的 Device Owner。鼠标悬停按钮可查看实际执行的命令。</value></data>
+  <data name="Tools_ActivateTitle" xml:space="preserve"><value>一键激活</value></data>
+  <data name="Tools_Act_Err_NoAdmin" xml:space="preserve"><value>未在该应用中找到设备管理员组件（DeviceAdminReceiver）。请确认应用已安装并启动过一次，或改用应用自带的激活方式。</value></data>
   <data name="Tools_RebootNormal" xml:space="preserve"><value>系统</value></data>
   <data name="Tools_RebootRecovery" xml:space="preserve"><value>Recovery</value></data>
   <data name="Tools_RebootBootloader" xml:space="preserve"><value>Bootloader</value></data>
@@ -116,13 +118,13 @@
   <data name="Fastboot_EraseConfirm" xml:space="preserve"><value>确定擦除该分区？数据将丢失且不可恢复！</value></data>
   <data name="Fastboot_RebootSystem" xml:space="preserve"><value>重启到系统</value></data>
   <data name="Fastboot_RebootBootloader" xml:space="preserve"><value>Bootloader（Fastboot）</value></data>
-  <data name="Fastboot_RebootFastbootd" xml:space="preserve"><value>Fastbootd</value></data>
+  <data name="Fastboot_RebootEdl" xml:space="preserve"><value>9008（EDL）</value></data>
   <data name="Fastboot_RebootRecovery" xml:space="preserve"><value>Recovery</value></data>
   <data name="Fastboot_ExtractTitle" xml:space="preserve"><value>提取镜像到电脑（adb 在线；部分分区需 root）</value></data>
   <data name="Fastboot_ExtractHint" xml:space="preserve"><value>先「读取分区表」，选择分区后「提取到电脑」。分区镜像较大，请耐心等待。</value></data>
   <data name="Fastboot_ReadPartitions" xml:space="preserve"><value>读取分区表</value></data>
   <data name="Fastboot_Extract" xml:space="preserve"><value>提取到电脑</value></data>
-  <data name="Tools_RebootFastbootd" xml:space="preserve"><value>Fastbootd</value></data>
+  <data name="Tools_RebootEdl" xml:space="preserve"><value>9008（EDL）</value></data>
   <data name="Apps_ExtractApk" xml:space="preserve"><value>提取 APK</value></data>
   <data name="Msg_ExtractOk" xml:space="preserve"><value>APK 已提取到</value></data>
   <data name="Wireless_Ip" xml:space="preserve"><value>IP 地址</value></data>
@@ -216,6 +218,7 @@
   <data name="Adb_Err_NoWlanIp" xml:space="preserve"><value>未获取到设备 WLAN IP（手机可能未连接 Wi-Fi）。</value></data>
   <data name="Adb_Err_Unhandled" xml:space="preserve"><value>未处理异常：{0}</value></data>
   <data name="Fastboot_Err_Dd" xml:space="preserve"><value>dd 失败（部分分区需要 root 权限）：{0}</value></data>
+  <data name="Fastboot_Err_NoFetch" xml:space="preserve"><value>当前设备不支持 fastboot 读取分区（fetch）。请启动到系统或 Recovery 让 adb 在线后再提取，或改用厂商专用工具（如 MiFlash / firehose）。</value></data>
   <data name="Scan_ZeroconfFound" xml:space="preserve"><value>原生 mDNS（Zeroconf）：发现 {0} 个服务。</value></data>
   <data name="Scan_ZeroconfFail" xml:space="preserve"><value>原生 mDNS（Zeroconf）失败：{0}</value></data>
   <data name="Scan_MdnsNew" xml:space="preserve"><value>adb mdns services：新增 {0} 个服务。</value></data>
@@ -273,4 +276,38 @@
   <data name="Busy_Working" xml:space="preserve"><value>正在执行…</value></data>
   <data name="Busy_LoadingPartitions" xml:space="preserve"><value>正在读取分区表…</value></data>
   <data name="Busy_LoadingFiles" xml:space="preserve"><value>正在读取目录…</value></data>
+  <data name="Nav_Mirror" xml:space="preserve"><value>投屏控制</value></data>
+  <data name="Mirror_Title" xml:space="preserve"><value>投屏与控制</value></data>
+  <data name="Mirror_Desc" xml:space="preserve"><value>通过 scrcpy 实时镜像设备屏幕，并用鼠标键盘直接控制。手机与 Wear OS 手表均支持（Android 5.0+），延迟约 35–70ms。</value></data>
+  <data name="Mirror_Preset" xml:space="preserve"><value>设备预设</value></data>
+  <data name="Mirror_PresetAuto" xml:space="preserve"><value>自动检测</value></data>
+  <data name="Mirror_PresetPhone" xml:space="preserve"><value>手机（默认）</value></data>
+  <data name="Mirror_PresetWatch" xml:space="preserve"><value>手表（低分辨率）</value></data>
+  <data name="Mirror_MaxSize" xml:space="preserve"><value>最大分辨率</value></data>
+  <data name="Mirror_MaxFps" xml:space="preserve"><value>帧率上限</value></data>
+  <data name="Mirror_BitRate" xml:space="preserve"><value>码率 (Mbps)</value></data>
+  <data name="Mirror_NoAudio" xml:space="preserve"><value>不转发声音</value></data>
+  <data name="Mirror_ReadOnly" xml:space="preserve"><value>只读（不注入控制）</value></data>
+  <data name="Mirror_ScreenOff" xml:space="preserve"><value>投屏时熄灭设备屏幕</value></data>
+  <data name="Mirror_StayAwake" xml:space="preserve"><value>保持设备唤醒</value></data>
+  <data name="Mirror_Start" xml:space="preserve"><value>启动投屏</value></data>
+  <data name="Mirror_Stop" xml:space="preserve"><value>停止投屏</value></data>
+  <data name="Mirror_Running" xml:space="preserve"><value>投屏运行中…</value></data>
+  <data name="Mirror_NotRunning" xml:space="preserve"><value>当前没有正在运行的投屏。</value></data>
+  <data name="Mirror_Started" xml:space="preserve"><value>投屏已启动。</value></data>
+  <data name="Mirror_Exit" xml:space="preserve"><value>投屏已结束。</value></data>
+  <data name="Mirror_Err_NotFound" xml:space="preserve"><value>内置 scrcpy 组件释放失败：{0}</value></data>
+  <data name="Mirror_Err_Start" xml:space="preserve"><value>scrcpy 启动失败：{0}</value></data>
+  <data name="Mirror_Keys" xml:space="preserve"><value>常用按键</value></data>
+  <data name="Key_Home" xml:space="preserve"><value>主屏</value></data>
+  <data name="Key_Back" xml:space="preserve"><value>返回</value></data>
+  <data name="Key_Recents" xml:space="preserve"><value>最近任务</value></data>
+  <data name="Key_Power" xml:space="preserve"><value>电源</value></data>
+  <data name="Key_VolUp" xml:space="preserve"><value>音量+</value></data>
+  <data name="Key_VolDown" xml:space="preserve"><value>音量−</value></data>
+  <data name="Mirror_WatchDetected" xml:space="preserve"><value>检测到手表（Wear OS），已应用低分辨率预设。</value></data>
+  <data name="Mem_Used" xml:space="preserve"><value>已用内存</value></data>
+  <data name="Sto_Total" xml:space="preserve"><value>存储总容量</value></data>
+  <data name="Sto_Used" xml:space="preserve"><value>已用空间</value></data>
+  <data name="Sto_Free" xml:space="preserve"><value>可用空间</value></data>
 </root>

@@ -65,12 +65,14 @@
   <data name="Tools_RebootNormal" xml:space="preserve"><value>システム</value></data>
   <data name="Tools_RebootRecovery" xml:space="preserve"><value>Recovery</value></data>
   <data name="Tools_RebootBootloader" xml:space="preserve"><value>Bootloader（Fastboot）</value></data>
-  <data name="Tools_RebootFastbootd" xml:space="preserve"><value>Fastbootd</value></data>
+  <data name="Tools_RebootEdl" xml:space="preserve"><value>9008 (EDL)</value></data>
   <data name="Tools_Output" xml:space="preserve"><value>出力</value></data>
   <data name="Tools_WifiFix" xml:space="preserve"><value>Wi-Fi 検出修復</value></data>
   <data name="Tools_Shizuku" xml:space="preserve"><value>Shizuku を有効化</value></data>
   <data name="Tools_Scene" xml:space="preserve"><value>Scene を有効化</value></data>
-  <data name="Tools_ActivateHint" xml:space="preserve"><value>Shizuku / Scene の有効化には、対象アプリが端末にインストールされ一度起動済み（起動スクリプト生成済み）である必要があります。</value></data>
+  <data name="Tools_ActivateHint" xml:space="preserve"><value>有効化前の確認: ① 対象アプリがインストールされ、少なくとも一度起動済み（起動スクリプト生成済み）であること ② dpm（Device Owner）で有効化する場合は、端末のすべてのアカウントと追加ユーザーを先に削除 ③ Device Owner は 1 台につき 1 アプリのみ。他アプリを先に解除してください。</value></data>
+  <data name="Tools_ActivateTitle" xml:space="preserve"><value>ワンタップ有効化</value></data>
+  <data name="Tools_Act_Err_NoAdmin" xml:space="preserve"><value>このアプリからデバイス管理コンポーネント（DeviceAdminReceiver）を検出できませんでした。アプリがインストールされ一度起動されているか確認するか、アプリ自身の有効化手順を利用してください。</value></data>
   <data name="Apps_Title" xml:space="preserve"><value>アプリ管理</value></data>
   <data name="Apps_InstallApk" xml:space="preserve"><value>APK をインストール</value></data>
   <data name="Apps_InstallBundle" xml:space="preserve"><value>APKS（分割）をインストール</value></data>
@@ -153,13 +155,14 @@
   <data name="Fastboot_EraseConfirm" xml:space="preserve"><value>このパーティションを消去しますか？データは失われ元に戻せません！</value></data>
   <data name="Fastboot_RebootSystem" xml:space="preserve"><value>システムへ再起動</value></data>
   <data name="Fastboot_RebootBootloader" xml:space="preserve"><value>Bootloader（Fastboot）</value></data>
-  <data name="Fastboot_RebootFastbootd" xml:space="preserve"><value>Fastbootd</value></data>
+  <data name="Fastboot_RebootEdl" xml:space="preserve"><value>9008 (EDL)</value></data>
   <data name="Fastboot_RebootRecovery" xml:space="preserve"><value>Recovery</value></data>
   <data name="Fastboot_ExtractTitle" xml:space="preserve"><value>イメージを PC に抽出（adb 在線；一部 root 必要）</value></data>
   <data name="Fastboot_ExtractHint" xml:space="preserve"><value>先に「パーティション表を取得」し、パーティションを選んで「PC へ抽出」。イメージが大きい場合は時間がかかります。</value></data>
   <data name="Fastboot_ReadPartitions" xml:space="preserve"><value>パーティション表を取得</value></data>
   <data name="Fastboot_Extract" xml:space="preserve"><value>PC へ抽出</value></data>
   <data name="Fastboot_Err_Dd" xml:space="preserve"><value>dd 失敗（一部パーティションは root が必要）：{0}</value></data>
+  <data name="Fastboot_Err_NoFetch" xml:space="preserve"><value>この端末は fastboot fetch に対応していません。システムまたは Recovery を起動して adb をオンラインにしてから抽出するか、メーカー専用ツール（MiFlash / firehose）を使用してください。</value></data>
   <data name="Scan_ZeroconfFound" xml:space="preserve"><value>ネイティブ mDNS（Zeroconf）：{0} 件のサービスを発見。</value></data>
   <data name="Scan_ZeroconfFail" xml:space="preserve"><value>ネイティブ mDNS（Zeroconf）失敗：{0}</value></data>
   <data name="Scan_MdnsNew" xml:space="preserve"><value>adb mdns services：新規 {0} 件。</value></data>
@@ -263,13 +266,47 @@
   <data name="Busy_ExtractingApk" xml:space="preserve"><value>APK を抽出中…</value></data>
   <data name="Busy_Screenshot" xml:space="preserve"><value>スクリーンショットを撮影中…</value></data>
   <data name="Busy_SavingRecording" xml:space="preserve"><value>録画を保存中…</value></data>
-  <data name="Busy_Uploading" xml:space="preserve"><value>ファイルをアップロード中…</value></data>
-  <data name="Busy_Downloading" xml:space="preserve"><value>ファイルをダウンロード中…</value></data>
-  <data name="Busy_Transferring" xml:space="preserve"><value>ファイルを転送中…</value></data>
-  <data name="Busy_Flashing" xml:space="preserve"><value>イメージを書き込み中…</value></data>
+  <data name="Busy_Uploading" xml:space="preserve"><value>アップロード中…</value></data>
+  <data name="Busy_Downloading" xml:space="preserve"><value>ダウンロード中…</value></data>
+  <data name="Busy_Transferring" xml:space="preserve"><value>転送中…</value></data>
+  <data name="Busy_Flashing" xml:space="preserve"><value>イメージを書き込み中（取り外さないでください）…</value></data>
   <data name="Busy_Erasing" xml:space="preserve"><value>パーティションを消去中…</value></data>
   <data name="Busy_ExtractingImage" xml:space="preserve"><value>イメージを抽出中…</value></data>
-  <data name="Busy_Working" xml:space="preserve"><value>処理中…</value></data>
+  <data name="Busy_Working" xml:space="preserve"><value>実行中…</value></data>
   <data name="Busy_LoadingPartitions" xml:space="preserve"><value>パーティション表を読み込み中…</value></data>
-  <data name="Busy_LoadingFiles" xml:space="preserve"><value>フォルダを読み込み中…</value></data>
+  <data name="Busy_LoadingFiles" xml:space="preserve"><value>ディレクトリを読み込み中…</value></data>
+  <data name="Nav_Mirror" xml:space="preserve"><value>ミラーリング</value></data>
+  <data name="Mirror_Title" xml:space="preserve"><value>ミラーリングと操作</value></data>
+  <data name="Mirror_Desc" xml:space="preserve"><value>scrcpy で端末画面をリアルタイム表示し、マウスとキーボードで操作します。スマホと Wear OS 時計（Android 5.0+）の両方に対応、遅延は約 35〜70ms。</value></data>
+  <data name="Mirror_Preset" xml:space="preserve"><value>端末プリセット</value></data>
+  <data name="Mirror_PresetAuto" xml:space="preserve"><value>自動判定</value></data>
+  <data name="Mirror_PresetPhone" xml:space="preserve"><value>スマホ（既定）</value></data>
+  <data name="Mirror_PresetWatch" xml:space="preserve"><value>時計（低解像度）</value></data>
+  <data name="Mirror_MaxSize" xml:space="preserve"><value>最大解像度</value></data>
+  <data name="Mirror_MaxFps" xml:space="preserve"><value>FPS 上限</value></data>
+  <data name="Mirror_BitRate" xml:space="preserve"><value>ビットレート (Mbps)</value></data>
+  <data name="Mirror_NoAudio" xml:space="preserve"><value>音声を転送しない</value></data>
+  <data name="Mirror_ReadOnly" xml:space="preserve"><value>読み取り専用（操作を注入しない）</value></data>
+  <data name="Mirror_ScreenOff" xml:space="preserve"><value>ミラーリング中に端末画面を消す</value></data>
+  <data name="Mirror_StayAwake" xml:space="preserve"><value>端末をスリープさせない</value></data>
+  <data name="Mirror_Start" xml:space="preserve"><value>ミラーリング開始</value></data>
+  <data name="Mirror_Stop" xml:space="preserve"><value>ミラーリング停止</value></data>
+  <data name="Mirror_Running" xml:space="preserve"><value>ミラーリング中…</value></data>
+  <data name="Mirror_NotRunning" xml:space="preserve"><value>実行中のミラーリングはありません。</value></data>
+  <data name="Mirror_Started" xml:space="preserve"><value>ミラーリングを開始しました。</value></data>
+  <data name="Mirror_Exit" xml:space="preserve"><value>ミラーリングが終了しました。</value></data>
+  <data name="Mirror_Err_NotFound" xml:space="preserve"><value>内蔵 scrcpy コンポーネントの展開に失敗：{0}</value></data>
+  <data name="Mirror_Err_Start" xml:space="preserve"><value>scrcpy の起動に失敗：{0}</value></data>
+  <data name="Mirror_Keys" xml:space="preserve"><value>よく使うキー</value></data>
+  <data name="Key_Home" xml:space="preserve"><value>ホーム</value></data>
+  <data name="Key_Back" xml:space="preserve"><value>戻る</value></data>
+  <data name="Key_Recents" xml:space="preserve"><value>最近のタスク</value></data>
+  <data name="Key_Power" xml:space="preserve"><value>電源</value></data>
+  <data name="Key_VolUp" xml:space="preserve"><value>音量+</value></data>
+  <data name="Key_VolDown" xml:space="preserve"><value>音量−</value></data>
+  <data name="Mirror_WatchDetected" xml:space="preserve"><value>時計（Wear OS）を検出：低解像度プリセットを適用しました。</value></data>
+  <data name="Mem_Used" xml:space="preserve"><value>使用中メモリ</value></data>
+  <data name="Sto_Total" xml:space="preserve"><value>ストレージ総容量</value></data>
+  <data name="Sto_Used" xml:space="preserve"><value>使用中ストレージ</value></data>
+  <data name="Sto_Free" xml:space="preserve"><value>空きストレージ</value></data>
 </root>
