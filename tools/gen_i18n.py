@@ -322,6 +322,11 @@ T = [
  ('Sto_Total','ストレージ総容量','저장소 총 용량','Gesamtspeicher','Stockage total','Almacenamiento total'),
  ('Sto_Used','使用中ストレージ','사용 중 공간','Belegter Speicherplatz','Espace utilisé','Espacio en uso'),
  ('Sto_Free','空きストレージ','여유 공간','Freier Speicherplatz','Espace libre','Espacio libre'),
+ ('Files_DropHint','ドロップでここへアップロード','놓아서 여기에 업로드','Zum Hochladen hier ablegen','Déposer pour téléverser ici','Soltar para subir aquí'),
+ ('Files_DropDone','{0} 件アップロードしました','{0}개 업로드했습니다','{0} Element(e) hochgeladen','{0} élément(s) téléversé(s)','{0} elemento(s) subidos'),
+ ('Files_DropPartial','{0} 件アップロード失敗：','{0}개 업로드 실패:','{0} Element(e) fehlgeschlagen:','{0} élément(s) en échec :','{0} elemento(s) con error:'),
+ ('Files_HideHidden','隠しファイルを隠す','숨김 파일 숨기기','Versteckte Dateien ausblenden','Masquer les fichiers cachés','Ocultar archivos ocultos'),
+ ('Files_ShowHidden','隠しファイルを表示','숨김 파일 표시','Versteckte Dateien anzeigen','Afficher les fichiers cachés','Mostrar archivos ocultos'),
 ]
 
 # 读取 zh 键集合（作为全集校验）

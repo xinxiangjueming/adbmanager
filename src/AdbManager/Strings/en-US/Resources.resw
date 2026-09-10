@@ -324,4 +324,9 @@
   <data name="Sto_Total" xml:space="preserve"><value>Total storage</value></data>
   <data name="Sto_Used" xml:space="preserve"><value>Used space</value></data>
   <data name="Sto_Free" xml:space="preserve"><value>Free space</value></data>
+  <data name="Files_DropHint" xml:space="preserve"><value>Drop to upload here</value></data>
+  <data name="Files_DropDone" xml:space="preserve"><value>{0} item(s) uploaded</value></data>
+  <data name="Files_DropPartial" xml:space="preserve"><value>{0} item(s) failed:</value></data>
+  <data name="Files_HideHidden" xml:space="preserve"><value>Hide hidden files</value></data>
+  <data name="Files_ShowHidden" xml:space="preserve"><value>Show hidden files</value></data>
 </root>

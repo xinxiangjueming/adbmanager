@@ -309,4 +309,9 @@
   <data name="Sto_Total" xml:space="preserve"><value>ストレージ総容量</value></data>
   <data name="Sto_Used" xml:space="preserve"><value>使用中ストレージ</value></data>
   <data name="Sto_Free" xml:space="preserve"><value>空きストレージ</value></data>
+  <data name="Files_DropHint" xml:space="preserve"><value>ドロップでここへアップロード</value></data>
+  <data name="Files_DropDone" xml:space="preserve"><value>{0} 件アップロードしました</value></data>
+  <data name="Files_DropPartial" xml:space="preserve"><value>{0} 件アップロード失敗：</value></data>
+  <data name="Files_HideHidden" xml:space="preserve"><value>隠しファイルを隠す</value></data>
+  <data name="Files_ShowHidden" xml:space="preserve"><value>隠しファイルを表示</value></data>
 </root>

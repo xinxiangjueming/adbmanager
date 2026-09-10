@@ -309,4 +309,9 @@
   <data name="Sto_Total" xml:space="preserve"><value>Gesamtspeicher</value></data>
   <data name="Sto_Used" xml:space="preserve"><value>Belegter Speicherplatz</value></data>
   <data name="Sto_Free" xml:space="preserve"><value>Freier Speicherplatz</value></data>
+  <data name="Files_DropHint" xml:space="preserve"><value>Zum Hochladen hier ablegen</value></data>
+  <data name="Files_DropDone" xml:space="preserve"><value>{0} Element(e) hochgeladen</value></data>
+  <data name="Files_DropPartial" xml:space="preserve"><value>{0} Element(e) fehlgeschlagen:</value></data>
+  <data name="Files_HideHidden" xml:space="preserve"><value>Versteckte Dateien ausblenden</value></data>
+  <data name="Files_ShowHidden" xml:space="preserve"><value>Versteckte Dateien anzeigen</value></data>
 </root>

@@ -310,4 +310,9 @@
   <data name="Sto_Total" xml:space="preserve"><value>存储总容量</value></data>
   <data name="Sto_Used" xml:space="preserve"><value>已用空间</value></data>
   <data name="Sto_Free" xml:space="preserve"><value>可用空间</value></data>
+  <data name="Files_DropHint" xml:space="preserve"><value>松开上传到此目录</value></data>
+  <data name="Files_DropDone" xml:space="preserve"><value>已上传 {0} 项</value></data>
+  <data name="Files_DropPartial" xml:space="preserve"><value>{0} 项上传失败：</value></data>
+  <data name="Files_HideHidden" xml:space="preserve"><value>隐藏隐藏文件</value></data>
+  <data name="Files_ShowHidden" xml:space="preserve"><value>显示隐藏文件</value></data>
 </root>

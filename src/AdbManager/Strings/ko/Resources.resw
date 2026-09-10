@@ -309,4 +309,9 @@
   <data name="Sto_Total" xml:space="preserve"><value>저장소 총 용량</value></data>
   <data name="Sto_Used" xml:space="preserve"><value>사용 중 공간</value></data>
   <data name="Sto_Free" xml:space="preserve"><value>여유 공간</value></data>
+  <data name="Files_DropHint" xml:space="preserve"><value>놓아서 여기에 업로드</value></data>
+  <data name="Files_DropDone" xml:space="preserve"><value>{0}개 업로드했습니다</value></data>
+  <data name="Files_DropPartial" xml:space="preserve"><value>{0}개 업로드 실패:</value></data>
+  <data name="Files_HideHidden" xml:space="preserve"><value>숨김 파일 숨기기</value></data>
+  <data name="Files_ShowHidden" xml:space="preserve"><value>숨김 파일 표시</value></data>
 </root>
