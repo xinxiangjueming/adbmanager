@@ -11,6 +11,7 @@ namespace AdbManager.Views;
 
 public sealed class FilesView : PageBase
 {
+    private readonly string _home = "/storage/emulated/0";
     private string _path = "/storage/emulated/0";
     private readonly TextBlock _pathText = Miuix.Body("/storage/emulated/0");
     private readonly StackPanel _list = new() { Spacing = 6 };
@@ -18,6 +19,10 @@ public sealed class FilesView : PageBase
     private RemoteFileItem? _clipboardItem;
     private bool _clipboardIsCut;
     private bool _showHidden = true;
+    /// <summary>已浏览目录所属的设备序列号；为空表示还没浏览过。</summary>
+    private string _loadedSerial = "";
+    /// <summary>设备掉线后置为 true，重新连上（同序列号）时也要重新浏览。</summary>
+    private bool _stale = true;
 
     public FilesView()
     {
@@ -27,11 +32,32 @@ public sealed class FilesView : PageBase
             new EntranceThemeTransition { FromVerticalOffset = 14, IsStaggeringEnabled = false }
         };
         Content = Build();
+        AppState.CurrentDeviceChanged += OnCurrentDeviceChanged;
+    }
+
+    /// <summary>设备变化（含首次连上、切换设备）时自动回到默认目录重新浏览，避免显示上一台设备的内容。</summary>
+    private void OnCurrentDeviceChanged(AdbDevice? device)
+    {
+        var queue = DispatcherQueue ?? Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+        void Apply()
+        {
+            // 设备消失或掉线：标记待刷新，保留当前目录不闪空
+            if (device is null || !device.IsOnline) { _stale = true; return; }
+            if (_stale || device.Serial != _loadedSerial) _ = BrowseAsync(_home);
+        }
+
+        if (queue is { } q && !q.HasThreadAccess) q.TryEnqueue(Apply);
+        else Apply();
     }
 
     public override async Task OnShownAsync()
     {
-        if (_list.Children.Count == 0) await BrowseAsync(_path);
+        // 换过设备或曾掉线则回到默认目录重新浏览；否则沿用当前目录
+        var device = AppState.CurrentDevice;
+        var deviceChanged = device is { IsOnline: true } && device.Serial != _loadedSerial;
+        if (deviceChanged && _stale) _path = _home;
+
+        if (_list.Children.Count == 0 || _stale || deviceChanged) await BrowseAsync(_path);
     }
 
     private UIElement Build()
@@ -112,6 +138,8 @@ public sealed class FilesView : PageBase
         _path = path;
         _pathText.Text = _path;
         _selected = null;
+        _loadedSerial = device!.Serial;
+        _stale = false;
 
         // 先显示内联 loading，再拉取目录
         ShowListLoading();

@@ -5,8 +5,35 @@ namespace AdbManager.Services;
 
 public sealed partial class AdbService
 {
-    /// <summary>列出设备已安装包（第三方 + 系统 + 冻结状态）。</summary>
+    /// <summary>列出设备已安装包（第三方 + 系统 + 冻结状态 + 应用显示名）。</summary>
     public async Task<List<PackageInfo>> ListPackagesAsync(string serial)
+    {
+        var result = await ListPackagesCoreAsync(serial).ConfigureAwait(false);
+
+        // 应用名读取失败不阻断列表：拿不到 label 的包回退显示包名
+        try
+        {
+            var labels = await QueryLabelsAsync(serial, result.Select(p => p.PackageName).ToList())
+                .ConfigureAwait(false);
+            foreach (var package in result)
+            {
+                if (labels.TryGetValue(package.PackageName, out var label)) package.Label = label;
+            }
+        }
+        catch (Exception ex)
+        {
+            AppState.Log.Error(L("Apps_Err_LabelRead", ex.Message));
+        }
+
+        return result.OrderBy(p => p.DisplayName, StringComparer.OrdinalIgnoreCase).ToList();
+    }
+
+    /// <summary>
+    /// 只列出包名与类型/冻结状态，不读应用名。
+    /// 供 ListPackagesWithIconsAsync 使用——应用名与图标在同一次 app_process
+    /// 调用里一并取回，若在此处先查一次名称，会多付一次约 2.8 秒的 JVM 启动开销。
+    /// </summary>
+    private async Task<List<PackageInfo>> ListPackagesCoreAsync(string serial)
     {
         var thirdParty = await QueryPackagesAsync(serial, "-3").ConfigureAwait(false);
         var system = await QueryPackagesAsync(serial, "-s").ConfigureAwait(false);
@@ -19,7 +46,7 @@ public sealed partial class AdbService
         foreach (var name in system)
             result.Add(new PackageInfo { PackageName = name, IsSystem = true, IsDisabled = disabledSet.Contains(name) });
 
-        return result.OrderBy(p => p.PackageName, StringComparer.OrdinalIgnoreCase).ToList();
+        return result;
     }
 
     private async Task<List<string>> QueryPackagesAsync(string serial, string flag)
@@ -37,6 +64,50 @@ public sealed partial class AdbService
         }
         return names;
     }
+
+    // ---------------- 应用名读取（app_process + dex） ----------------
+
+    /// <summary>
+    /// 批量读取应用显示名（application-label）。返回「包名 → 应用名」字典；
+    /// 取不到的包不会出现在结果中。失败时返回空字典（调用方回退显示包名）。
+    ///
+    /// 走 AppInfoProbe 的 label-only 模式（outDir 传 "-"），与图标读取共用同一个 dex，
+    /// 只是跳过 PNG 编码与磁盘写入。
+    /// </summary>
+    public async Task<Dictionary<string, string>> QueryLabelsAsync(string serial, IReadOnlyList<string> packages)
+    {
+        var labels = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        if (packages.Count == 0) return labels;
+
+        if (!await EnsureAppInfoDexAsync(serial).ConfigureAwait(false))
+            return labels;
+
+        for (var offset = 0; offset < packages.Count; offset += AppInfoBatchSize)
+        {
+            var batch = packages.Skip(offset).Take(AppInfoBatchSize).ToList();
+            var arguments = string.Join(' ', batch.Select(QuoteIfNeeded));
+            var command =
+                $"CLASSPATH={AppInfoRemoteDex} app_process /system/bin AppInfoProbe - {arguments}";
+
+            var result = await RunAsync($"-s \"{serial}\" shell \"{EscapeForShell(command)}\"",
+                    timeout: TimeSpan.FromSeconds(60))
+                .ConfigureAwait(false);
+
+            // 复用 AppInfoProbe 的解析：label-only 模式下第三列（图标路径）恒为空，忽略即可
+            ParseAppInfoOutput(result.StdOut, out _, out var parsed);
+            foreach (var (package, label) in parsed) labels[package] = label;
+        }
+
+        return labels;
+    }
+
+    private static string QuoteIfNeeded(string value) =>
+        value.Contains(' ') ? $"\"{value}\"" : value;
+
+    /// <summary>把整条设备端命令包进双引号前，先转义其中的特殊字符。</summary>
+    private static string EscapeForShell(string command) =>
+        command.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("$", "\\$").Replace("`", "\\`");
+
 
     /// <summary>安装单个 APK。</summary>
     public async Task<(bool Success, string Message)> InstallApkAsync(string serial, string apkPath)

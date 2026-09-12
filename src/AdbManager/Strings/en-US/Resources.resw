@@ -73,7 +73,7 @@
   <data name="Apps_Title" xml:space="preserve"><value>Apps</value></data>
   <data name="Apps_InstallApk" xml:space="preserve"><value>Install APK</value></data>
   <data name="Apps_InstallBundle" xml:space="preserve"><value>Install APKS bundle</value></data>
-  <data name="Apps_Search" xml:space="preserve"><value>Search package</value></data>
+  <data name="Apps_Search" xml:space="preserve"><value>Search app or package name</value></data>
   <data name="Apps_ThirdParty" xml:space="preserve"><value>Third-party</value></data>
   <data name="Apps_System" xml:space="preserve"><value>System</value></data>
   <data name="Apps_Disabled" xml:space="preserve"><value>Frozen</value></data>
@@ -83,6 +83,7 @@
   <data name="Apps_ForceStop" xml:space="preserve"><value>Force stop</value></data>
   <data name="Apps_ClearData" xml:space="preserve"><value>Clear data</value></data>
   <data name="Apps_KeepData" xml:space="preserve"><value>Keep data</value></data>
+  <data name="Apps_UninstallKeepData" xml:space="preserve"><value>Uninstall, keep data</value></data>
 
   <data name="Files_Title" xml:space="preserve"><value>Files</value></data>
   <data name="Files_Up" xml:space="preserve"><value>Up</value></data>
@@ -125,6 +126,7 @@
   <data name="Msg_Done" xml:space="preserve"><value>Done</value></data>
   <data name="Msg_Failed" xml:space="preserve"><value>Failed</value></data>
   <data name="Msg_ConfirmUninstall" xml:space="preserve"><value>Uninstall this app?</value></data>
+  <data name="Msg_ConfirmUninstallKeep" xml:space="preserve"><value>Uninstall this app? Its data will be kept and restored if reinstalled.</value></data>
   <data name="Msg_ConfirmDelete" xml:space="preserve"><value>Delete the selected item(s)?</value></data>
   <data name="Msg_ConfirmFreeze" xml:space="preserve"><value>Freeze this app? Its launcher icon will disappear.</value></data>
   <data name="Msg_Ready" xml:space="preserve"><value>Ready</value></data>
@@ -242,6 +244,9 @@
   <data name="Apps_Err_NoApkInBundle" xml:space="preserve"><value>No APK found inside the bundle.</value></data>
   <data name="Apps_Loading" xml:space="preserve"><value>Loading app list…</value></data>
   <data name="Apps_Loaded" xml:space="preserve"><value>{0} app(s).</value></data>
+  <data name="Apps_Err_LabelDexMissing" xml:space="preserve"><value>Bundled app-label component is missing.</value></data>
+  <data name="Apps_Err_LabelDexPush" xml:space="preserve"><value>Failed to push the app-label component: {0}</value></data>
+  <data name="Apps_Err_LabelRead" xml:space="preserve"><value>Failed to read app names, falling back to package names: {0}</value></data>
   <data name="Tether_Err_Start" xml:space="preserve"><value>Proxy start failed: {0}</value></data>
   <data name="Tether_ProxySet" xml:space="preserve"><value>Proxy set: {0} (PC listening on 127.0.0.1:{1})</value></data>
   <data name="Tether_Stopped" xml:space="preserve"><value>Sharing stopped and device proxy cleared.</value></data>
@@ -256,7 +261,6 @@
   <data name="Info_Abi" xml:space="preserve"><value>CPU (ABI)</value></data>
   <data name="Bt_Level" xml:space="preserve"><value>Level</value></data>
   <data name="Bt_Status" xml:space="preserve"><value>Status</value></data>
-  <data name="Bt_Health" xml:space="preserve"><value>Health</value></data>
   <data name="Bt_HealthGood" xml:space="preserve"><value>Good</value></data>
   <data name="Bt_Temp" xml:space="preserve"><value>Temperature</value></data>
   <data name="Bt_Voltage" xml:space="preserve"><value>Voltage</value></data>
@@ -329,4 +333,34 @@
   <data name="Files_DropPartial" xml:space="preserve"><value>{0} item(s) failed:</value></data>
   <data name="Files_HideHidden" xml:space="preserve"><value>Hide hidden files</value></data>
   <data name="Files_ShowHidden" xml:space="preserve"><value>Show hidden files</value></data>
+  <data name="Bt_CycleCount" xml:space="preserve"><value>Cycle count</value></data>
+  <data name="Bt_HealthPct" xml:space="preserve"><value>Battery health</value></data>
+  <data name="Sys_Platform" xml:space="preserve"><value>Chipset platform</value></data>
+  <data name="Sys_Imei" xml:space="preserve"><value>IMEI</value></data>
+  <data name="Sys_UfsLife" xml:space="preserve"><value>Flash lifespan</value></data>
+  <data name="Sys_UfsA" xml:space="preserve"><value>Life A</value></data>
+  <data name="Sys_UfsB" xml:space="preserve"><value>Life B</value></data>
+  <data name="Info_Wifi" xml:space="preserve"><value>WiFi passwords</value></data>
+  <data name="Info_Usage" xml:space="preserve"><value>App usage</value></data>
+  <data name="Info_PrivacyTitle" xml:space="preserve"><value>Private data (root required)</value></data>
+  <data name="Info_PrivacyHint" xml:space="preserve"><value>WiFi passwords, IMEI and app usage history are sensitive personal data and are masked by default. Do not screenshot or share them after revealing.</value></data>
+  <data name="Info_ShowSecrets" xml:space="preserve"><value>Show</value></data>
+  <data name="Info_HideSecrets" xml:space="preserve"><value>Hide</value></data>
+  <data name="Info_NeedRoot" xml:space="preserve"><value>This device is not rooted; the data cannot be read.</value></data>
+  <data name="Info_WifiEmpty" xml:space="preserve"><value>No saved WiFi networks found.</value></data>
+  <data name="Info_UsageCount" xml:space="preserve"><value>{0} times foreground</value></data>
+  <data name="Info_OpenNetwork" xml:space="preserve"><value>(open network)</value></data>
+  <data name="Apps_Err_IconPack" xml:space="preserve"><value>Failed to package icons: {0}</value></data>
+  <data name="Apps_Err_IconPull" xml:space="preserve"><value>Failed to pull icons: {0}</value></data>
+  <data name="Apps_Err_IconExtract" xml:space="preserve"><value>Failed to extract icons: {0}</value></data>
+  <data name="Apps_IconLoaded" xml:space="preserve"><value>Loaded {0} app icons.</value></data>
+  <data name="Apps_InfoLoading" xml:space="preserve"><value>Loading app names and icons…</value></data>
+  <data name="Nav_Processes" xml:space="preserve"><value>Running</value></data>
+  <data name="Proc_Title" xml:space="preserve"><value>Running processes</value></data>
+  <data name="Proc_All" xml:space="preserve"><value>All</value></data>
+  <data name="Proc_Loading" xml:space="preserve"><value>Loading running processes…</value></data>
+  <data name="Proc_Loaded" xml:space="preserve"><value>{0} running apps.</value></data>
+  <data name="Proc_Err_Ps" xml:space="preserve"><value>Failed to read process list: {0}</value></data>
+  <data name="Proc_Memory" xml:space="preserve"><value>{0} MB</value></data>
+  <data name="Proc_Foreground" xml:space="preserve"><value>Foreground</value></data>
 </root>

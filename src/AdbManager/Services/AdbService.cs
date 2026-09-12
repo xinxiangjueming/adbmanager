@@ -188,6 +188,21 @@ public sealed partial class AdbService
 
     public Task<AdbResult> KillServerAsync() => RunAsync("kill-server", timeout: TimeSpan.FromSeconds(30));
 
+    /// <summary>应用退出时清理：结束可能遗留的录屏进程并停止 adb server 守护进程，
+    /// 避免关闭软件后 adb server 与设备连接仍在后台驻留。</summary>
+    public async Task ShutdownAsync()
+    {
+        if (_recordingProcess is not null)
+        {
+            TryKill(_recordingProcess);
+            try { _recordingProcess.Dispose(); } catch { /* 已退出 */ }
+            _recordingProcess = null;
+            _recordingRemoteFile = null;
+        }
+
+        await KillServerAsync().ConfigureAwait(false);
+    }
+
     /// <summary>重启 adb 服务；遇到版本冲突会强制清理残留 server 进程。</summary>
     public async Task<AdbResult> RestartServerAsync()
     {

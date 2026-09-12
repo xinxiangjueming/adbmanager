@@ -74,6 +74,13 @@
     <EmbeddedResource Include="Assets\AppIcon.ico" LogicalName="app.ico" />
   </ItemGroup>
 
+  <!-- 应用名 + 图标读取 dex（原创，约 5KB）：运行时释放并 push 到设备，
+       借 app_process 拿系统 Context，调 PackageManager 取应用名、导出图标 PNG。
+       源码 tools\labeldex\src\AppInfoProbe.java，重新编译见 tools\labeldex\README.txt -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\tools\labeldex\bin\classes.dex" LogicalName="labeldex.classes.dex" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Update="app.manifest" CopyToOutputDirectory="Never" />
   </ItemGroup>

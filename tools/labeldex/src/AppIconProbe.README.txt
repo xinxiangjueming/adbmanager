@@ -1,0 +1,29 @@
+# AppIconProbe.java —— 应用图标提取探针（已验证可行，2026-09-10）
+#
+# 结论：app_process + dex 可在免 root 下提取全部应用图标（PNG），
+# 真机实测 22081212C（Android 16）395 个包全部成功、0 失败、总耗时 10s，
+# 压缩后 5.1MB 传回仅 0.18s。
+#
+# 源码见 src/AppIconProbe.java。本文件仅作记录，不参与构建。
+#
+# 构建（与 labeldex 相同的三步）：
+#   mkdir -p build/classes build/dex
+#   cp /e/Sdk/platforms/android-36/android.jar ./android.jar
+#   "C:/Users/kongj/jdk-17.0.20+8/bin/javac.exe" -encoding UTF-8 -source 11 -target 11 \
+#       -nowarn -classpath android.jar -d build/classes src/AppIconProbe.java
+#   "C:/Users/kongj/jdk-17.0.20+8/bin/java.exe" -cp "E:/Sdk/build-tools/36.0.0/lib/d8.jar" \
+#       com.android.tools.r8.D8 --min-api 24 --output build/dex build/classes/AppIconProbe.class
+#
+# 运行：
+#   adb push build/dex/classes.dex /data/local/tmp/iconprobe.dex
+#   adb shell "CLASSPATH=/data/local/tmp/iconprobe.dex app_process /system/bin AppIconProbe /data/local/tmp/icons <pkg...>"
+#
+# 关键实现点：
+#   1. ActivityThread 是隐藏 API，必须纯反射（Class.forName + systemMain + getSystemContext）
+#   2. systemMain().getSystemContext() 拿到的 Context 已能按当前用户解析全部包，
+#      无需额外 createContextAsUser / LauncherApps（实测两者都不如它可靠）
+#   3. 取图标：createPackageContext(pkg, CONTEXT_IGNORE_SECURITY)
+#      → getResources().getDrawableForDensity(info.icon, 密度)
+#      逐档尝试 320/240/213/160/480/640，取到即用；失败回退 info.loadIcon(pm)
+#   4. Drawable → Bitmap → PNG（ARGB_8888，quality 100）
+#   5. 尺寸不定（实测 48px~3600px），UI 显示前必须缩放到固定尺寸

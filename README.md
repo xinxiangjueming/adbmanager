@@ -30,6 +30,13 @@
 - 卸载、冻结 / 解冻（`pm disable-user`）、强制停止、清除数据
 - 按第三方 / 系统 / 已冻结过滤，支持包名搜索
 
+### 运行中进程
+
+- 列出设备当前正在运行的应用（`ps -A` 与已安装包交叉匹配，自动剔除原生守护进程）
+- 显示应用名、图标、PID 与内存占用，前台应用自动标记并选中；可按全部 / 第三方 / 系统过滤，支持搜索
+- 顶部进度条显示设备运存占用（已用 / 总量与百分比）
+- 选中后一键强制停止并自动刷新列表
+
 ### 文件管理
 
 - 浏览设备目录（正确处理 `/sdcard` 等符号链接，点击即可进入）
@@ -124,7 +131,7 @@ dotnet publish src/AdbManager -c Release -r win-x64 --self-contained true -o dis
 repo/
 ├─ src/AdbManager/        应用源码（WinUI 3，纯 C# 构建 UI）
 │  ├─ Services/           adb / fastboot 调用、mDNS 发现、多语言、反向共享代理等
-│  ├─ Views/              各页面（设备 / 信息 / 工具 / 应用 / 文件 / Fastboot / 日志 / 设置）
+│  ├─ Views/              各页面（设备 / 信息 / 工具 / 应用 / 运行中进程 / 文件 / Fastboot / 日志 / 设置）
 │  ├─ Models/             设备、文件、应用包等数据模型
 │  ├─ Ui/                 miuix 设计体系：配色画笔与控件工厂
 │  └─ Strings/            7 种语言的 resw 资源
@@ -191,6 +198,13 @@ repo/
 - Extract APK (including splits) to the PC
 - Uninstall, freeze / unfreeze (`pm disable-user`), force stop, clear data
 - Filter by third-party / system / disabled, with package name search
+
+### Running processes
+
+- List apps currently running on the device (`ps -A` cross-matched with installed packages, native daemons excluded)
+- Shows app name, icon, PIDs and memory usage; the foreground app is marked and auto-selected; filter by all / third-party / system, with search
+- Memory bar next to the refresh button shows device RAM usage (used / total and percentage)
+- One-click force stop on the selected app with automatic list refresh
 
 ### File management
 
@@ -286,7 +300,7 @@ Output: `dist/AdbManager.exe` (single file).
 repo/
 ├─ src/AdbManager/        App source (WinUI 3, pure C# UI)
 │  ├─ Services/           adb / fastboot invocation, mDNS discovery, localization, reverse-tether proxy, etc.
-│  ├─ Views/              Pages (Devices / Info / Tools / Apps / Files / Fastboot / Logs / Settings)
+│  ├─ Views/              Pages (Devices / Info / Tools / Apps / Running / Files / Fastboot / Logs / Settings)
 │  ├─ Models/             Data models: devices, files, packages
 │  ├─ Ui/                 miuix design system: palette brushes and control factory
 │  └─ Strings/            resw resources for 7 languages

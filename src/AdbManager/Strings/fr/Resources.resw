@@ -76,7 +76,7 @@
   <data name="Apps_Title" xml:space="preserve"><value>Gestion des applications</value></data>
   <data name="Apps_InstallApk" xml:space="preserve"><value>Installer un APK</value></data>
   <data name="Apps_InstallBundle" xml:space="preserve"><value>Installer un bundle APKS</value></data>
-  <data name="Apps_Search" xml:space="preserve"><value>Rechercher un paquet</value></data>
+  <data name="Apps_Search" xml:space="preserve"><value>Rechercher un nom d’app ou de paquet</value></data>
   <data name="Apps_ThirdParty" xml:space="preserve"><value>Tierces</value></data>
   <data name="Apps_System" xml:space="preserve"><value>Système</value></data>
   <data name="Apps_Disabled" xml:space="preserve"><value>Désactivées</value></data>
@@ -86,9 +86,13 @@
   <data name="Apps_ForceStop" xml:space="preserve"><value>Forcer l’arrêt</value></data>
   <data name="Apps_ClearData" xml:space="preserve"><value>Effacer les données</value></data>
   <data name="Apps_KeepData" xml:space="preserve"><value>Conserver les données</value></data>
+  <data name="Apps_UninstallKeepData" xml:space="preserve"><value>Désinstaller en gardant les données</value></data>
   <data name="Apps_ExtractApk" xml:space="preserve"><value>Extraire l’APK</value></data>
   <data name="Apps_Loading" xml:space="preserve"><value>Chargement de la liste…</value></data>
   <data name="Apps_Loaded" xml:space="preserve"><value>{0} applications</value></data>
+  <data name="Apps_Err_LabelDexMissing" xml:space="preserve"><value>Composant intégré de lecture des noms d’applications manquant.</value></data>
+  <data name="Apps_Err_LabelDexPush" xml:space="preserve"><value>Échec de l’envoi du composant de lecture des noms : {0}</value></data>
+  <data name="Apps_Err_LabelRead" xml:space="preserve"><value>Échec de lecture des noms, affichage des noms de package : {0}</value></data>
   <data name="Apps_Err_NoApkPath" xml:space="preserve"><value>pm path n’a renvoyé aucun chemin d’APK.</value></data>
   <data name="Apps_Err_NoApks" xml:space="preserve"><value>Aucun APK à installer.</value></data>
   <data name="Apps_Err_NoApkInBundle" xml:space="preserve"><value>Aucun APK trouvé dans l’archive.</value></data>
@@ -131,6 +135,7 @@
   <data name="Msg_Done" xml:space="preserve"><value>Terminé</value></data>
   <data name="Msg_Failed" xml:space="preserve"><value>Échec</value></data>
   <data name="Msg_ConfirmUninstall" xml:space="preserve"><value>Désinstaller cette application ?</value></data>
+  <data name="Msg_ConfirmUninstallKeep" xml:space="preserve"><value>Désinstaller cette application ? Ses données seront conservées et restaurées après réinstallation.</value></data>
   <data name="Msg_ConfirmDelete" xml:space="preserve"><value>Supprimer les éléments sélectionnés ?</value></data>
   <data name="Msg_ConfirmFreeze" xml:space="preserve"><value>Geler cette application ? Son icône disparaîtra du lanceur.</value></data>
   <data name="Msg_Ready" xml:space="preserve"><value>Prêt</value></data>
@@ -200,7 +205,6 @@
   <data name="Info_Abi" xml:space="preserve"><value>CPU (ABI)</value></data>
   <data name="Bt_Level" xml:space="preserve"><value>Niveau</value></data>
   <data name="Bt_Status" xml:space="preserve"><value>État</value></data>
-  <data name="Bt_Health" xml:space="preserve"><value>Santé</value></data>
   <data name="Bt_HealthGood" xml:space="preserve"><value>Bonne</value></data>
   <data name="Bt_Temp" xml:space="preserve"><value>Température</value></data>
   <data name="Bt_Voltage" xml:space="preserve"><value>Tension</value></data>
@@ -314,4 +318,34 @@
   <data name="Files_DropPartial" xml:space="preserve"><value>{0} élément(s) en échec :</value></data>
   <data name="Files_HideHidden" xml:space="preserve"><value>Masquer les fichiers cachés</value></data>
   <data name="Files_ShowHidden" xml:space="preserve"><value>Afficher les fichiers cachés</value></data>
+  <data name="Bt_CycleCount" xml:space="preserve"><value>Cycles de charge</value></data>
+  <data name="Bt_HealthPct" xml:space="preserve"><value>Santé de la batterie</value></data>
+  <data name="Sys_Platform" xml:space="preserve"><value>Plateforme du chipset</value></data>
+  <data name="Sys_Imei" xml:space="preserve"><value>IMEI</value></data>
+  <data name="Sys_UfsLife" xml:space="preserve"><value>Durée de vie du stockage</value></data>
+  <data name="Sys_UfsA" xml:space="preserve"><value>Durée de vie A</value></data>
+  <data name="Sys_UfsB" xml:space="preserve"><value>Durée de vie B</value></data>
+  <data name="Info_Wifi" xml:space="preserve"><value>Mots de passe Wi-Fi</value></data>
+  <data name="Info_Usage" xml:space="preserve"><value>Utilisation des apps</value></data>
+  <data name="Info_PrivacyTitle" xml:space="preserve"><value>Données privées (root requis)</value></data>
+  <data name="Info_PrivacyHint" xml:space="preserve"><value>Les mots de passe Wi-Fi, l’IMEI et l’historique d’utilisation sont des données personnelles sensibles, masquées par défaut. Ne pas capturer ni partager après affichage.</value></data>
+  <data name="Info_ShowSecrets" xml:space="preserve"><value>Afficher</value></data>
+  <data name="Info_HideSecrets" xml:space="preserve"><value>Masquer</value></data>
+  <data name="Info_NeedRoot" xml:space="preserve"><value>Cet appareil n’est pas rooté ; ces données sont illisibles.</value></data>
+  <data name="Info_WifiEmpty" xml:space="preserve"><value>Aucun réseau Wi-Fi enregistré trouvé.</value></data>
+  <data name="Info_UsageCount" xml:space="preserve"><value>{0} fois au premier plan</value></data>
+  <data name="Info_OpenNetwork" xml:space="preserve"><value>(réseau ouvert)</value></data>
+  <data name="Apps_Err_IconPack" xml:space="preserve"><value>Échec de lempaquetage des icônes : {0}</value></data>
+  <data name="Apps_Err_IconPull" xml:space="preserve"><value>Échec de la récupération des icônes : {0}</value></data>
+  <data name="Apps_Err_IconExtract" xml:space="preserve"><value>Échec de lextraction des icônes : {0}</value></data>
+  <data name="Apps_IconLoaded" xml:space="preserve"><value>{0} icônes dapplication chargées.</value></data>
+  <data name="Apps_InfoLoading" xml:space="preserve"><value>Chargement des noms et icônes des applications…</value></data>
+  <data name="Nav_Processes" xml:space="preserve"><value>Apps actives</value></data>
+  <data name="Proc_Title" xml:space="preserve"><value>Processus en cours</value></data>
+  <data name="Proc_All" xml:space="preserve"><value>Tous</value></data>
+  <data name="Proc_Loading" xml:space="preserve"><value>Chargement des processus en cours…</value></data>
+  <data name="Proc_Loaded" xml:space="preserve"><value>{0} applications actives.</value></data>
+  <data name="Proc_Err_Ps" xml:space="preserve"><value>Échec de la lecture de la liste des processus : {0}</value></data>
+  <data name="Proc_Memory" xml:space="preserve"><value>{0} MB</value></data>
+  <data name="Proc_Foreground" xml:space="preserve"><value>Premier plan</value></data>
 </root>

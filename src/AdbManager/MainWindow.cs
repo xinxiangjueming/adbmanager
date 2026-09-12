@@ -32,7 +32,12 @@ public sealed partial class MainWindow : Window
     private readonly TextBlock _statusText = new() { FontSize = 12, VerticalAlignment = VerticalAlignment.Center };
     private readonly Dictionary<string, PageBase> _pages = new();
     private readonly DispatcherQueueTimer _refreshTimer;
+    private readonly DispatcherQueueTimer _notifyTimer;   // 通知自动收起的延时器
+    private Storyboard? _notifyFade;                      // 通知淡出动画，新通知到达时需停掉
     private static MainWindow? _current;
+
+    /// <summary>成功 / 提示类通知的自动收起延时；错误与警告不自动关闭。</summary>
+    private static readonly TimeSpan NotifyAutoCloseDelay = TimeSpan.FromSeconds(4);
 
     private static readonly (string Key, string Glyph)[] NavItems =
     {
@@ -42,6 +47,7 @@ public sealed partial class MainWindow : Window
         ("Nav_Info", "\uE9D9"),
         ("Nav_Fastboot", "\uE945"),
         ("Nav_Apps", "\uE7B8"),
+        ("Nav_Processes", "\uE768"),
         ("Nav_Files", "\uE8B7"),
         ("Nav_Logs", "\uE8A5"),
         ("Nav_Settings", "\uE713")
@@ -78,7 +84,28 @@ public sealed partial class MainWindow : Window
         _refreshTimer.Tick += async (_, _) => await RefreshDevicesQuietlyAsync();
         _refreshTimer.Start();
 
+        _notifyTimer = dispatcher.CreateTimer();
+        _notifyTimer.Interval = NotifyAutoCloseDelay;
+        _notifyTimer.IsRepeating = false;
+        _notifyTimer.Tick += (_, _) => CloseNotify();
+
+        Closed += OnClosed;
+
         _ = RefreshDevicesQuietlyAsync();
+    }
+
+    /// <summary>窗口关闭时清理后台进程：停止 adb server 守护进程并回收遗留录屏进程，
+    /// 使关闭软件后设备连接随之中断，不再在后台驻留。</summary>
+    private void OnClosed(object sender, Microsoft.UI.Xaml.WindowEventArgs args)
+    {
+        try
+        {
+            AppState.Adb.ShutdownAsync().Wait(TimeSpan.FromSeconds(10));
+        }
+        catch
+        {
+            // 退出阶段静默：即使清理失败也不应阻塞窗口关闭
+        }
     }
 
     /// <summary>把内置的应用图标释放到本地并应用到窗口 / 任务栏。</summary>
@@ -257,6 +284,7 @@ public sealed partial class MainWindow : Window
                 "Nav_Info" => new InfoView(),
                 "Nav_Fastboot" => new FastbootView(),
                 "Nav_Apps" => new AppsView(),
+                "Nav_Processes" => new ProcessesView(),
                 "Nav_Files" => new FilesView(),
                 "Nav_Logs" => new LogsView(),
                 "Nav_Settings" => new SettingsView(),
@@ -291,19 +319,63 @@ public sealed partial class MainWindow : Window
     public static void Notify(string message, InfoBarSeverity severity = InfoBarSeverity.Informational)
     {
         if (_current is null) return;
-        var queue = DispatcherQueue.GetForCurrentThread();
+        // 后台线程调用时 GetForCurrentThread() 返回 null，回退到窗口所属队列
+        var queue = DispatcherQueue.GetForCurrentThread() ?? _current.DispatcherQueue;
         if (queue is { } q && !q.HasThreadAccess)
         {
             q.TryEnqueue(() => Notify(message, severity));
             return;
         }
 
-        _current._infoBar.Severity = severity;
-        _current._infoBar.Title = severity == InfoBarSeverity.Error
+        _current.ShowNotify(message, severity);
+    }
+
+    /// <summary>在 UI 线程上真正渲染一条通知：成功/提示类延时自动收起，错误/警告保持常驻。</summary>
+    private void ShowNotify(string message, InfoBarSeverity severity)
+    {
+        // 新通知到达：取消上一次的收起计划，并撤销可能正在进行的淡出
+        _notifyTimer.Stop();
+        if (_notifyFade is { } fade)
+        {
+            fade.Stop();
+            _notifyFade = null;
+        }
+        _infoBar.Opacity = 1;
+
+        _infoBar.Severity = severity;
+        _infoBar.Title = severity == InfoBarSeverity.Error
             ? LocalizationService.Get("Msg_Failed")
             : LocalizationService.Get("Msg_Done");
-        _current._infoBar.Message = message;
-        _current._infoBar.IsOpen = true;
+        _infoBar.Message = message;
+        _infoBar.IsOpen = true;
+
+        if (severity is InfoBarSeverity.Success or InfoBarSeverity.Informational)
+            _notifyTimer.Start();
+    }
+
+    /// <summary>淡出并收起当前通知。InfoBar 的 IsOpen=false 自带收起动画，这里先做一层透明度过渡。</summary>
+    private void CloseNotify()
+    {
+        if (!_infoBar.IsOpen) return;
+
+        var fade = new Storyboard();
+        var anim = new DoubleAnimation
+        {
+            To = 0,
+            Duration = new Duration(TimeSpan.FromMilliseconds(220)),
+            EnableDependentAnimation = true
+        };
+        Storyboard.SetTarget(anim, _infoBar);
+        Storyboard.SetTargetProperty(anim, "Opacity");
+        fade.Children.Add(anim);
+        fade.Completed += (_, _) =>
+        {
+            _notifyFade = null;
+            _infoBar.IsOpen = false;
+            _infoBar.Opacity = 1;   // 复位，供下次通知淡入
+        };
+        _notifyFade = fade;
+        fade.Begin();
     }
 
     // ---------------- 长操作进度覆盖层 ----------------

@@ -67,7 +67,7 @@
   <data name="Apps_Title" xml:space="preserve"><value>应用管理</value></data>
   <data name="Apps_InstallApk" xml:space="preserve"><value>安装 APK</value></data>
   <data name="Apps_InstallBundle" xml:space="preserve"><value>安装 APKS（拆分包）</value></data>
-  <data name="Apps_Search" xml:space="preserve"><value>搜索包名</value></data>
+  <data name="Apps_Search" xml:space="preserve"><value>搜索应用名或包名</value></data>
   <data name="Apps_ThirdParty" xml:space="preserve"><value>第三方应用</value></data>
   <data name="Apps_System" xml:space="preserve"><value>系统应用</value></data>
   <data name="Apps_Disabled" xml:space="preserve"><value>已冻结</value></data>
@@ -77,6 +77,7 @@
   <data name="Apps_ForceStop" xml:space="preserve"><value>强制停止</value></data>
   <data name="Apps_ClearData" xml:space="preserve"><value>清除数据</value></data>
   <data name="Apps_KeepData" xml:space="preserve"><value>保留数据</value></data>
+  <data name="Apps_UninstallKeepData" xml:space="preserve"><value>卸载并保留数据</value></data>
   <data name="Files_Title" xml:space="preserve"><value>文件管理</value></data>
   <data name="Files_Up" xml:space="preserve"><value>上一级</value></data>
   <data name="Files_Home" xml:space="preserve"><value>根目录</value></data>
@@ -169,6 +170,7 @@
   <data name="Msg_Done" xml:space="preserve"><value>操作完成</value></data>
   <data name="Msg_Failed" xml:space="preserve"><value>操作失败</value></data>
   <data name="Msg_ConfirmUninstall" xml:space="preserve"><value>确定卸载该应用？</value></data>
+  <data name="Msg_ConfirmUninstallKeep" xml:space="preserve"><value>确定卸载该应用？应用数据将保留，重装后可恢复。</value></data>
   <data name="Msg_ConfirmDelete" xml:space="preserve"><value>确定删除选中的文件/文件夹？</value></data>
   <data name="Msg_ConfirmFreeze" xml:space="preserve"><value>确定冻结该应用？冻结后桌面图标会消失。</value></data>
   <data name="Msg_Ready" xml:space="preserve"><value>就绪</value></data>
@@ -228,6 +230,9 @@
   <data name="Apps_Err_NoApkInBundle" xml:space="preserve"><value>压缩包中没有找到 APK。</value></data>
   <data name="Apps_Loading" xml:space="preserve"><value>正在读取应用列表…</value></data>
   <data name="Apps_Loaded" xml:space="preserve"><value>共 {0} 个应用。</value></data>
+  <data name="Apps_Err_LabelDexMissing" xml:space="preserve"><value>内置应用名读取组件缺失。</value></data>
+  <data name="Apps_Err_LabelDexPush" xml:space="preserve"><value>应用名读取组件推送失败：{0}</value></data>
+  <data name="Apps_Err_LabelRead" xml:space="preserve"><value>应用名读取失败，已回退显示包名：{0}</value></data>
   <data name="Tether_Err_Start" xml:space="preserve"><value>代理启动失败：{0}</value></data>
   <data name="Tether_ProxySet" xml:space="preserve"><value>代理已设置：{0}（电脑监听 127.0.0.1:{1}）</value></data>
   <data name="Tether_Stopped" xml:space="preserve"><value>已停止共享并清除设备代理。</value></data>
@@ -242,7 +247,6 @@
   <data name="Info_Abi" xml:space="preserve"><value>处理器（ABI）</value></data>
   <data name="Bt_Level" xml:space="preserve"><value>电量</value></data>
   <data name="Bt_Status" xml:space="preserve"><value>状态</value></data>
-  <data name="Bt_Health" xml:space="preserve"><value>健康度</value></data>
   <data name="Bt_HealthGood" xml:space="preserve"><value>良好</value></data>
   <data name="Bt_Temp" xml:space="preserve"><value>温度</value></data>
   <data name="Bt_Voltage" xml:space="preserve"><value>电压</value></data>
@@ -315,4 +319,34 @@
   <data name="Files_DropPartial" xml:space="preserve"><value>{0} 项上传失败：</value></data>
   <data name="Files_HideHidden" xml:space="preserve"><value>隐藏隐藏文件</value></data>
   <data name="Files_ShowHidden" xml:space="preserve"><value>显示隐藏文件</value></data>
+  <data name="Bt_CycleCount" xml:space="preserve"><value>循环次数</value></data>
+  <data name="Bt_HealthPct" xml:space="preserve"><value>电池健康度</value></data>
+  <data name="Sys_Platform" xml:space="preserve"><value>芯片平台</value></data>
+  <data name="Sys_Imei" xml:space="preserve"><value>IMEI</value></data>
+  <data name="Sys_UfsLife" xml:space="preserve"><value>闪存寿命</value></data>
+  <data name="Sys_UfsA" xml:space="preserve"><value>寿命 A</value></data>
+  <data name="Sys_UfsB" xml:space="preserve"><value>寿命 B</value></data>
+  <data name="Info_Wifi" xml:space="preserve"><value>WiFi 密码</value></data>
+  <data name="Info_Usage" xml:space="preserve"><value>应用使用</value></data>
+  <data name="Info_PrivacyTitle" xml:space="preserve"><value>隐私数据（需 root）</value></data>
+  <data name="Info_PrivacyHint" xml:space="preserve"><value>WiFi 密码、IMEI 与应用使用记录属于敏感个人信息，默认脱敏显示。点击「显示」后请勿截图或外传。</value></data>
+  <data name="Info_ShowSecrets" xml:space="preserve"><value>显示</value></data>
+  <data name="Info_HideSecrets" xml:space="preserve"><value>隐藏</value></data>
+  <data name="Info_NeedRoot" xml:space="preserve"><value>该设备未获取 root 权限，无法读取此数据。</value></data>
+  <data name="Info_WifiEmpty" xml:space="preserve"><value>未找到已保存的 WiFi 网络。</value></data>
+  <data name="Info_UsageCount" xml:space="preserve"><value>{0} 次前台</value></data>
+  <data name="Info_OpenNetwork" xml:space="preserve"><value>（开放网络）</value></data>
+  <data name="Apps_Err_IconPack" xml:space="preserve"><value>图标打包失败：{0}</value></data>
+  <data name="Apps_Err_IconPull" xml:space="preserve"><value>图标拉取失败：{0}</value></data>
+  <data name="Apps_Err_IconExtract" xml:space="preserve"><value>图标解包失败：{0}</value></data>
+  <data name="Apps_IconLoaded" xml:space="preserve"><value>已读取 {0} 个应用图标。</value></data>
+  <data name="Apps_InfoLoading" xml:space="preserve"><value>正在读取应用名与图标…</value></data>
+  <data name="Nav_Processes" xml:space="preserve"><value>运行中进程</value></data>
+  <data name="Proc_Title" xml:space="preserve"><value>运行中进程</value></data>
+  <data name="Proc_All" xml:space="preserve"><value>全部</value></data>
+  <data name="Proc_Loading" xml:space="preserve"><value>正在读取运行中的进程…</value></data>
+  <data name="Proc_Loaded" xml:space="preserve"><value>共 {0} 个运行中的应用。</value></data>
+  <data name="Proc_Err_Ps" xml:space="preserve"><value>读取进程列表失败：{0}</value></data>
+  <data name="Proc_Memory" xml:space="preserve"><value>{0} MB</value></data>
+  <data name="Proc_Foreground" xml:space="preserve"><value>前台运行</value></data>
 </root>
