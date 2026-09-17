@@ -184,7 +184,9 @@ public sealed class DevicesView : PageBase
                 actions.Children.Add(selectButton);
             }
 
-            if (string.IsNullOrEmpty(device.UsbPort))
+            // 仅 TCP（ip:port）设备支持断开：mDNS 设备的 serial 是服务名，
+            // adb disconnect 只接受 HOST[:PORT]，传服务名会报 no such device。
+            if (string.IsNullOrEmpty(device.UsbPort) && !device.IsMdns)
             {
                 var disconnect = Miuix.DangerButton(L("Devices_Disconnect"));
                 disconnect.Height = 36;

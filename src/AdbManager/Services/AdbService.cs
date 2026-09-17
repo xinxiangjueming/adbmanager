@@ -226,7 +226,22 @@ public sealed partial class AdbService
 
     // ---------------- 设备 ----------------
 
-    /// <summary>adb devices -l 解析。</summary>
+    /// <summary>adb devices -l 的固定属性 key（用于从右侧反推属性区边界）。</summary>
+    private static readonly HashSet<string> DeviceAttrKeys = new(StringComparer.Ordinal)
+    {
+        "product", "model", "device", "transport_id", "usb"
+    };
+
+    /// <summary>adb devices 可能出现的状态词（用于定位 state 列）。</summary>
+    private static readonly HashSet<string> DeviceStates = new(StringComparer.Ordinal)
+    {
+        "device", "unauthorized", "offline", "recovery", "sideload",
+        "bootloader", "fastboot", "authorizing", "rescue", "no permissions"
+    };
+
+    /// <summary>
+    /// adb devices -l 解析：兼容 serial 含空格的 mDNS（无线调试）设备。
+    /// </summary>
     public async Task<List<AdbDevice>> GetDevicesAsync()
     {
         var result = await RunAsync("devices -l", timeout: TimeSpan.FromSeconds(30)).ConfigureAwait(false);
@@ -239,11 +254,37 @@ public sealed partial class AdbService
             if (line.StartsWith("List of devices", StringComparison.OrdinalIgnoreCase)) continue;
             if (line.StartsWith("*", StringComparison.Ordinal)) continue;
 
-            var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length < 2) continue;
+            // mDNS（无线调试）设备的 serial 是服务实例名，可能包含空格，例如：
+            //   adb-1e8bfbfa-oyEf42 (2)._adb-tls-connect._tcp
+            // 直接按列取 parts[0]/parts[1] 会把 serial 截断，并把后半段误当成 state
+            // （state 不是 "device" → IsOnline=false；-s 又报 device not found）。
+            // 正确做法：先从右侧剥离固定集合的 key:value 属性区，
+            // 再在剩余 token 中取最后一个已知状态词作为 state，其余整体拼回 serial。
+            // tab 与空格都当分隔符（Linux 平台 adb 用 tab 分隔 serial 与状态）
+            var tokens = line.Replace('\t', ' ').Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length < 2) continue;
 
-            var device = new AdbDevice { Serial = parts[0], State = parts[1] };
-            foreach (var field in parts.Skip(2))
+            var attrStart = tokens.Length;
+            for (var i = tokens.Length - 1; i >= 1; i--)
+            {
+                var colon = tokens[i].IndexOf(':');
+                if (colon > 0 && DeviceAttrKeys.Contains(tokens[i][..colon])) attrStart = i;
+                else break;
+            }
+
+            var stateIndex = 1;
+            for (var i = attrStart - 1; i >= 1; i--)
+            {
+                if (DeviceStates.Contains(tokens[i])) { stateIndex = i; break; }
+            }
+
+            var device = new AdbDevice
+            {
+                Serial = string.Join(' ', tokens.Take(stateIndex)),
+                State = tokens[stateIndex]
+            };
+
+            foreach (var field in tokens.Skip(attrStart))
             {
                 var index = field.IndexOf(':');
                 if (index <= 0) continue;
@@ -259,7 +300,10 @@ public sealed partial class AdbService
                 }
             }
 
-            if (string.IsNullOrEmpty(device.Model) && device.Serial.Contains(':') && device.IsOnline)
+            // 无线设备的 model 有时在 devices -l 中缺失，按需补查。
+            // 注意：mDNS serial 不含冒号，不能只靠 ':' 判断是否为无线设备。
+            if (string.IsNullOrEmpty(device.Model) && device.IsOnline &&
+                (device.Serial.Contains(':') || device.IsMdns))
             {
                 // 无线设备：devices -l 有时拿不到 model，按需补查
                 device.Model = await QueryPropAsync(device.Serial, "ro.product.model").ConfigureAwait(false);
