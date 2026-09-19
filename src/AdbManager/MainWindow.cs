@@ -34,6 +34,7 @@ public sealed partial class MainWindow : Window
     private readonly DispatcherQueueTimer _refreshTimer;
     private readonly DispatcherQueueTimer _notifyTimer;   // 通知自动收起的延时器
     private Storyboard? _notifyFade;                      // 通知淡出动画，新通知到达时需停掉
+    private AcrylicBackdrop? _acrylic;                    // 微信式实时模糊背景，窗口关闭时释放
     private static MainWindow? _current;
 
     /// <summary>成功 / 提示类通知的自动收起延时；错误与警告不自动关闭。</summary>
@@ -57,7 +58,10 @@ public sealed partial class MainWindow : Window
     {
         _current = this;
         Title = LocalizationService.Get("App_Title");
-        SystemBackdrop = new MicaBackdrop();
+        // 亚克力背景：实时模糊窗口后面的桌面（微信侧栏那种效果）；
+        // 侧栏与顶栏全透明、内容区半透明层色的搭配保持不变
+        _acrylic = new AcrylicBackdrop();
+        _acrylic.Attach(this);
         ExtendsContentIntoTitleBar = true;
 
         var dispatcher = DispatcherQueue.GetForCurrentThread();
@@ -98,6 +102,8 @@ public sealed partial class MainWindow : Window
     /// 使关闭软件后设备连接随之中断，不再在后台驻留。</summary>
     private void OnClosed(object sender, Microsoft.UI.Xaml.WindowEventArgs args)
     {
+        _acrylic?.Dispose();
+        _acrylic = null;
         try
         {
             AppState.Adb.ShutdownAsync().Wait(TimeSpan.FromSeconds(10));
@@ -143,11 +149,12 @@ public sealed partial class MainWindow : Window
         // miuix 画笔已在 App.OnLaunched 注册到应用级资源字典，此处直接使用
         Services.StartupLog.Write("shell:resources ok");
 
-        // 统一窗格/内容/窗体底色：修复 NavigationView 左栏展开/收起时窗格与内容宽度动画
-        // 不同步导致窗口底色短暂露出（microsoft-ui-xaml#9370，官方不修）——闪烁区被同色填充后不可见
+        // Win11 云母风格：根容器与侧栏全透明透出 Mica，内容区叠半透明层色保证正文可读。
+        // 侧栏展开/收起动画不同步露底的问题（microsoft-ui-xaml#9370）随之消失——
+        // 露出的正是底层云母，与两侧视觉一致，无需再靠同色填充遮盖。
         root.Background = Miuix.Brush("MiuixPageBackground");
         _navigation.Resources["NavigationViewExpandedPaneBackground"] = Miuix.Brush("MiuixPageBackground");
-        _navigation.Resources["NavigationViewContentBackground"] = Miuix.Brush("MiuixPageBackground");
+        _navigation.Resources["NavigationViewContentBackground"] = Miuix.Brush("MiuixLayerBackground");
 
         root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
@@ -209,7 +216,7 @@ public sealed partial class MainWindow : Window
         // 状态栏
         var statusBar = new Border
         {
-            Background = Ui.Miuix.Brush("MiuixCardBackground"),
+            Background = Ui.Miuix.Brush("MiuixLayerBackground"),
             BorderBrush = Ui.Miuix.Brush("MiuixCardBorder"),
             BorderThickness = new Thickness(0, 1, 0, 0),
             Padding = new Thickness(16, 6, 16, 6)
@@ -222,6 +229,7 @@ public sealed partial class MainWindow : Window
         root.ActualThemeChanged += (_, _) =>
         {
             Miuix.ApplyTheme(root.ActualTheme);
+            _acrylic?.SetTheme(root.ActualTheme);
             UpdateTitleBarColors(root.ActualTheme);
         };
         Miuix.ApplyTheme(root.ActualTheme);
@@ -246,6 +254,7 @@ public sealed partial class MainWindow : Window
         };
 
         Miuix.ApplyTheme(root.ActualTheme);
+        _acrylic?.SetTheme(root.ActualTheme);
         UpdateTitleBarColors(root.ActualTheme);
     }
 

@@ -20,7 +20,10 @@ public static class Miuix
 
     private static readonly (string Key, Color Light, Color Dark)[] Palette =
     {
-        ("MiuixPageBackground", Color.FromArgb(255, 244, 245, 247), Color.FromArgb(255, 16, 16, 18)),
+        // 页面底色全透明：让窗口的 Mica 云母（壁纸染色）从顶栏、侧栏透出来
+        ("MiuixPageBackground", Color.FromArgb(0, 244, 245, 247), Color.FromArgb(0, 16, 16, 18)),
+        // 内容区半透明层色：叠在云母上保证正文可读（参考 Win11 LayerFill，浅 60% / 深 40%）
+        ("MiuixLayerBackground", Color.FromArgb(153, 255, 255, 255), Color.FromArgb(102, 16, 16, 18)),
         ("MiuixCardBackground", Color.FromArgb(255, 255, 255, 255), Color.FromArgb(255, 28, 28, 30)),
         ("MiuixCardBorder", Color.FromArgb(255, 232, 234, 237), Color.FromArgb(255, 48, 48, 51)),
         ("MiuixAccent", Color.FromArgb(255, 10, 132, 255), Color.FromArgb(255, 77, 163, 255)),
