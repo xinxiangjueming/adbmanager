@@ -12,7 +12,6 @@ public sealed class ScrcpyOptions
     public bool NoAudio { get; init; }
     public bool ReadOnly { get; init; }
     public bool ScreenOff { get; init; }
-    public bool StayAwake { get; init; }
 }
 
 /// <summary>
@@ -50,7 +49,6 @@ public sealed class ScrcpyService
         if (options.NoAudio) args.Append(" --no-audio");
         if (options.ReadOnly) args.Append(" --read-only");
         if (options.ScreenOff) args.Append(" --turn-screen-off");
-        if (options.StayAwake) args.Append(" --stay-awake");
 
         var process = new Process
         {
