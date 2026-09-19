@@ -1,15 +1,46 @@
+using System.ComponentModel;
 using AdbManager.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 
 namespace AdbManager.Models;
 
-public sealed class PackageInfo
+/// <summary>
+/// 一个已安装应用。
+///
+/// 实现 <see cref="INotifyPropertyChanged"/> 是为了支持「流式补全」：列表先用包名落地渲染，
+/// 应用名与图标随后分批回填到**已有实例**上。WinUI 没有 Compose 那样的状态自动重组，
+/// 不回填通知 UI 就不会刷新；而重建 ItemsSource 会丢选中项与滚动位置，
+/// 并让数百条同时播放入场动画（见 AppsView 的 AddDeleteThemeTransition）。
+/// </summary>
+public sealed class PackageInfo : INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>批量通知受影响的绑定属性。</summary>
+    private void Raise(params string[] names)
+    {
+        var handler = PropertyChanged;
+        if (handler is null) return;
+        foreach (var name in names) handler(this, new PropertyChangedEventArgs(name));
+    }
+
     public string PackageName { get; set; } = "";
 
+    private string _label = "";
+
     /// <summary>应用显示名（application-label）。未取到时为空，界面回退显示包名。</summary>
-    public string Label { get; set; } = "";
+    public string Label
+    {
+        get => _label;
+        set
+        {
+            if (string.Equals(_label, value, StringComparison.Ordinal)) return;
+            _label = value;
+            Raise(nameof(Label), nameof(DisplayName), nameof(IconPlaceholder),
+                  nameof(HasDistinctLabel), nameof(SubtitleText));
+        }
+    }
 
     private byte[]? _iconBytes;
     private ImageSource? _iconImage;
@@ -22,8 +53,10 @@ public sealed class PackageInfo
         set
         {
             _iconBytes = value;
+            // 解码结果失效必须同时通知 IconImage，否则绑定仍停在旧的 null 上，表现为图标永远不出现
             _iconImage = null;
             _iconDecoded = false;
+            Raise(nameof(IconBytes), nameof(IconImage));
         }
     }
 
@@ -64,8 +97,31 @@ public sealed class PackageInfo
     public string IconPlaceholder =>
         DisplayName.Length > 0 ? DisplayName[..1].ToUpperInvariant() : "?";
 
-    public bool IsSystem { get; set; }
-    public bool IsDisabled { get; set; }
+    private bool _isSystem;
+
+    public bool IsSystem
+    {
+        get => _isSystem;
+        set
+        {
+            if (_isSystem == value) return;
+            _isSystem = value;
+            Raise(nameof(IsSystem), nameof(KindText), nameof(SubtitleText));
+        }
+    }
+
+    private bool _isDisabled;
+
+    public bool IsDisabled
+    {
+        get => _isDisabled;
+        set
+        {
+            if (_isDisabled == value) return;
+            _isDisabled = value;
+            Raise(nameof(IsDisabled), nameof(StateText), nameof(SubtitleText));
+        }
+    }
 
     /// <summary>列表主标题：优先应用名，取不到时用包名。</summary>
     public string DisplayName => string.IsNullOrWhiteSpace(Label) ? PackageName : Label;

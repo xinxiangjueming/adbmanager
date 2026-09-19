@@ -23,8 +23,15 @@ public sealed partial class AdbService
     private const long PerUserRange = 100_000;
     private const long FirstApplicationUid = 10_000;
 
-    /// <summary>列出当前运行中的应用（按包名聚合，含应用名与图标）。失败时抛出异常由调用方处理。</summary>
-    public async Task<List<ProcessInfo>> ListRunningAppsAsync(string serial)
+    /// <summary>
+    /// 列出当前运行中的应用（按包名聚合），**不读应用名与图标**。失败时抛出异常由调用方处理。
+    ///
+    /// 供进程页先落地首屏使用：应用名与图标由调用方另行走
+    /// <see cref="LoadAppInfoStreamingAsync"/> 流式补全（与应用页同一套机制）。
+    ///
+    /// 排序固定按包名：名称到手后不重排，避免用户正在滚动时列表跳动。
+    /// </summary>
+    public async Task<List<ProcessInfo>> ListRunningProcessesAsync(string serial)
     {
         // ps 输出较慢的设备上可能超过默认超时，放宽到 30s 已足够
         List<(string Name, int Pid, long RssKb, string User)> processes;
@@ -77,13 +84,9 @@ public sealed partial class AdbService
             GetOrCreate(resolved.Value.Package, resolved.Value.IsSystem).Add(pid, rssKb);
         }
 
-        var apps = grouped.Values.ToList();
-
-        // 应用名 + 图标：复用应用管理页的 app_process 通道与会话缓存，
-        // 应用管理页已加载过时这里几乎零开销
-        await LoadAppInfoForAppsAsync(serial, apps).ConfigureAwait(false);
-
-        return apps.OrderBy(p => p.DisplayName, StringComparer.OrdinalIgnoreCase).ToList();
+        // 应用名与图标不在这里读取：由进程页在列表落地后流式补全。
+        // 应用管理页已加载过时，补全会整批命中会话缓存，几乎零开销。
+        return grouped.Values.OrderBy(p => p.PackageName, StringComparer.OrdinalIgnoreCase).ToList();
     }
 
     /// <summary>执行 ps 并解析出（进程名, PID, RSS KB, USER）。命令失败时抛异常，由调用方提示用户。</summary>
@@ -261,61 +264,5 @@ public sealed partial class AdbService
         if (systemSet.Contains(package)) return (package, true);
         if (thirdPartySet.Contains(package)) return (package, false);
         return null;
-    }
-
-    /// <summary>批量补齐应用名与图标（走应用管理页的 dex 通道），结果写入会话缓存。</summary>
-    private async Task LoadAppInfoForAppsAsync(string serial, List<ProcessInfo> apps)
-    {
-        // 换设备时整体作废图标缓存，语义与应用管理页一致
-        if (!string.Equals(_iconCacheSerial, serial, StringComparison.Ordinal))
-        {
-            _iconCache.Clear();
-            _knownNoIcon.Clear();
-            _iconCacheSerial = serial;
-        }
-
-        var pending = apps
-            .Where(p => !_labelCache.ContainsKey(p.PackageName) ||
-                        (!_iconCache.ContainsKey(p.PackageName) && !_knownNoIcon.Contains(p.PackageName)))
-            .Select(p => p.PackageName)
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        if (pending.Count == 0)
-        {
-            ApplyCachedAppInfo(apps);
-            return;
-        }
-
-        try
-        {
-            if (!await EnsureAppInfoDexAsync(serial).ConfigureAwait(false)) return;
-
-            for (var offset = 0; offset < pending.Count; offset += AppInfoBatchSize)
-            {
-                var batch = pending.Skip(offset).Take(AppInfoBatchSize).ToList();
-                await QueryAppInfoBatchAsync(serial, batch).ConfigureAwait(false);
-            }
-        }
-        catch (Exception ex)
-        {
-            AppState.Log.Error(L("Apps_Err_LabelRead", ex.Message));
-        }
-        finally
-        {
-            // 成败都回填一次缓存里已有的值：拿不到的项界面回退显示包名 / 占位图标
-            ApplyCachedAppInfo(apps);
-        }
-    }
-
-    /// <summary>把会话缓存里已有的应用名与图标写回到运行列表项。</summary>
-    private void ApplyCachedAppInfo(List<ProcessInfo> apps)
-    {
-        foreach (var app in apps)
-        {
-            if (_labelCache.TryGetValue(app.PackageName, out var label) && label.Length > 0)
-                app.Label = label;
-            app.IconBytes = GetCachedIcon(app.PackageName);
-        }
     }
 }

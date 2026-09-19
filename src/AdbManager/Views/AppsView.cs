@@ -29,11 +29,19 @@ public sealed class AppsView : PageBase
     /// <summary>加载进行中标志：轮询心跳每 3 秒一次，防止上一次还没跑完就再次进入。</summary>
     private bool _loading;
 
+    /// <summary>应用名/图标流式补全（进度胶囊 + 代次作废 + 两轮串行），与进程页共用同一实现。</summary>
+    private readonly AppInfoStream _stream;
+
     public AppsView()
     {
         // 列表增删/筛选时的进出动画
         _list.ItemContainerTransitions = new TransitionCollection { new AddDeleteThemeTransition() };
         _list.ItemTemplate = BuildItemTemplate();
+        _stream = new AppInfoStream(
+            () => DispatcherQueue ?? Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread(),
+            serial => string.Equals(serial, _loadedSerial, StringComparison.Ordinal),
+            ApplyAppInfoUpdate,
+            OnStreamFinished);
         Content = Build();
         AppState.CurrentDeviceChanged += OnCurrentDeviceChanged;
         // 兜底心跳：DevicesChanged 每轮轮询都会触发，覆盖「同一设备状态变化但
@@ -48,7 +56,7 @@ public sealed class AppsView : PageBase
         void Apply()
         {
             // 设备消失或掉线：标记待刷新，保留现有列表不闪空
-            if (device is null || !device.IsOnline) { _stale = true; return; }
+            if (device is null || !device.IsOnline) { _stale = true; AbortStream(); return; }
             if (_stale || device.Serial != _loadedSerial) _ = LoadAsync();
         }
 
@@ -60,7 +68,7 @@ public sealed class AppsView : PageBase
     private void OnDevicesChanged()
     {
         var device = AppState.CurrentDevice;
-        if (device is not { IsOnline: true }) { _stale = true; return; }
+        if (device is not { IsOnline: true }) { _stale = true; AbortStream(); return; }
         if (_loading) return;
         if (_stale || device.Serial != _loadedSerial) _ = LoadAsync();
     }
@@ -128,7 +136,15 @@ public sealed class AppsView : PageBase
         // 每次进入页面都校验设备是否换了/曾掉线，避免显示上一台设备的应用
         var device = AppState.CurrentDevice;
         if (device is { IsOnline: true } && (_stale || device.Serial != _loadedSerial)) await LoadAsync();
+
+        // 上次补全被掉线打断：重新进入页面时补跑一次（只在被打断后触发，不会反复重试）
+        if (_stream.NeedsRetry && device is { IsOnline: true })
+            await _stream.StartAsync(device.Serial, PendingPackageNames);
     }
+
+    /// <summary>当前列表中需要补全应用名/图标的包名快照。</summary>
+    private IReadOnlyList<string> PendingPackageNames() =>
+        _packages.Select(p => p.PackageName).ToList();
 
     private UIElement Build()
     {
@@ -171,7 +187,11 @@ public sealed class AppsView : PageBase
 
         var listPanel = new StackPanel { Spacing = 10 };
         listPanel.Children.Add(Miuix.Horizontal(_search, _filter));
-        listPanel.Children.Add(_list);
+        // 列表与进度指示同格叠放：指示悬浮在卡内右下角，不改变列表卡高度
+        var listHost = new Grid();
+        listHost.Children.Add(_list);
+        listHost.Children.Add(_stream.Chip);
+        listPanel.Children.Add(listHost);
         root.Children.Add(Miuix.Card(listPanel));
 
         return root;
@@ -195,6 +215,16 @@ public sealed class AppsView : PageBase
 
     private PackageInfo? Selected() => _list.SelectedItem as PackageInfo;
 
+    /// <summary>
+    /// 两段式加载。
+    ///
+    /// 第一段只取包名与类型/冻结状态（约 1 秒，走全屏遮罩），列表落地后立即按包名渲染，
+    /// 图标显示首字母占位；第二段在后台流式补全应用名与图标并逐批回填。
+    ///
+    /// 改造前是「全量读完后一次性显示」：pm list → dex push → app_process 全量 →
+    /// 图标打包拉回，全程被全屏遮罩盖住约 5 秒，一个条目都看不到。
+    /// 总耗时不变，变的是用户从第 1 秒起就能看到并操作列表。
+    /// </summary>
     private async Task LoadAsync()
     {
         if (_loading) return;
@@ -207,15 +237,61 @@ public sealed class AppsView : PageBase
             _stale = false;
 
             AppState.Log.Info(L("Apps_Loading"));
+
+            var list = await MainWindow.RunBusyAsync(L("Apps_Loading"),
+                () => AppState.Adb.ListPackageNamesAsync(device.Serial));
+
             _packages.Clear();
-            _packages.AddRange(await MainWindow.RunBusyAsync(L("Apps_InfoLoading"),
-                () => AppState.Adb.ListPackagesWithIconsAsync(device.Serial)));
+            _packages.AddRange(list);
             ApplyFilter();
             AppState.Log.Success(L("Apps_Loaded", _packages.Count));
         }
         finally
         {
             _loading = false;
+        }
+
+        // 第二段：后台流式补全（不阻塞界面）
+        await _stream.StartAsync(device.Serial, PendingPackageNames);
+    }
+
+    /// <summary>
+    /// 回填一批解析结果（由 <see cref="AppInfoStream"/> 保证在 UI 线程、且结果仍有效时调用）。
+    ///
+    /// 刻意只改已有 <see cref="PackageInfo"/> 实例的属性（靠 INotifyPropertyChanged 刷新绑定），
+    /// 不重建 ItemsSource：重建会丢选中项与滚动位置，还会让数百条同时播放入场动画。
+    /// </summary>
+    private void ApplyAppInfoUpdate(AppInfoUpdate update)
+    {
+        foreach (var package in _packages)
+        {
+            if (update.Labels.TryGetValue(package.PackageName, out var label) && label.Length > 0)
+                package.Label = label;
+
+            if (update.Icons.TryGetValue(package.PackageName, out var bytes) && bytes.Length > 0)
+                package.IconBytes = bytes;
+        }
+    }
+
+    /// <summary>本轮补全结束。</summary>
+    private void OnStreamFinished()
+    {
+        // 应用名到手后搜索语义才完整（搜索同时匹配名称与包名）。
+        // 顺序仍为包名序、不重排，避免用户正在滚动时列表跳动。
+        if (!string.IsNullOrWhiteSpace(_search.Text)) ReapplyFilterKeepingSelection();
+    }
+
+    /// <summary>设备掉线：停止进度显示并记下「需补跑」，待重新连上后由 OnShownAsync 触发。</summary>
+    private void AbortStream() => _stream.Abort();
+
+    private void ReapplyFilterKeepingSelection()
+    {
+        var selected = _list.SelectedItem as PackageInfo;
+        ApplyFilter();
+        if (selected is not null &&
+            _list.ItemsSource is IEnumerable<PackageInfo> source && source.Contains(selected))
+        {
+            _list.SelectedItem = selected;
         }
     }
 

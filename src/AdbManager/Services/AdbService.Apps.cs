@@ -29,10 +29,22 @@ public sealed partial class AdbService
     }
 
     /// <summary>
-    /// 只列出包名与类型/冻结状态，不读应用名。
-    /// 供 ListPackagesWithIconsAsync 使用——应用名与图标在同一次 app_process
-    /// 调用里一并取回，若在此处先查一次名称，会多付一次约 2.8 秒的 JVM 启动开销。
+    /// 只列出包名与类型/冻结状态，不读应用名（约 1 秒）。
+    ///
+    /// 供界面先落地首屏使用：应用名与图标在同一次 app_process 调用里一并回填
+    /// （见 <see cref="LoadAppInfoStreamingAsync"/>），若在此处先查一次名称，
+    /// 会多付一次约 2.8 秒的 JVM 启动开销。
+    ///
+    /// 排序固定按包名：名称到手后不重排，避免用户正在滚动时列表跳动
+    /// （手机端 AppsScreen 同样只做筛选、不按应用名重排）。
     /// </summary>
+    public async Task<List<PackageInfo>> ListPackageNamesAsync(string serial)
+    {
+        var result = await ListPackagesCoreAsync(serial).ConfigureAwait(false);
+        return result.OrderBy(p => p.PackageName, StringComparer.OrdinalIgnoreCase).ToList();
+    }
+
+    /// <summary>只列出包名与类型/冻结状态，不读应用名。供界面先落地首屏使用。</summary>
     private async Task<List<PackageInfo>> ListPackagesCoreAsync(string serial)
     {
         var thirdParty = await QueryPackagesAsync(serial, "-3").ConfigureAwait(false);

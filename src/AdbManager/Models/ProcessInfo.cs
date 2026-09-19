@@ -1,16 +1,45 @@
+using System.ComponentModel;
 using AdbManager.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 
 namespace AdbManager.Models;
 
-/// <summary>设备上当前运行中的应用进程（按包名聚合，可含多个子进程）。</summary>
-public sealed class ProcessInfo
+/// <summary>
+/// 设备上当前运行中的应用进程（按包名聚合，可含多个子进程）。
+///
+/// 与应用页一致，实现 <see cref="INotifyPropertyChanged"/> 以支持「流式补全」：
+/// 进程列表先用包名落地渲染，应用名与图标随后分批回填到**已有实例**上。
+/// WinUI 没有状态自动重组，不回填通知 UI 就不会刷新（重建 ItemsSource 则丢选中项与滚动位置）。
+/// </summary>
+public sealed class ProcessInfo : INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>批量通知受影响的绑定属性。</summary>
+    private void Raise(params string[] names)
+    {
+        var handler = PropertyChanged;
+        if (handler is null) return;
+        foreach (var name in names) handler(this, new PropertyChangedEventArgs(name));
+    }
+
     public string PackageName { get; set; } = "";
 
+    private string _label = "";
+
     /// <summary>应用显示名（application-label）。未取到时为空，界面回退显示包名。</summary>
-    public string Label { get; set; } = "";
+    public string Label
+    {
+        get => _label;
+        set
+        {
+            if (string.Equals(_label, value, StringComparison.Ordinal)) return;
+            _label = value;
+            Raise(nameof(Label), nameof(DisplayName), nameof(IconPlaceholder),
+                  nameof(HasDistinctLabel), nameof(SubtitleText));
+        }
+    }
 
     public bool IsSystem { get; set; }
 
@@ -41,8 +70,10 @@ public sealed class ProcessInfo
         set
         {
             _iconBytes = value;
+            // 解码结果失效必须同时通知 IconImage，否则绑定仍停在旧的 null 上，表现为图标永远不出现
             _iconImage = null;
             _iconDecoded = false;
+            Raise(nameof(IconBytes), nameof(IconImage));
         }
     }
 
