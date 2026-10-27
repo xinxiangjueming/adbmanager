@@ -76,6 +76,11 @@
   <data name="Apps_Title" xml:space="preserve"><value>アプリ管理</value></data>
   <data name="Apps_InstallApk" xml:space="preserve"><value>APK をインストール</value></data>
   <data name="Apps_InstallBundle" xml:space="preserve"><value>APKS（分割）をインストール</value></data>
+  <data name="Apps_InstallXapk" xml:space="preserve"><value>XAPK をインストール</value></data>
+  <data name="Apps_Err_XapkExtract" xml:space="preserve"><value>XAPK の展開に失敗しました：{0}</value></data>
+  <data name="Apps_XapkObkPushed" xml:space="preserve"><value>{0} 個の OBB データをプッシュしました</value></data>
+  <data name="Apps_Warn_ObkPushFail" xml:space="preserve"><value>OBB のプッシュに失敗しました：{0}</value></data>
+  <data name="Apps_Warn_XapkNoPkg" xml:space="preserve"><value>パッケージ名が特定できず OBB プッシュをスキップしました</value></data>
   <data name="Apps_Search" xml:space="preserve"><value>アプリ名またはパッケージ名を検索</value></data>
   <data name="Apps_ThirdParty" xml:space="preserve"><value>サードパーティ</value></data>
   <data name="Apps_System" xml:space="preserve"><value>システム</value></data>

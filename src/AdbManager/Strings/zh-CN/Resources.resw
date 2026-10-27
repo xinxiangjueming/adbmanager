@@ -67,6 +67,11 @@
   <data name="Apps_Title" xml:space="preserve"><value>应用管理</value></data>
   <data name="Apps_InstallApk" xml:space="preserve"><value>安装 APK</value></data>
   <data name="Apps_InstallBundle" xml:space="preserve"><value>安装 APKS（拆分包）</value></data>
+  <data name="Apps_InstallXapk" xml:space="preserve"><value>安装 XAPK</value></data>
+  <data name="Apps_Err_XapkExtract" xml:space="preserve"><value>XAPK 解压失败：{0}</value></data>
+  <data name="Apps_XapkObkPushed" xml:space="preserve"><value>已推送 {0} 个 OBB 数据包</value></data>
+  <data name="Apps_Warn_ObkPushFail" xml:space="preserve"><value>OBB 推送失败：{0}</value></data>
+  <data name="Apps_Warn_XapkNoPkg" xml:space="preserve"><value>未识别包名，已跳过 OBB 推送（游戏资源可能缺失）</value></data>
   <data name="Apps_Search" xml:space="preserve"><value>搜索应用名或包名</value></data>
   <data name="Apps_ThirdParty" xml:space="preserve"><value>第三方应用</value></data>
   <data name="Apps_System" xml:space="preserve"><value>系统应用</value></data>

@@ -2,11 +2,17 @@ using AdbManager.Services;
 using AdbManager.Ui;
 using AdbManager.Views;
 using Microsoft.UI;
+using Microsoft.UI.Composition;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Media.Imaging;
+using System.Diagnostics;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
 using Windows.UI;
 
 namespace AdbManager;
@@ -35,6 +41,12 @@ public sealed partial class MainWindow : Window
     private readonly DispatcherQueueTimer _notifyTimer;   // 通知自动收起的延时器
     private Storyboard? _notifyFade;                      // 通知淡出动画，新通知到达时需停掉
     private AcrylicBackdrop? _acrylic;                    // 微信式实时模糊背景，窗口关闭时释放
+    private Grid? _shellHost;                             // 外壳宿主：[实时界面] + [旧画面覆盖层（过渡期）] + [输入拦截层]
+    private Grid? _shellRoot;                             // 实时界面根（标题栏 + 导航 + 内容 + 状态栏）
+    private Image? _themeSnapshot;                        // 过渡期间盖在最上层的旧画面（抓屏所得，含系统亚克力）
+    private Grid? _themeInputBlocker;                     // 过渡期间拦截触摸（裁剪不影响命中测试）
+    private DispatcherQueueTimer? _themeTimer;             // 圆形揭示的帧驱动器
+    private bool _themeTransitioning;                     // 过渡进行中标记（防重入 / 快速连点取消）
     private static MainWindow? _current;
 
     /// <summary>成功 / 提示类通知的自动收起延时；错误与警告不自动关闭。</summary>
@@ -225,37 +237,220 @@ public sealed partial class MainWindow : Window
         Grid.SetRow(statusBar, 2);
         root.Children.Add(statusBar);
 
-        Content = root;
-        root.ActualThemeChanged += (_, _) =>
-        {
-            Miuix.ApplyTheme(root.ActualTheme);
-            _acrylic?.SetTheme(root.ActualTheme);
-            UpdateTitleBarColors(root.ActualTheme);
-        };
+        // 外壳宿主：实时界面 root 放进来，过渡期间再在其上临时盖一张「旧画面覆盖层」。
+        // 覆盖层是抓屏所得（含系统亚克力），圆形裁剪只让它留在圆内、半径从满帧收缩到 0——
+        // 视觉上就是从右下角把旧画面擦掉、露出新主题，全程没有哪块区域抢先变色。
+        _shellRoot = root;
+        _shellHost = new Grid();
+        _shellHost.Children.Add(root);
+        Content = _shellHost;
+
+        root.ActualThemeChanged += (_, _) => OnActualThemeChanged(root);
         Miuix.ApplyTheme(root.ActualTheme);
+        // 亚克力淋色初值：下面 ApplyThemeSetting(animate:false) 在「跟随系统」下会因
+        // RequestedTheme 未变化而提前返回，不初始化的话侧栏会停在控制器默认淋色上。
+        // ActualTheme 此刻还没解析出来（Default）就跳过，保持原行为，等首次真实切换再设。
+        if (root.ActualTheme != ElementTheme.Default) _acrylic?.SetTheme(root.ActualTheme);
         UpdateTitleBarColors(root.ActualTheme);
 
         _navigation.SelectedItem = _navigation.MenuItems[0];
         UpdateStatus();
-        ApplyThemeSetting();
+        ApplyThemeSetting(animate: false);
         Services.StartupLog.Write("shell:done");
     }
 
-    /// <summary>按用户设置应用主题（跟随系统 / 浅色 / 深色），可实时切换。</summary>
-    public void ApplyThemeSetting()
+    /// <summary>按用户设置应用主题（跟随系统 / 浅色 / 深色）。
+    /// animate=true（设置页手动切换默认）时播放从右下角圆形揭示的过渡——
+    /// 移植自 SportLink 的 ThemeTransition：先抓一张旧画面盖在最上层，再把这张覆盖层
+    /// 裁成圆、半径从满帧收缩到 0，旧画面被擦掉的地方就是新主题。启动初值等场景传 animate:false 直切。</summary>
+    public void ApplyThemeSetting(bool animate = true)
     {
-        if (Content is not FrameworkElement root) return;
+        if (_shellRoot is not { } root) return;
 
-        root.RequestedTheme = AppSettings.Theme switch
+        var target = AppSettings.Theme switch
         {
             "light" => ElementTheme.Light,
             "dark" => ElementTheme.Dark,
             _ => ElementTheme.Default
         };
 
+        // 上一轮过渡未结束（快速连点）：先干净收尾——撤裁剪、移走旧快照，
+        // 否则接下来的切换会作用在被裁掉的画面上。收尾必须在「主题是否变化」判断之前，
+        // 否则连点回原主题会提前 return，把未完成的过渡留在后面生效。
+        if (_themeTransitioning) EndThemeTransition();
+
+        // 主题未变化（启动初值与设置一致等）直接跳过
+        if (root.RequestedTheme == target) return;
+
+        if (!animate)
+        {
+            ApplyThemeCore(root, target);
+            return;
+        }
+
+        _ = TransitionThemeAsync(root, target);
+    }
+
+    /// <summary>真正生效主题：设置 RequestedTheme 并刷新 miuix 画笔 / 亚克力 / 标题栏。
+    /// 过渡期间亚克力可以放心瞬切——此刻整屏仍被旧画面覆盖层盖住，这次变化用户根本看不到。</summary>
+    private void ApplyThemeCore(Grid root, ElementTheme target)
+    {
+        root.RequestedTheme = target;
         Miuix.ApplyTheme(root.ActualTheme);
         _acrylic?.SetTheme(root.ActualTheme);
         UpdateTitleBarColors(root.ActualTheme);
+    }
+
+    /// <summary>主题实际变化回调（ActualThemeChanged）。只做画笔刷新。
+    /// 「跟随系统」下 ActualTheme 是系统直接翻新的，此刻 ThemeResources 已经换过、旧主题像素
+    /// 不复存在，截不到「旧主题快照」⇒ 圆形揭露无从做起，只能即时换装（该事件本身也是变化
+    /// 之后才到的）。手动切换由 ApplyThemeSetting 主动驱动，不依赖这里。</summary>
+    private void OnActualThemeChanged(Grid root)
+    {
+        Miuix.ApplyTheme(root.ActualTheme);
+        _acrylic?.SetTheme(root.ActualTheme);
+        UpdateTitleBarColors(root.ActualTheme);
+    }
+
+    /// <summary>圆形揭示过渡（移植自 SportLink 的 ThemeTransition）。
+    ///
+    /// 覆盖层必须是「用户此刻看到的整屏像素」，并且盖在最上层、只让圆内可见。
+    /// 早先的版本是「截 XAML 快照垫在底下 + 裁实时界面」，但本应用页面底色全透明，侧栏 / 页边 /
+    /// 顶栏的观感来自窗口背后的系统亚克力——RenderTargetBitmap 截不到系统背景，快照里这些区域
+    /// 是空的（alpha = 0），圆外会透出已经切成新主题的实时淋色，圆形还没扫到侧栏就先变色了。
+    /// 现在改用 ScreenGrab 抓屏幕 DC（DWM 合成后的最终画面，含亚克力），覆盖层才真正等于旧画面；
+    /// 裁剪施加在覆盖层自身（圆内可见），半径从满帧收缩到 0，视觉上就是从右下角擦掉旧画面。
+    /// 对齐 SportLink：400ms 线性。差异：WinUI 的几何裁剪是硬边，无 BlurMaskFilter 羽化。</summary>
+    private async Task TransitionThemeAsync(Grid root, ElementTheme target)
+    {
+        var host = _shellHost;
+        var w = root.ActualWidth;
+        var h = root.ActualHeight;
+        // 窗口尚未布局（尺寸 0）→ 直接切换，无动画降级
+        if (host is null || w <= 0 || h <= 0)
+        {
+            ApplyThemeCore(root, target);
+            return;
+        }
+
+        // 1) 抓「用户此刻看到的画面」，必须含系统亚克力（原因见 ScreenGrab 注释）。
+        //    抓不到（窗口被完全遮挡 / 远程会话等）就直切，不做半成品动画。
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        var pixels = ScreenGrab.CaptureClient(hwnd, out var pxW, out var pxH);
+        if (pixels is null)
+        {
+            ApplyThemeCore(root, target);
+            return;
+        }
+
+        _themeTransitioning = true;
+        try
+        {
+            var bitmap = new WriteableBitmap(pxW, pxH);
+            using (var stream = bitmap.PixelBuffer.AsStream())
+            {
+                stream.Write(pixels, 0, pixels.Length);
+            }
+            bitmap.Invalidate();
+
+            // 2) 盖在最上层。此刻覆盖层与屏幕完全一致，用户看不出任何变化
+            var snapshot = new Image
+            {
+                Source = bitmap,
+                Stretch = Stretch.Fill,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                IsHitTestVisible = false
+            };
+            host.Children.Add(snapshot);
+            _themeSnapshot = snapshot;
+            host.UpdateLayout();
+
+            // 3) 等它真正上屏。否则下面切主题那一帧覆盖层还没画出来，会闪一下新主题
+            await NextRenderTickAsync();
+            // 等待期间被取消（快速连点）：后续步骤交给新一轮过渡，这里直接退出
+            if (!_themeTransitioning || !ReferenceEquals(_themeSnapshot, snapshot)) return;
+
+            // 4) 生效新主题。亚克力淋色在这里瞬切完全没问题——整屏仍被覆盖层盖住，看不见这次变化
+            ApplyThemeCore(root, target);
+
+            // 5) 裁剪只作用在覆盖层自身：圆内保留旧画面。圆心钉在右下角顶点，
+            //    半径从 max → 0 线性收缩，旧画面就被从右下角开始擦掉，露出下面的新主题。
+            var maxRadius = (float)(Math.Sqrt(w * w + h * h) * 1.05);
+            var visual = ElementCompositionPreview.GetElementVisual(snapshot);
+            var compositor = visual.Compositor;
+            var hole = compositor.CreateEllipseGeometry();
+            hole.Center = new System.Numerics.Vector2((float)w, (float)h);
+            hole.Radius = new System.Numerics.Vector2(maxRadius, maxRadius);
+            visual.Clip = compositor.CreateGeometricClip(hole);
+
+            // 6) 拦截输入：Composition 裁剪不影响 XAML 命中测试，圆外那块旧画面视觉上已消失，
+            //    但仍会响应点击，故压一层透明挡板
+            var blocker = new Grid { Background = new SolidColorBrush(Colors.Transparent) };
+            host.Children.Add(blocker);
+            _themeInputBlocker = blocker;
+
+            // 7) 60fps 线性收缩
+            const double durationMs = 400;
+            var sw = Stopwatch.StartNew();
+            var timer = DispatcherQueue.CreateTimer();
+            _themeTimer = timer;
+            timer.IsRepeating = true;
+            timer.Interval = TimeSpan.FromMilliseconds(1000.0 / 60);
+            timer.Tick += (_, _) =>
+            {
+                var t = Math.Min(1.0, sw.ElapsedMilliseconds / durationMs);
+                var r = maxRadius * (float)(1.0 - t);
+                hole.Radius = new System.Numerics.Vector2(r, r);
+                if (t >= 1.0) EndThemeTransition();
+            };
+            timer.Start();
+        }
+        catch
+        {
+            // 抓屏 / 渲染异常：降级为直接切换，并清掉可能已插入的覆盖层，不阻塞主题生效
+            ApplyThemeCore(root, target);
+            EndThemeTransition();
+        }
+    }
+
+    /// <summary>结束过渡（正常擦完或被下一次切换取消）。先摘掉覆盖层上的裁剪再移除元素，
+    /// 避免移除瞬间留下被裁掉的一帧；此刻半径已为 0，画面与实时界面一致，移除无跳变。</summary>
+    private void EndThemeTransition()
+    {
+        _themeTimer?.Stop();
+        _themeTimer = null;
+
+        if (_themeSnapshot is { } snapshot)
+        {
+            try { ElementCompositionPreview.GetElementVisual(snapshot).Clip = null; }
+            catch { /* 窗口已关闭时元素视觉可能已失效，忽略 */ }
+            _shellHost?.Children.Remove(snapshot);
+        }
+        _themeSnapshot = null;
+
+        if (_themeInputBlocker is { } blocker) _shellHost?.Children.Remove(blocker);
+        _themeInputBlocker = null;
+
+        _themeTransitioning = false;
+    }
+
+    /// <summary>等一帧真正渲染（合成器提交过一次）。窗口最小化 / 被遮挡时拿不到渲染回调，
+    /// 100ms 兜底放行，避免过渡卡住后一直挂着裁剪。</summary>
+    private static async Task NextRenderTickAsync()
+    {
+        var tcs = new TaskCompletionSource<bool>();
+
+        void OnRendering(object? sender, object e)
+        {
+            CompositionTarget.Rendering -= OnRendering;
+            tcs.TrySetResult(true);
+        }
+
+        CompositionTarget.Rendering += OnRendering;
+        await Task.WhenAny(tcs.Task, Task.Delay(100));
+        CompositionTarget.Rendering -= OnRendering;
+        tcs.TrySetResult(false);
     }
 
     private void UpdateTitleBarColors(ElementTheme theme)
@@ -479,7 +674,7 @@ public sealed partial class MainWindow : Window
         _busyOverlay.Children.Add(card);
         Grid.SetRowSpan(_busyOverlay, 3);
 
-        if (Content is Grid root) root.Children.Add(_busyOverlay);
+        _shellRoot?.Children.Add(_busyOverlay);
     }
 
     /// <summary>淡入淡出动画（透明度）。</summary>

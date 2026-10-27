@@ -154,12 +154,14 @@ public sealed class AppsView : PageBase
         installApk.Click += async (_, _) => await InstallApkAsync();
         var installBundle = Miuix.SecondaryButton(L("Apps_InstallBundle"));
         installBundle.Click += async (_, _) => await InstallBundleAsync();
+        var installXapk = Miuix.SecondaryButton(L("Apps_InstallXapk"));
+        installXapk.Click += async (_, _) => await InstallXapkAsync();
         var reload = Miuix.SecondaryButton(L("Common_Refresh"));
         reload.Click += async (_, _) => await LoadAsync();
 
         var topCard = Miuix.Card(new StackPanel { Spacing = 10 });
         ((StackPanel)topCard.Child).Children.Add(Miuix.SectionTitle(L("Apps_Title")));
-        ((StackPanel)topCard.Child).Children.Add(Miuix.Horizontal(installApk, installBundle, reload));
+        ((StackPanel)topCard.Child).Children.Add(Miuix.Horizontal(installApk, installBundle, installXapk, reload));
         root.Children.Add(topCard);
 
         var uninstall = Miuix.DangerButton(L("Apps_Uninstall"));
@@ -359,6 +361,19 @@ public sealed class AppsView : PageBase
 
         var (ok, message) = await MainWindow.RunBusyAsync(L("Busy_Installing"),
             () => AppState.Adb.InstallMultipleAsync(device!.Serial, apks));
+        MainWindow.Notify(message, ok ? InfoBarSeverity.Success : InfoBarSeverity.Error);
+        if (ok) await LoadAsync();
+    }
+
+    private async Task InstallXapkAsync()
+    {
+        if (!TryGetDevice(out var device)) return;
+
+        var file = await Pickers.PickFileAsync(".xapk");
+        if (file is null) return;
+
+        var (ok, message) = await MainWindow.RunBusyAsync(L("Busy_Installing"),
+            () => AppState.Adb.InstallXapkAsync(device!.Serial, file.Path));
         MainWindow.Notify(message, ok ? InfoBarSeverity.Success : InfoBarSeverity.Error);
         if (ok) await LoadAsync();
     }

@@ -2,6 +2,10 @@
 dist/
 bin/
 obj/
+# objRelFiles 是中间产物重定向目录（自包含/重链接那遍的产出）。SDK 的默认源码
+# glob **/*.cs 只排除 obj/ 与 bin/，不排除它；一旦残留，里面生成的
+# *.AssemblyInfo.cs 会被当成普通源码编进去，与新生成的特性文件撞车 → CS0579。
+objRelFiles/
 
 # 谷歌官方 platform-tools 二进制（构建前按 README 自行下载）
 tools/adb/

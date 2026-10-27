@@ -16,6 +16,10 @@ public sealed class AcrylicBackdrop : IDisposable
     private readonly DesktopAcrylicController _controller = new();
     private readonly SystemBackdropConfiguration _configuration = new() { IsInputActive = true };
 
+    /// <summary>一组染色参数。界面里的页面底色是全透明的（alpha=0），侧栏 / 页边 / 顶栏的观感
+    /// 完全由这层淋色决定。</summary>
+    public readonly record struct ThemeState(Color Tint, float TintOpacity, Color Fallback);
+
     /// <summary>挂到窗口。返回 false 表示系统不支持（如 Win10），窗口保持纯色。</summary>
     public bool Attach(Window window)
     {
@@ -25,14 +29,29 @@ public sealed class AcrylicBackdrop : IDisposable
         return true;
     }
 
-    /// <summary>深浅色切换时更新染色浓度；回退色与 miuix 页面底色一致。</summary>
+    /// <summary>立即套用某个主题的淋色。
+    /// 深浅色切换时这里可以放心瞬切：过渡期间整屏被抓屏得到的旧画面覆盖层盖着，
+    /// 圆外看到的也是快照里的旧淋色像素，所以不会出现「圆形还没扫到、侧栏先变色」。</summary>
     public void SetTheme(ElementTheme theme)
     {
+        _configuration.Theme = theme == ElementTheme.Dark ? SystemBackdropTheme.Dark : SystemBackdropTheme.Light;
+        ApplyState(StateFor(theme));
+    }
+
+    public static ThemeState StateFor(ElementTheme theme)
+    {
         var dark = theme == ElementTheme.Dark;
-        _configuration.Theme = dark ? SystemBackdropTheme.Dark : SystemBackdropTheme.Light;
-        _controller.TintColor = dark ? Color.FromArgb(255, 22, 22, 24) : Colors.White;
-        _controller.TintOpacity = dark ? 0.55f : 0.45f;
-        _controller.FallbackColor = dark ? Color.FromArgb(255, 16, 16, 18) : Color.FromArgb(255, 244, 245, 247);
+        return new ThemeState(
+            dark ? Color.FromArgb(255, 22, 22, 24) : Colors.White,
+            dark ? 0.55f : 0.45f,
+            dark ? Color.FromArgb(255, 16, 16, 18) : Color.FromArgb(255, 244, 245, 247));
+    }
+
+    private void ApplyState(in ThemeState s)
+    {
+        _controller.TintColor = s.Tint;
+        _controller.TintOpacity = s.TintOpacity;
+        _controller.FallbackColor = s.Fallback;
     }
 
     public void Dispose() => _controller.Dispose();

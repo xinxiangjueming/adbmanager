@@ -76,6 +76,11 @@
   <data name="Apps_Title" xml:space="preserve"><value>Gestion des applications</value></data>
   <data name="Apps_InstallApk" xml:space="preserve"><value>Installer un APK</value></data>
   <data name="Apps_InstallBundle" xml:space="preserve"><value>Installer un bundle APKS</value></data>
+  <data name="Apps_InstallXapk" xml:space="preserve"><value>Installer un XAPK</value></data>
+  <data name="Apps_Err_XapkExtract" xml:space="preserve"><value>Échec de l’extraction du XAPK : {0}</value></data>
+  <data name="Apps_XapkObkPushed" xml:space="preserve"><value>{0} fichier(s) de données OBB envoyé(s)</value></data>
+  <data name="Apps_Warn_ObkPushFail" xml:space="preserve"><value>Échec de l’envoi OBB : {0}</value></data>
+  <data name="Apps_Warn_XapkNoPkg" xml:space="preserve"><value>Nom de package introuvable, envoi OBB ignoré</value></data>
   <data name="Apps_Search" xml:space="preserve"><value>Rechercher un nom d’app ou de paquet</value></data>
   <data name="Apps_ThirdParty" xml:space="preserve"><value>Tierces</value></data>
   <data name="Apps_System" xml:space="preserve"><value>Système</value></data>

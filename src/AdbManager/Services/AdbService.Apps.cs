@@ -1,4 +1,6 @@
 using System.IO.Compression;
+using System.Text;
+using System.Text.Json;
 using AdbManager.Models;
 
 namespace AdbManager.Services;
@@ -151,6 +153,90 @@ public sealed partial class AdbService
         var result = await RunAsync(arguments, null, TimeSpan.FromMinutes(20)).ConfigureAwait(false);
         var ok = result.Success && result.Message.Contains("Success", StringComparison.OrdinalIgnoreCase);
         return (ok, result.Message);
+    }
+
+    /// <summary>
+    /// 安装 XAPK（APKPure 格式）：解压后安装 base.apk + 拆分包，若存在 obb/ 目录则额外把
+    /// OBB 游戏数据包推送至 /sdcard/Android/obb/&lt;包名&gt;/。
+    ///
+    /// XAPK 与普通 APKS 的关键差异：它携带 manifest.json（含包名）与可选 obb 资源。
+    /// 若仅按「解压全部 apk → install-multiple」处理，会漏装 OBB，导致游戏 / 大型应用缺资源。
+    /// </summary>
+    public async Task<(bool Success, string Message)> InstallXapkAsync(string serial, string xapkPath)
+    {
+        string directory;
+        try
+        {
+            directory = Path.Combine(Path.GetTempPath(), "AdbManager", "xapk", Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(directory);
+            ZipFile.ExtractToDirectory(xapkPath, directory);
+        }
+        catch (Exception ex)
+        {
+            return (false, L("Apps_Err_XapkExtract", ex.Message));
+        }
+
+        try
+        {
+            var apks = Directory.GetFiles(directory, "*.apk", SearchOption.AllDirectories)
+                .OrderBy(f => Path.GetFileName(f).Contains("base", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                .ToList();
+            if (apks.Count == 0) return (false, L("Apps_Err_NoApkInBundle"));
+
+            var install = await InstallMultipleAsync(serial, apks).ConfigureAwait(false);
+            if (!install.Success) return install;
+
+            // XAPK 可选 OBB 数据包：应用安装完成后推送，供游戏 / 大型应用读取
+            var obbDir = Path.Combine(directory, "obb");
+            var obbFiles = Directory.Exists(obbDir)
+                ? Directory.GetFiles(obbDir, "*.obb", SearchOption.AllDirectories).ToList()
+                : new List<string>();
+            if (obbFiles.Count == 0) return install;
+
+            var package = ReadXapkPackageName(directory);
+            if (string.IsNullOrEmpty(package))
+                return (true, install.Message + "\n" + L("Apps_Warn_XapkNoPkg"));
+
+            var remoteObb = $"/sdcard/Android/obb/{package}";
+            await RunAsync($"-s \"{serial}\" shell mkdir -p \"{remoteObb}\"", null, TimeSpan.FromMinutes(2))
+                .ConfigureAwait(false);
+
+            var report = new StringBuilder(install.Message);
+            foreach (var obb in obbFiles)
+            {
+                var push = await RunAsync($"-s \"{serial}\" push \"{obb}\" \"{remoteObb}/\"", null, TimeSpan.FromMinutes(5))
+                    .ConfigureAwait(false);
+                if (!push.Success) report.Append('\n').Append(L("Apps_Warn_ObkPushFail", Path.GetFileName(obb)));
+            }
+            report.Append('\n').Append(L("Apps_XapkObkPushed", obbFiles.Count));
+            return (true, report.ToString());
+        }
+        finally
+        {
+            try { Directory.Delete(directory, recursive: true); }
+            catch { /* 临时目录清理失败不影响安装结果 */ }
+        }
+    }
+
+    /// <summary>从 XAPK 的 manifest.json 读取包名（APKPure 字段为 package_name，兼容 package）。</summary>
+    private static string? ReadXapkPackageName(string directory)
+    {
+        var manifest = Path.Combine(directory, "manifest.json");
+        if (!File.Exists(manifest)) return null;
+        try
+        {
+            using var doc = JsonDocument.Parse(File.ReadAllText(manifest));
+            foreach (var key in new[] { "package_name", "package" })
+            {
+                if (doc.RootElement.TryGetProperty(key, out var value) && value.ValueKind == JsonValueKind.String)
+                {
+                    var text = value.GetString();
+                    if (!string.IsNullOrEmpty(text)) return text;
+                }
+            }
+        }
+        catch { /* 解析失败回退 null，由调用方跳过 OBB 推送 */ }
+        return null;
     }
 
     public async Task<(bool Success, string Message)> UninstallAsync(string serial, string package, bool keepData)
