@@ -120,6 +120,7 @@
   <data name="Settings_OpenAdbFolder" xml:space="preserve"><value>adb のフォルダを開く</value></data>
   <data name="Settings_Language" xml:space="preserve"><value>言語</value></data>
   <data name="Settings_Theme" xml:space="preserve"><value>テーマ</value></data>
+  <data name="Settings_Display" xml:space="preserve"><value>外観</value></data>
   <data name="Settings_ThemeFollow" xml:space="preserve"><value>システムに従う</value></data>
   <data name="Settings_ThemeLight" xml:space="preserve"><value>ライト</value></data>
   <data name="Settings_ThemeDark" xml:space="preserve"><value>ダーク</value></data>

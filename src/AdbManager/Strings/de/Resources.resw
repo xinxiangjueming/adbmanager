@@ -120,6 +120,7 @@
   <data name="Settings_OpenAdbFolder" xml:space="preserve"><value>adb-Ordner öffnen</value></data>
   <data name="Settings_Language" xml:space="preserve"><value>Sprache</value></data>
   <data name="Settings_Theme" xml:space="preserve"><value>Design</value></data>
+  <data name="Settings_Display" xml:space="preserve"><value>Erscheinungsbild</value></data>
   <data name="Settings_ThemeFollow" xml:space="preserve"><value>System folgen</value></data>
   <data name="Settings_ThemeLight" xml:space="preserve"><value>Hell</value></data>
   <data name="Settings_ThemeDark" xml:space="preserve"><value>Dunkel</value></data>

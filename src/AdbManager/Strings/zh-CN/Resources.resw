@@ -101,6 +101,7 @@
   <data name="Settings_OpenAdbFolder" xml:space="preserve"><value>打开 adb 所在目录</value></data>
   <data name="Settings_Language" xml:space="preserve"><value>界面语言</value></data>
   <data name="Settings_Theme" xml:space="preserve"><value>深浅色</value></data>
+  <data name="Settings_Display" xml:space="preserve"><value>界面显示</value></data>
   <data name="Status_DeviceCount" xml:space="preserve"><value>{0} 台设备</value></data>
   <data name="Status_CurrentDevice" xml:space="preserve"><value>当前：{0}（{1}）</value></data>
   <data name="Msg_RecordStarted" xml:space="preserve"><value>录屏已开始，最长 180 秒。</value></data>

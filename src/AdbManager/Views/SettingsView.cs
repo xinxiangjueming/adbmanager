@@ -85,7 +85,7 @@ public sealed class SettingsView : PageBase
             });
             App.MainWindow.ApplyThemeSetting();
         };
-        panel.Children.Add(Miuix.SettingRow(L("Settings_Theme"), L("Settings_ThemeFollow"), themeBox));
+        panel.Children.Add(Miuix.SettingRow(L("Settings_Display"), null, themeBox));
 
         var openFolder = Miuix.PrimaryButton(L("Settings_OpenAdbFolder"));
         openFolder.Click += (_, _) =>
