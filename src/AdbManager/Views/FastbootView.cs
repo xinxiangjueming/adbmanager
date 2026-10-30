@@ -18,14 +18,7 @@ public sealed class FastbootView : PageBase
 
     private readonly ComboBox _extractPartition = new() { MinWidth = 200, MaxDropDownHeight = 320 };
 
-    private readonly TextBox _output = new()
-    {
-        IsReadOnly = true,
-        AcceptsReturn = true,
-        TextWrapping = TextWrapping.Wrap,
-        MinHeight = 150,
-        CornerRadius = new CornerRadius(Miuix.ControlRadius)
-    };
+    private readonly TextBox _output = Miuix.OutputBox(150);
 
     private FastbootDevice? _device;
     private readonly DispatcherQueue? _queue;

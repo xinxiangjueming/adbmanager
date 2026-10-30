@@ -29,15 +29,7 @@ public sealed class ToolsView : PageBase
     private const string PkgSecondSpace = "com.hld.anzenbokusu";
 
     private readonly TextBox _command = Miuix.Input("");
-    private readonly TextBox _output = new()
-    {
-        IsReadOnly = true,
-        AcceptsReturn = true,
-        TextWrapping = TextWrapping.Wrap,
-        MinHeight = 160,
-        MaxHeight = 320,
-        CornerRadius = new CornerRadius(Miuix.ControlRadius)
-    };
+    private readonly TextBox _output = Miuix.OutputBox(160, 320);
 
     private readonly Button _recordButton = Miuix.PrimaryButton("");
 

@@ -155,6 +155,30 @@ public static class Miuix
         VerticalContentAlignment = VerticalAlignment.Center
     };
 
+    /// <summary>只读输出框：底色与所在卡片一致（同日志页列表），悬停/聚焦不提亮。</summary>
+    public static TextBox OutputBox(double minHeight, double? maxHeight = null)
+    {
+        var box = new TextBox
+        {
+            IsReadOnly = true,
+            AcceptsReturn = true,
+            TextWrapping = TextWrapping.Wrap,
+            MinHeight = minHeight,
+            CornerRadius = new CornerRadius(ControlRadius),
+            Background = Brush("MiuixCardBackground"),
+            BorderBrush = Brush("MiuixCardBorder"),
+            Foreground = Brush("MiuixTextPrimary")
+        };
+        if (maxHeight is { } height) box.MaxHeight = height;
+
+        // 默认模板的悬停/聚焦状态刷是半透明白，盖在卡片上会发灰；
+        // 在控件级资源里覆盖成卡片色，保证任何状态下底色都与卡片一致
+        box.Resources["TextControlBackgroundPointerOver"] = Brush("MiuixCardBackground");
+        box.Resources["TextControlBackgroundFocused"] = Brush("MiuixCardBackground");
+        box.Resources["TextControlBackgroundDisabled"] = Brush("MiuixCardBackground");
+        return box;
+    }
+
     public static StackPanel Vertical(params UIElement[] children)
     {
         var panel = new StackPanel { Spacing = 12, Orientation = Orientation.Vertical };
