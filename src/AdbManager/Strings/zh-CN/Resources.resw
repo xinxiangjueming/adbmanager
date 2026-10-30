@@ -131,8 +131,8 @@
   <data name="Fastboot_ReadPartitions" xml:space="preserve"><value>读取分区表</value></data>
   <data name="Fastboot_Extract" xml:space="preserve"><value>提取到电脑</value></data>
   <data name="Tools_RebootEdl" xml:space="preserve"><value>9008（EDL）</value></data>
-  <data name="Apps_ExtractApk" xml:space="preserve"><value>提取 APK</value></data>
-  <data name="Msg_ExtractOk" xml:space="preserve"><value>APK 已提取到</value></data>
+  <data name="Apps_ExtractApk" xml:space="preserve"><value>提取安装包</value></data>
+  <data name="Msg_ExtractOk" xml:space="preserve"><value>安装包已提取到</value></data>
   <data name="Wireless_Ip" xml:space="preserve"><value>IP 地址</value></data>
   <data name="Wireless_PairPort" xml:space="preserve"><value>配对端口</value></data>
   <data name="Wireless_ConnectPort" xml:space="preserve"><value>连接端口（默认 5555）</value></data>
@@ -233,6 +233,7 @@
   <data name="Apps_Err_NoApkPath" xml:space="preserve"><value>pm path 未返回 APK 路径。</value></data>
   <data name="Apps_Err_NoApks" xml:space="preserve"><value>没有可安装的 APK。</value></data>
   <data name="Apps_Err_NoApkInBundle" xml:space="preserve"><value>压缩包中没有找到 APK。</value></data>
+  <data name="Apps_Err_Pack" xml:space="preserve"><value>安装包打包失败：{0}</value></data>
   <data name="Apps_Loading" xml:space="preserve"><value>正在读取应用列表…</value></data>
   <data name="Apps_Loaded" xml:space="preserve"><value>共 {0} 个应用。</value></data>
   <data name="Apps_Err_LabelDexMissing" xml:space="preserve"><value>内置应用名读取组件缺失。</value></data>
@@ -273,7 +274,7 @@
   <data name="Sys_Uptime" xml:space="preserve"><value>开机时长</value></data>
   <data name="Pick_Png" xml:space="preserve"><value>PNG 图片</value></data>
   <data name="Busy_Installing" xml:space="preserve"><value>安装中，请稍候…</value></data>
-  <data name="Busy_ExtractingApk" xml:space="preserve"><value>正在提取 APK…</value></data>
+  <data name="Busy_ExtractingApk" xml:space="preserve"><value>正在提取安装包…</value></data>
   <data name="Busy_Screenshot" xml:space="preserve"><value>正在截取屏幕…</value></data>
   <data name="Busy_SavingRecording" xml:space="preserve"><value>正在保存录屏…</value></data>
   <data name="Busy_Uploading" xml:space="preserve"><value>正在上传文件…</value></data>

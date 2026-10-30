@@ -92,7 +92,7 @@
   <data name="Apps_ClearData" xml:space="preserve"><value>데이터 삭제</value></data>
   <data name="Apps_KeepData" xml:space="preserve"><value>데이터 유지</value></data>
   <data name="Apps_UninstallKeepData" xml:space="preserve"><value>데이터를 유지하고 제거</value></data>
-  <data name="Apps_ExtractApk" xml:space="preserve"><value>APK 추출</value></data>
+  <data name="Apps_ExtractApk" xml:space="preserve"><value>설치 패키지 추출</value></data>
   <data name="Apps_Loading" xml:space="preserve"><value>앱 목록 불러오는 중…</value></data>
   <data name="Apps_Loaded" xml:space="preserve"><value>총 {0}개 앱</value></data>
   <data name="Apps_Err_LabelDexMissing" xml:space="preserve"><value>내장 앱 이름 읽기 구성 요소가 없습니다.</value></data>
@@ -101,6 +101,7 @@
   <data name="Apps_Err_NoApkPath" xml:space="preserve"><value>pm path가 APK 경로를 반환하지 않았습니다.</value></data>
   <data name="Apps_Err_NoApks" xml:space="preserve"><value>설치할 APK가 없습니다.</value></data>
   <data name="Apps_Err_NoApkInBundle" xml:space="preserve"><value>번들 내에서 APK를 찾을 수 없습니다.</value></data>
+  <data name="Apps_Err_Pack" xml:space="preserve"><value>설치 패키지 생성 실패: {0}</value></data>
   <data name="Files_Title" xml:space="preserve"><value>파일</value></data>
   <data name="Files_Up" xml:space="preserve"><value>위로</value></data>
   <data name="Files_Home" xml:space="preserve"><value>루트</value></data>
@@ -148,7 +149,7 @@
   <data name="Msg_RefreshDone" xml:space="preserve"><value>새로 고침 완료</value></data>
   <data name="Msg_NoSelection" xml:space="preserve"><value>먼저 항목을 선택하세요.</value></data>
   <data name="Msg_MdnsEmpty" xml:space="preserve"><value>PC adb의 mDNS 검색을 사용할 수 없습니다. 수동으로 주소를 입력해 연결하세요.</value></data>
-  <data name="Msg_ExtractOk" xml:space="preserve"><value>APK 추출됨:</value></data>
+  <data name="Msg_ExtractOk" xml:space="preserve"><value>설치 패키지 추출됨:</value></data>
   <data name="Msg_LanguageRestart" xml:space="preserve"><value>언어 변경은 앱 재시작 후 적용됩니다.</value></data>
   <data name="Msg_RecordStarted" xml:space="preserve"><value>녹화를 시작했습니다(최대 180초).</value></data>
   <data name="Status_DeviceCount" xml:space="preserve"><value>{0}대 기기</value></data>
@@ -272,7 +273,7 @@
   <data name="Adb_Err_NoWlanIp" xml:space="preserve"><value>기기의 WLAN IP를 가져오지 못했습니다(Wi-Fi 미연결 가능).</value></data>
   <data name="Adb_Err_Unhandled" xml:space="preserve"><value>처리되지 않은 예외: {0}</value></data>
   <data name="Busy_Installing" xml:space="preserve"><value>설치 중…</value></data>
-  <data name="Busy_ExtractingApk" xml:space="preserve"><value>APK 추출 중…</value></data>
+  <data name="Busy_ExtractingApk" xml:space="preserve"><value>설치 패키지 추출 중…</value></data>
   <data name="Busy_Screenshot" xml:space="preserve"><value>스크린샷 촬영 중…</value></data>
   <data name="Busy_SavingRecording" xml:space="preserve"><value>녹화 저장 중…</value></data>
   <data name="Busy_Uploading" xml:space="preserve"><value>업로드 중…</value></data>

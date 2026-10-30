@@ -92,7 +92,7 @@
   <data name="Apps_ClearData" xml:space="preserve"><value>Daten löschen</value></data>
   <data name="Apps_KeepData" xml:space="preserve"><value>Daten behalten</value></data>
   <data name="Apps_UninstallKeepData" xml:space="preserve"><value>Deinstallieren, Daten behalten</value></data>
-  <data name="Apps_ExtractApk" xml:space="preserve"><value>APK extrahieren</value></data>
+  <data name="Apps_ExtractApk" xml:space="preserve"><value>Paket extrahieren</value></data>
   <data name="Apps_Loading" xml:space="preserve"><value>App-Liste wird geladen…</value></data>
   <data name="Apps_Loaded" xml:space="preserve"><value>{0} Apps</value></data>
   <data name="Apps_Err_LabelDexMissing" xml:space="preserve"><value>Integrierte App-Namen-Komponente fehlt.</value></data>
@@ -101,6 +101,7 @@
   <data name="Apps_Err_NoApkPath" xml:space="preserve"><value>pm path lieferte keinen APK-Pfad.</value></data>
   <data name="Apps_Err_NoApks" xml:space="preserve"><value>Keine APK zum Installieren.</value></data>
   <data name="Apps_Err_NoApkInBundle" xml:space="preserve"><value>Kein APK im Paket gefunden.</value></data>
+  <data name="Apps_Err_Pack" xml:space="preserve"><value>Paket konnte nicht erstellt werden: {0}</value></data>
   <data name="Files_Title" xml:space="preserve"><value>Dateien</value></data>
   <data name="Files_Up" xml:space="preserve"><value>Übergeordneter Ordner</value></data>
   <data name="Files_Home" xml:space="preserve"><value>Stammverzeichnis</value></data>
@@ -148,7 +149,7 @@
   <data name="Msg_RefreshDone" xml:space="preserve"><value>Aktualisiert</value></data>
   <data name="Msg_NoSelection" xml:space="preserve"><value>Bitte zuerst ein Element auswählen.</value></data>
   <data name="Msg_MdnsEmpty" xml:space="preserve"><value>Die mDNS-Erkennung von adb ist nicht verfügbar. Adresse bitte manuell eingeben.</value></data>
-  <data name="Msg_ExtractOk" xml:space="preserve"><value>APK extrahiert nach:</value></data>
+  <data name="Msg_ExtractOk" xml:space="preserve"><value>Paket extrahiert nach:</value></data>
   <data name="Msg_LanguageRestart" xml:space="preserve"><value>Die Sprachänderung wird nach einem Neustart wirksam.</value></data>
   <data name="Msg_RecordStarted" xml:space="preserve"><value>Aufnahme gestartet (max. 180 Sek.).</value></data>
   <data name="Status_DeviceCount" xml:space="preserve"><value>{0} Gerät(e)</value></data>
@@ -272,7 +273,7 @@
   <data name="Adb_Err_NoWlanIp" xml:space="preserve"><value>WLAN-IP des Geräts nicht ermittelbar (evtl. kein WLAN).</value></data>
   <data name="Adb_Err_Unhandled" xml:space="preserve"><value>Unbehandelte Ausnahme: {0}</value></data>
   <data name="Busy_Installing" xml:space="preserve"><value>Installiere…</value></data>
-  <data name="Busy_ExtractingApk" xml:space="preserve"><value>APK wird extrahiert…</value></data>
+  <data name="Busy_ExtractingApk" xml:space="preserve"><value>Paket wird extrahiert…</value></data>
   <data name="Busy_Screenshot" xml:space="preserve"><value>Screenshot wird aufgenommen…</value></data>
   <data name="Busy_SavingRecording" xml:space="preserve"><value>Aufnahme wird gespeichert…</value></data>
   <data name="Busy_Uploading" xml:space="preserve"><value>Wird hochgeladen…</value></data>

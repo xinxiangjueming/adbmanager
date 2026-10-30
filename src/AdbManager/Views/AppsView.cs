@@ -191,7 +191,7 @@ public sealed class AppsView : PageBase
         var actionCard = Miuix.Card(new StackPanel { Spacing = 10 });
         var actionPanel = (StackPanel)actionCard.Child;
         actionPanel.Children.Add(Miuix.Horizontal(uninstall, freeze, unfreeze, forceStop, clearData));
-        // 第二行：保留数据卸载与提取 APK 放一起，避免第一行按钮过多导致横向溢出
+        // 第二行：保留数据卸载与提取安装包放一起，避免第一行按钮过多导致横向溢出
         actionPanel.Children.Add(Miuix.Horizontal(uninstallKeep, extractApk));
         Grid.SetRow(actionCard, 1);
         root.Children.Add(actionCard);
@@ -216,7 +216,7 @@ public sealed class AppsView : PageBase
         return root;
     }
 
-    /// <summary>提取选中应用的 APK（含拆分包）到电脑。</summary>
+    /// <summary>提取选中应用的安装包到电脑：单 APK 存 .apk，拆分包打 .apks，带 OBB 打 .xapk。</summary>
     private async Task ExtractApkAsync()
     {
         if (Selected() is not { } package) { MainWindow.Notify(L("Msg_NoSelection"), InfoBarSeverity.Warning); return; }
@@ -225,9 +225,8 @@ public sealed class AppsView : PageBase
         var folder = await Pickers.PickFolderAsync();
         if (folder is null) return;
 
-        var targetDir = System.IO.Path.Combine(folder.Path, package.PackageName);
         var (ok, message) = await MainWindow.RunBusyAsync(L("Busy_ExtractingApk"),
-            () => AppState.Adb.ExtractApkAsync(device!.Serial, package.PackageName, targetDir));
+            () => AppState.Adb.ExtractApkAsync(device!.Serial, package.PackageName, package.DisplayName, folder.Path));
         MainWindow.Notify(ok ? L("Msg_ExtractOk") + " " + message : message,
             ok ? InfoBarSeverity.Success : InfoBarSeverity.Error);
     }

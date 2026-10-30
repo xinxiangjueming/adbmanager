@@ -167,8 +167,8 @@
   <data name="Fastboot_ReadPartitions" xml:space="preserve"><value>Read partitions</value></data>
   <data name="Fastboot_Extract" xml:space="preserve"><value>Extract to PC</value></data>
   <data name="Tools_RebootEdl" xml:space="preserve"><value>9008 (EDL)</value></data>
-  <data name="Apps_ExtractApk" xml:space="preserve"><value>Extract APK</value></data>
-  <data name="Msg_ExtractOk" xml:space="preserve"><value>APK extracted to</value></data>
+  <data name="Apps_ExtractApk" xml:space="preserve"><value>Extract package</value></data>
+  <data name="Msg_ExtractOk" xml:space="preserve"><value>Package extracted to</value></data>
   <data name="Wireless_Ip" xml:space="preserve"><value>IP address</value></data>
   <data name="Wireless_PairPort" xml:space="preserve"><value>Pairing port</value></data>
   <data name="Wireless_ConnectPort" xml:space="preserve"><value>Connect port (default 5555)</value></data>
@@ -247,6 +247,7 @@
   <data name="Apps_Err_NoApkPath" xml:space="preserve"><value>pm path returned no APK path.</value></data>
   <data name="Apps_Err_NoApks" xml:space="preserve"><value>No APK to install.</value></data>
   <data name="Apps_Err_NoApkInBundle" xml:space="preserve"><value>No APK found inside the bundle.</value></data>
+  <data name="Apps_Err_Pack" xml:space="preserve"><value>Failed to build the package: {0}</value></data>
   <data name="Apps_Loading" xml:space="preserve"><value>Loading app list…</value></data>
   <data name="Apps_Loaded" xml:space="preserve"><value>{0} app(s).</value></data>
   <data name="Apps_Err_LabelDexMissing" xml:space="preserve"><value>Bundled app-label component is missing.</value></data>
@@ -287,7 +288,7 @@
   <data name="Sys_Uptime" xml:space="preserve"><value>Uptime</value></data>
   <data name="Pick_Png" xml:space="preserve"><value>PNG image</value></data>
   <data name="Busy_Installing" xml:space="preserve"><value>Installing…</value></data>
-  <data name="Busy_ExtractingApk" xml:space="preserve"><value>Extracting APK…</value></data>
+  <data name="Busy_ExtractingApk" xml:space="preserve"><value>Extracting package…</value></data>
   <data name="Busy_Screenshot" xml:space="preserve"><value>Taking screenshot…</value></data>
   <data name="Busy_SavingRecording" xml:space="preserve"><value>Saving recording…</value></data>
   <data name="Busy_Uploading" xml:space="preserve"><value>Uploading file…</value></data>

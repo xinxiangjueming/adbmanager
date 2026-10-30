@@ -92,7 +92,7 @@
   <data name="Apps_ClearData" xml:space="preserve"><value>データ消去</value></data>
   <data name="Apps_KeepData" xml:space="preserve"><value>データ保持</value></data>
   <data name="Apps_UninstallKeepData" xml:space="preserve"><value>アンインストールしてデータを保持</value></data>
-  <data name="Apps_ExtractApk" xml:space="preserve"><value>APK を抽出</value></data>
+  <data name="Apps_ExtractApk" xml:space="preserve"><value>パッケージを抽出</value></data>
   <data name="Apps_Loading" xml:space="preserve"><value>アプリ一覧を読み込み中…</value></data>
   <data name="Apps_Loaded" xml:space="preserve"><value>全 {0} アプリ</value></data>
   <data name="Apps_Err_LabelDexMissing" xml:space="preserve"><value>内蔵のアプリ名取得コンポーネントが見つかりません。</value></data>
@@ -101,6 +101,7 @@
   <data name="Apps_Err_NoApkPath" xml:space="preserve"><value>pm path が APK パスを返しませんでした。</value></data>
   <data name="Apps_Err_NoApks" xml:space="preserve"><value>インストール可能な APK がありません。</value></data>
   <data name="Apps_Err_NoApkInBundle" xml:space="preserve"><value>バンドル内に APK が見つかりません。</value></data>
+  <data name="Apps_Err_Pack" xml:space="preserve"><value>パッケージの作成に失敗：{0}</value></data>
   <data name="Files_Title" xml:space="preserve"><value>ファイル</value></data>
   <data name="Files_Up" xml:space="preserve"><value>上へ</value></data>
   <data name="Files_Home" xml:space="preserve"><value>ルート</value></data>
@@ -148,7 +149,7 @@
   <data name="Msg_RefreshDone" xml:space="preserve"><value>更新完了</value></data>
   <data name="Msg_NoSelection" xml:space="preserve"><value>先に項目を選択してください。</value></data>
   <data name="Msg_MdnsEmpty" xml:space="preserve"><value>本機 adb の mDNS 発見が利用できません。手動でアドレスを入力して接続してください。</value></data>
-  <data name="Msg_ExtractOk" xml:space="preserve"><value>APK を抽出しました：</value></data>
+  <data name="Msg_ExtractOk" xml:space="preserve"><value>パッケージを抽出しました：</value></data>
   <data name="Msg_LanguageRestart" xml:space="preserve"><value>言語の変更はアプリ再起動後に有効になります。</value></data>
   <data name="Msg_RecordStarted" xml:space="preserve"><value>録画を開始しました（最長 180 秒）。</value></data>
   <data name="Status_DeviceCount" xml:space="preserve"><value>{0} 台のデバイス</value></data>
@@ -272,7 +273,7 @@
   <data name="Adb_Err_NoWlanIp" xml:space="preserve"><value>デバイスの WLAN IP を取得できませんでした（Wi-Fi 未接続の可能性）。</value></data>
   <data name="Adb_Err_Unhandled" xml:space="preserve"><value>未処理の例外：{0}</value></data>
   <data name="Busy_Installing" xml:space="preserve"><value>インストール中…</value></data>
-  <data name="Busy_ExtractingApk" xml:space="preserve"><value>APK を抽出中…</value></data>
+  <data name="Busy_ExtractingApk" xml:space="preserve"><value>パッケージを抽出中…</value></data>
   <data name="Busy_Screenshot" xml:space="preserve"><value>スクリーンショットを撮影中…</value></data>
   <data name="Busy_SavingRecording" xml:space="preserve"><value>録画を保存中…</value></data>
   <data name="Busy_Uploading" xml:space="preserve"><value>アップロード中…</value></data>

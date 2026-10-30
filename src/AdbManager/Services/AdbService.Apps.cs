@@ -1,6 +1,7 @@
 using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using AdbManager.Models;
 
 namespace AdbManager.Services;
@@ -275,8 +276,13 @@ public sealed partial class AdbService
         return (ok, result.Message);
     }
 
-    /// <summary>提取已安装应用的 APK（含拆分包）到电脑目录。</summary>
-    public async Task<(bool Success, string Message)> ExtractApkAsync(string serial, string package, string localDir)
+    /// <summary>
+    /// 提取已安装应用到电脑目录，按设备上的真实安装形态保存为可直接再安装的格式：
+    /// 单 APK 存为「名称.apk」；拆分包打包为「名称.apks」（zip 容器，base + splits）；
+    /// 设备上存在 OBB 数据包时打包为「名称.xapk」（zip 容器，含 manifest.json 与 obb/）。
+    /// 返回生成的文件完整路径。
+    /// </summary>
+    public async Task<(bool Success, string Message)> ExtractApkAsync(string serial, string package, string displayName, string localDir)
     {
         var result = await RunAsync($"-s \"{serial}\" shell pm path {package}", null, TimeSpan.FromSeconds(60))
             .ConfigureAwait(false);
@@ -300,17 +306,178 @@ public sealed partial class AdbService
             return (false, ex.Message);
         }
 
-        foreach (var remote in remotePaths)
+        // 先拉到临时目录、全部成功后再打包落盘：半途失败不会在目标目录留下残缺文件
+        var tempDir = Path.Combine(Path.GetTempPath(), "AdbManager", "extract", Guid.NewGuid().ToString("N"));
+        try
         {
-            var fileName = Path.GetFileName(remote.Replace('\\', '/'));
-            var target = Path.Combine(localDir, fileName);
-            if (File.Exists(target)) target = Path.Combine(localDir, $"extract_{fileName}");
+            Directory.CreateDirectory(tempDir);
 
-            var pull = await RunAsync($"-s \"{serial}\" pull \"{remote}\" \"{target}\"", null, TimeSpan.FromMinutes(15))
-                .ConfigureAwait(false);
-            if (!pull.Success) return (false, pull.Message);
+            var apkFiles = new List<string>();
+            foreach (var remote in remotePaths)
+            {
+                var fileName = Path.GetFileName(remote.Replace('\\', '/'));
+                var target = Path.Combine(tempDir, fileName);
+
+                var pull = await RunAsync($"-s \"{serial}\" pull \"{remote}\" \"{target}\"", null, TimeSpan.FromMinutes(15))
+                    .ConfigureAwait(false);
+                if (!pull.Success) return (false, pull.Message);
+                apkFiles.Add(target);
+            }
+
+            var obbFiles = await PullObbFilesAsync(serial, package, tempDir).ConfigureAwait(false);
+
+            var baseName = SanitizeFileName(displayName);
+            if (baseName.Length == 0) baseName = SanitizeFileName(package);
+
+            string targetFile;
+            if (obbFiles.Count > 0)
+            {
+                // 有 OBB 的应用（多为游戏）缺数据包无法运行，打成 .xapk 才能随安装器一并恢复
+                var version = await QueryVersionAsync(serial, package).ConfigureAwait(false);
+                var manifest = BuildXapkManifest(package, baseName, version, apkFiles, obbFiles);
+                targetFile = BuildZipBundle(UniqueTarget(localDir, baseName + ".xapk"), apkFiles, obbFiles, manifest);
+            }
+            else if (apkFiles.Count == 1)
+            {
+                targetFile = UniqueTarget(localDir, baseName + ".apk");
+                File.Copy(apkFiles[0], targetFile);
+            }
+            else
+            {
+                targetFile = BuildZipBundle(UniqueTarget(localDir, baseName + ".apks"), apkFiles, obbFiles: null, manifestJson: null);
+            }
+
+            return (true, targetFile);
         }
+        catch (Exception ex)
+        {
+            return (false, L("Apps_Err_Pack", ex.Message));
+        }
+        finally
+        {
+            try { Directory.Delete(tempDir, recursive: true); }
+            catch { /* 临时目录清理失败不影响提取结果 */ }
+        }
+    }
 
-        return (true, localDir);
+    /// <summary>
+    /// 拉取设备的 OBB 数据包到 tempDir/obb/。目录不存在是常态（多数应用没有 OBB），静默返回空列表；
+    /// 个别文件拉取失败跳过而不中断提取（.xapk 缺单个 OBB 仍可安装，只是缺该份资源）。
+    /// </summary>
+    private async Task<List<string>> PullObbFilesAsync(string serial, string package, string tempDir)
+    {
+        var remoteDir = $"/sdcard/Android/obb/{package}";
+        var list = await RunAsync($"-s \"{serial}\" shell ls {remoteDir}", null, TimeSpan.FromSeconds(30))
+            .ConfigureAwait(false);
+        if (!list.Success) return new List<string>();
+
+        var names = list.StdOut.Split('\n')
+            .Select(line => line.Trim())
+            .Select(line => line.Replace('\\', '/').Split('/').Last())
+            .Where(name => name.EndsWith(".obb", StringComparison.OrdinalIgnoreCase))
+            .Distinct()
+            .ToList();
+        if (names.Count == 0) return new List<string>();
+
+        var obbDir = Path.Combine(tempDir, "obb");
+        Directory.CreateDirectory(obbDir);
+
+        var pulled = new List<string>();
+        foreach (var name in names)
+        {
+            var target = Path.Combine(obbDir, name);
+            var pull = await RunAsync($"-s \"{serial}\" pull \"{remoteDir}/{name}\" \"{target}\"", null, TimeSpan.FromMinutes(15))
+                .ConfigureAwait(false);
+            if (pull.Success) pulled.Add(target);
+        }
+        return pulled;
+    }
+
+    /// <summary>dumpsys 读取版本号 / 版本名供 manifest.json 使用，失败返回空值（缺字段可容忍）。</summary>
+    private async Task<(string Code, string Name)> QueryVersionAsync(string serial, string package)
+    {
+        try
+        {
+            var result = await RunAsync($"-s \"{serial}\" shell dumpsys package {package}", null, TimeSpan.FromSeconds(30))
+                .ConfigureAwait(false);
+            var code = Regex.Match(result.StdOut, @"versionCode=(\d+)").Groups[1].Value;
+            var name = Regex.Match(result.StdOut, @"versionName=([^\s]+)").Groups[1].Value;
+            return (code, name);
+        }
+        catch
+        {
+            return ("0", "");
+        }
+    }
+
+    /// <summary>生成 XAPK manifest.json（v2 必要字段；SAI / MT 等安装器按需读取，缺省字段可容忍）。</summary>
+    private static string BuildXapkManifest(string package, string displayName, (string Code, string Name) version,
+        List<string> apkFiles, List<string> obbFiles)
+    {
+        var manifest = new
+        {
+            xapk_version = 2,
+            package_name = package,
+            name = displayName,
+            version_code = version.Code,
+            version_name = version.Name,
+            split_apks = apkFiles.Select(f => new
+            {
+                file = Path.GetFileName(f),
+                id = Path.GetFileNameWithoutExtension(f),
+            }).ToArray(),
+            expansions = obbFiles.Select(f => new
+            {
+                file = "obb/" + Path.GetFileName(f),
+                install_location = $"Android/obb/{package}",
+                install_path = $"Android/obb/{package}/{Path.GetFileName(f)}",
+            }).ToArray(),
+        };
+        return JsonSerializer.Serialize(manifest);
+    }
+
+    /// <summary>把拉取到的 apk（与可选 OBB / manifest.json）打包成 zip 容器（.apks / .xapk 均为该结构）。</summary>
+    private static string BuildZipBundle(string targetFile, List<string> apkFiles, List<string>? obbFiles, string? manifestJson)
+    {
+        using var archive = ZipFile.Open(targetFile, ZipArchiveMode.Create);
+        foreach (var apk in apkFiles)
+        {
+            using var entry = archive.CreateEntry(Path.GetFileName(apk), CompressionLevel.Optimal).Open();
+            using var file = File.OpenRead(apk);
+            file.CopyTo(entry);
+        }
+        if (obbFiles is not null)
+        {
+            foreach (var obb in obbFiles)
+            {
+                using var entry = archive.CreateEntry("obb/" + Path.GetFileName(obb), CompressionLevel.Optimal).Open();
+                using var file = File.OpenRead(obb);
+                file.CopyTo(entry);
+            }
+        }
+        if (manifestJson is not null)
+        {
+            using var entry = archive.CreateEntry("manifest.json", CompressionLevel.Optimal).Open();
+            using var writer = new StreamWriter(entry);
+            writer.Write(manifestJson);
+        }
+        return targetFile;
+    }
+
+    /// <summary>目标目录内重名时追加序号（应用重名常见，覆盖别人提取过的文件不合适）。</summary>
+    private static string UniqueTarget(string dir, string fileName)
+    {
+        var candidate = Path.Combine(dir, fileName);
+        var baseName = Path.GetFileNameWithoutExtension(fileName);
+        var extension = Path.GetExtension(fileName);
+        for (var i = 1; File.Exists(candidate); i++)
+            candidate = Path.Combine(dir, $"{baseName} ({i}){extension}");
+        return candidate;
+    }
+
+    private static string SanitizeFileName(string name)
+    {
+        foreach (var c in Path.GetInvalidFileNameChars()) name = name.Replace(c, '_');
+        return name.Trim();
     }
 }
