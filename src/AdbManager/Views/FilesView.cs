@@ -11,6 +11,9 @@ namespace AdbManager.Views;
 
 public sealed class FilesView : PageBase
 {
+    /// <summary>列表卡只占中间剩余空间，标题卡/操作卡无论窗口多小都保持可见。</summary>
+    public override bool FillsViewport => true;
+
     private readonly string _home = "/storage/emulated/0";
     private string _path = "/storage/emulated/0";
     private readonly TextBlock _pathText = Miuix.Body("/storage/emulated/0");
@@ -62,7 +65,12 @@ public sealed class FilesView : PageBase
 
     private UIElement Build()
     {
-        var root = new StackPanel { Spacing = 16 };
+        // 三行布局：标题卡、操作卡按内容高且始终可见，文件列表卡夹在中间吃掉剩余
+        // 空间（窗口多高它就多高，内部自己滚动）——列表再长也不会把操作卡顶出首屏。
+        var root = new Grid { RowSpacing = 16 };
+        root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
         var up = Miuix.SecondaryButton(L("Files_Up"));
         up.Click += async (_, _) =>
@@ -82,13 +90,13 @@ public sealed class FilesView : PageBase
         top.Children.Add(Miuix.SectionTitle(L("Files_Title")));
         top.Children.Add(Miuix.Horizontal(up, home, refresh));
         top.Children.Add(_pathText);
+        Grid.SetRow(topCard, 0);
         root.Children.Add(topCard);
 
-        var listCard = Miuix.Card(new StackPanel { Spacing = 8 });
-        ((StackPanel)listCard.Child).Children.Add(new ScrollViewer
+        // 列表卡直接以 ScrollViewer 为内容：卡片高度由星号行限定，超长列表在卡内滚动
+        var listCard = Miuix.Card(new ScrollViewer
         {
             Content = _list,
-            MaxHeight = 430,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             Padding = new Thickness(0, 0, 4, 0)
         });
@@ -96,6 +104,7 @@ public sealed class FilesView : PageBase
         listCard.AllowDrop = true;
         listCard.DragOver += ListCard_DragOver;
         listCard.Drop += ListCard_Drop;
+        Grid.SetRow(listCard, 1);
         root.Children.Add(listCard);
 
         var upload = Miuix.PrimaryButton(L("Files_Upload"));
@@ -126,6 +135,7 @@ public sealed class FilesView : PageBase
         var actionCard = Miuix.Card(new StackPanel { Spacing = 10 });
         ((StackPanel)actionCard.Child).Children.Add(Miuix.Horizontal(upload, download, rename, newFolder));
         ((StackPanel)actionCard.Child).Children.Add(Miuix.Horizontal(copy, cut, paste, delete, hiddenButton));
+        Grid.SetRow(actionCard, 2);
         root.Children.Add(actionCard);
 
         return root;

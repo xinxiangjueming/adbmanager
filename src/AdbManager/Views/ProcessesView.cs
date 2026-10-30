@@ -9,6 +9,9 @@ namespace AdbManager.Views;
 
 public sealed class ProcessesView : PageBase
 {
+    /// <summary>列表卡吃掉窗口剩余空间，外壳关闭外层纵向滚动。</summary>
+    public override bool FillsViewport => true;
+
     private readonly TextBox _search = Miuix.Input("");
     private readonly ComboBox _filter = new() { MinWidth = 140 };
     /// <summary>运存占用进度条：随每次加载/刷新更新，放在刷新按钮右侧。</summary>
@@ -23,8 +26,9 @@ public sealed class ProcessesView : PageBase
     private readonly ListView _list = new()
     {
         SelectionMode = ListViewSelectionMode.Single,
-        MinHeight = 180,
-        MaxHeight = 368
+        // 进程数量可达数百个，靠 ListView 虚拟化承载。页面为 FillsViewport 布局：
+        // 列表卡以 * 行吃掉窗口剩余空间，高度始终有界，虚拟化不受影响。
+        MinHeight = 180
     };
 
     private readonly List<ProcessInfo> _apps = new();
@@ -163,7 +167,12 @@ public sealed class ProcessesView : PageBase
 
     private UIElement Build()
     {
-        var root = new StackPanel { Spacing = 16 };
+        // 三行布局：标题卡、操作卡按内容高，列表卡吃掉剩余空间（页面随 FillsViewport
+        // 在有界高度下测量，星号行才能真正撑满；窗口过矮时被压缩的也只是列表卡）。
+        var root = new Grid { RowSpacing = 16 };
+        root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
         var reload = Miuix.SecondaryButton(L("Common_Refresh"));
         reload.Click += async (_, _) => await LoadAsync();
@@ -184,6 +193,7 @@ public sealed class ProcessesView : PageBase
         topRow.Children.Add(_memoryBar);
         topRow.Children.Add(_memoryText);
         ((StackPanel)topCard.Child).Children.Add(topRow);
+        Grid.SetRow(topCard, 0);
         root.Children.Add(topCard);
 
         var forceStop = Miuix.SecondaryButton(L("Apps_ForceStop"));
@@ -191,16 +201,25 @@ public sealed class ProcessesView : PageBase
 
         var actionCard = Miuix.Card(new StackPanel { Spacing = 10 });
         ((StackPanel)actionCard.Child).Children.Add(Miuix.Horizontal(forceStop));
+        Grid.SetRow(actionCard, 1);
         root.Children.Add(actionCard);
 
-        var listPanel = new StackPanel { Spacing = 10 };
-        listPanel.Children.Add(Miuix.Horizontal(_search, _filter));
+        // 卡内也用两行 Grid：搜索行按内容高，列表宿主吃掉卡片剩余高度
+        var listPanel = new Grid { RowSpacing = 10 };
+        listPanel.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        listPanel.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        var searchRow = Miuix.Horizontal(_search, _filter);
+        Grid.SetRow(searchRow, 0);
+        listPanel.Children.Add(searchRow);
         // 列表与进度指示同格叠放：指示悬浮在卡内右下角，不改变列表卡高度
         var listHost = new Grid();
         listHost.Children.Add(_list);
         listHost.Children.Add(_stream.Chip);
+        Grid.SetRow(listHost, 1);
         listPanel.Children.Add(listHost);
-        root.Children.Add(Miuix.Card(listPanel));
+        var listCard = Miuix.Card(listPanel);
+        Grid.SetRow(listCard, 2);
+        root.Children.Add(listCard);
 
         return root;
     }

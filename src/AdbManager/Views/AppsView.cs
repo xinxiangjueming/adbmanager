@@ -9,16 +9,18 @@ namespace AdbManager.Views;
 
 public sealed class AppsView : PageBase
 {
+    /// <summary>列表卡吃掉窗口剩余空间，外壳关闭外层纵向滚动。</summary>
+    public override bool FillsViewport => true;
+
     private readonly TextBox _search = Miuix.Input("");
     private readonly ComboBox _filter = new() { MinWidth = 140 };
     private readonly ListView _list = new()
     {
         SelectionMode = ListViewSelectionMode.Single,
         // 应用数量可达数百个，靠 ListView 虚拟化承载，不改成 StackPanel。
-        // 高度只做上限封顶：内容少时按内容收缩，避免把下方操作卡挤出首屏。
-        // 180~368 对应「列表卡」整体 262~450（卡片 padding 32 + 搜索行 40 + 间距 10 = 82）。
-        MinHeight = 180,
-        MaxHeight = 368
+        // 页面为 FillsViewport 布局：列表卡以 * 行吃掉窗口剩余空间，高度始终有界，
+        // 虚拟化不受影响；MaxHeight 不再封顶，MinHeight 只是极矮窗口下的兜底下限。
+        MinHeight = 180
     };
 
     private readonly List<PackageInfo> _packages = new();
@@ -148,7 +150,12 @@ public sealed class AppsView : PageBase
 
     private UIElement Build()
     {
-        var root = new StackPanel { Spacing = 16 };
+        // 三行布局：标题卡、操作卡按内容高，列表卡吃掉剩余空间（页面随 FillsViewport
+        // 在有界高度下测量，星号行才能真正撑满；窗口过矮时被压缩的也只是列表卡）。
+        var root = new Grid { RowSpacing = 16 };
+        root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
         var installApk = Miuix.PrimaryButton(L("Apps_InstallApk"));
         installApk.Click += async (_, _) => await InstallApkAsync();
@@ -162,6 +169,7 @@ public sealed class AppsView : PageBase
         var topCard = Miuix.Card(new StackPanel { Spacing = 10 });
         ((StackPanel)topCard.Child).Children.Add(Miuix.SectionTitle(L("Apps_Title")));
         ((StackPanel)topCard.Child).Children.Add(Miuix.Horizontal(installApk, installBundle, installXapk, reload));
+        Grid.SetRow(topCard, 0);
         root.Children.Add(topCard);
 
         var uninstall = Miuix.DangerButton(L("Apps_Uninstall"));
@@ -185,16 +193,25 @@ public sealed class AppsView : PageBase
         actionPanel.Children.Add(Miuix.Horizontal(uninstall, freeze, unfreeze, forceStop, clearData));
         // 第二行：保留数据卸载与提取 APK 放一起，避免第一行按钮过多导致横向溢出
         actionPanel.Children.Add(Miuix.Horizontal(uninstallKeep, extractApk));
+        Grid.SetRow(actionCard, 1);
         root.Children.Add(actionCard);
 
-        var listPanel = new StackPanel { Spacing = 10 };
-        listPanel.Children.Add(Miuix.Horizontal(_search, _filter));
+        // 卡内也用两行 Grid：搜索行按内容高，列表宿主吃掉卡片剩余高度
+        var listPanel = new Grid { RowSpacing = 10 };
+        listPanel.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        listPanel.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        var searchRow = Miuix.Horizontal(_search, _filter);
+        Grid.SetRow(searchRow, 0);
+        listPanel.Children.Add(searchRow);
         // 列表与进度指示同格叠放：指示悬浮在卡内右下角，不改变列表卡高度
         var listHost = new Grid();
         listHost.Children.Add(_list);
         listHost.Children.Add(_stream.Chip);
+        Grid.SetRow(listHost, 1);
         listPanel.Children.Add(listHost);
-        root.Children.Add(Miuix.Card(listPanel));
+        var listCard = Miuix.Card(listPanel);
+        Grid.SetRow(listCard, 2);
+        root.Children.Add(listCard);
 
         return root;
     }

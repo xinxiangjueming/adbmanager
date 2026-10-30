@@ -28,6 +28,7 @@ public sealed partial class MainWindow : Window
     };
 
     private readonly Grid _pageHost = new();
+    private ScrollViewer _pageScroll = null!;   // BuildShell 中创建；按页面切换纵向滚动模式
     private readonly InfoBar _infoBar = new()
     {
         IsOpen = false,
@@ -209,15 +210,17 @@ public sealed partial class MainWindow : Window
         {
             new EntranceThemeTransition { FromVerticalOffset = 28, IsStaggeringEnabled = false }
         };
-        var scroll = new ScrollViewer { Content = _pageHost, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
+        // 填满型页面（FillsViewport）会把纵向滚动切到 Disabled：该方向按视口高度做
+        // 有界测量，页面内的 * 行才能吃掉剩余空间；普通页面保持 Auto 原样滚动。
+        _pageScroll = new ScrollViewer { Content = _pageHost, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
 
         var contentGrid = new Grid();
         contentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
         contentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        Grid.SetRow(scroll, 0);
+        Grid.SetRow(_pageScroll, 0);
         Grid.SetRow(_infoBar, 1);
         _infoBar.Margin = new Thickness(24, 0, 24, 12);
-        contentGrid.Children.Add(scroll);
+        contentGrid.Children.Add(_pageScroll);
         contentGrid.Children.Add(_infoBar);
 
         _navigation.Content = contentGrid;
@@ -497,6 +500,9 @@ public sealed partial class MainWindow : Window
             _pages[key] = page;
         }
 
+        _pageScroll.VerticalScrollBarVisibility = page.FillsViewport
+            ? ScrollBarVisibility.Disabled
+            : ScrollBarVisibility.Auto;
         _pageHost.Children.Clear();
         _pageHost.Children.Add(page);
         Services.StartupLog.Write("page:" + key + " shown");
