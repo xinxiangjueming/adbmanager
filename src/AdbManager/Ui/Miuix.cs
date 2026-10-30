@@ -147,13 +147,31 @@ public static class Miuix
         return button;
     }
 
-    public static TextBox Input(string placeholder) => new()
+    public static TextBox Input(string placeholder)
     {
-        PlaceholderText = placeholder,
-        CornerRadius = new CornerRadius(ControlRadius),
-        Height = 40,
-        VerticalContentAlignment = VerticalAlignment.Center
-    };
+        var box = new TextBox
+        {
+            PlaceholderText = placeholder,
+            CornerRadius = new CornerRadius(ControlRadius),
+            Height = 40,
+            VerticalContentAlignment = VerticalAlignment.Center,
+            BorderBrush = Brush("MiuixCardBorder")
+        };
+        FlattenTextBoxBorder(box);
+        return box;
+    }
+
+    /// <summary>
+    /// 去掉 WinUI 默认模板的「底部横线」观感：默认边框刷是底部 1px 明显、其余近乎透明的
+    /// elevation 渐变（聚焦时底边变 2px 强调色线）。统一覆盖为与卡片一致的 1px 全边框。
+    /// 各状态的 Setter 直接引用这些主题资源，控件级覆盖即可生效（同 OutputBox 的底色覆盖）。
+    /// </summary>
+    public static void FlattenTextBoxBorder(TextBox box)
+    {
+        box.Resources["TextControlBorderThemeThicknessFocused"] = new Thickness(1);
+        box.Resources["TextControlBorderBrushPointerOver"] = Brush("MiuixCardBorder");
+        box.Resources["TextControlBorderBrushFocused"] = Brush("MiuixCardBorder");
+    }
 
     /// <summary>只读输出框：底色与所在卡片一致（同日志页列表），悬停/聚焦不提亮。</summary>
     public static TextBox OutputBox(double minHeight, double? maxHeight = null)
@@ -176,6 +194,7 @@ public static class Miuix
         box.Resources["TextControlBackgroundPointerOver"] = Brush("MiuixCardBackground");
         box.Resources["TextControlBackgroundFocused"] = Brush("MiuixCardBackground");
         box.Resources["TextControlBackgroundDisabled"] = Brush("MiuixCardBackground");
+        FlattenTextBoxBorder(box);
         return box;
     }
 

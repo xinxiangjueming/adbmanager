@@ -292,7 +292,8 @@ public sealed class FilesView : PageBase
         if (_selected is null) { MainWindow.Notify(L("Msg_NoSelection"), InfoBarSeverity.Warning); return; }
         if (!TryGetDevice(out var device)) return;
 
-        var box = new TextBox { Text = _selected.Name };
+        var box = Miuix.Input("");
+        box.Text = _selected.Name;
         var dialog = new ContentDialog
         {
             Title = L("Common_Rename"),
@@ -316,7 +317,7 @@ public sealed class FilesView : PageBase
     {
         if (!TryGetDevice(out var device)) return;
 
-        var box = new TextBox();
+        var box = Miuix.Input("");
         var dialog = new ContentDialog
         {
             Title = L("Files_NewFolder"),
