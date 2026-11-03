@@ -301,6 +301,7 @@
   <data name="Mirror_ReadOnly" xml:space="preserve"><value>只读（不注入控制）</value></data>
   <data name="Mirror_ScreenOff" xml:space="preserve"><value>投屏时熄灭设备屏幕</value></data>
   <data name="Mirror_StayAwake" xml:space="preserve"><value>保持设备唤醒</value></data>
+  <data name="Mirror_CircleMask" xml:space="preserve"><value>圆形屏幕遮罩（圆外涂白）</value></data>
   <data name="Mirror_Start" xml:space="preserve"><value>启动投屏</value></data>
   <data name="Mirror_Stop" xml:space="preserve"><value>停止投屏</value></data>
   <data name="Mirror_Running" xml:space="preserve"><value>投屏运行中…</value></data>

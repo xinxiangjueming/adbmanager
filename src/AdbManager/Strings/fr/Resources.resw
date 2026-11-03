@@ -300,6 +300,7 @@
   <data name="Mirror_ReadOnly" xml:space="preserve"><value>Lecture seule (aucune entrée)</value></data>
   <data name="Mirror_ScreenOff" xml:space="preserve"><value>Éteindre l’écran de l’appareil pendant le miroir</value></data>
   <data name="Mirror_StayAwake" xml:space="preserve"><value>Garder l’appareil éveillé</value></data>
+  <data name="Mirror_CircleMask" xml:space="preserve"><value>Masque d’écran circulaire (blanc à l’extérieur)</value></data>
   <data name="Mirror_Start" xml:space="preserve"><value>Démarrer le miroir</value></data>
   <data name="Mirror_Stop" xml:space="preserve"><value>Arrêter le miroir</value></data>
   <data name="Mirror_Running" xml:space="preserve"><value>Miroir en cours…</value></data>

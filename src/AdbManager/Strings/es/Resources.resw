@@ -300,6 +300,7 @@
   <data name="Mirror_ReadOnly" xml:space="preserve"><value>Solo lectura (sin entradas)</value></data>
   <data name="Mirror_ScreenOff" xml:space="preserve"><value>Apagar la pantalla del dispositivo al duplicar</value></data>
   <data name="Mirror_StayAwake" xml:space="preserve"><value>Mantener el dispositivo despierto</value></data>
+  <data name="Mirror_CircleMask" xml:space="preserve"><value>Máscara de pantalla circular (blanco por fuera)</value></data>
   <data name="Mirror_Start" xml:space="preserve"><value>Iniciar duplicación</value></data>
   <data name="Mirror_Stop" xml:space="preserve"><value>Detener duplicación</value></data>
   <data name="Mirror_Running" xml:space="preserve"><value>Duplicación en curso…</value></data>

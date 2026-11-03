@@ -19,6 +19,7 @@ public sealed class MirrorView : PageBase
     private readonly CheckBox _readOnly = new();
     private readonly CheckBox _screenOff = new();
     private readonly CheckBox _stayAwake = new();
+    private readonly CheckBox _circleMask = new(); // 圆形屏幕遮罩：手表预设自动勾选，圆外涂白便于截图分享
     private readonly Button _startButton = Miuix.SuccessButton("");
     private readonly Button _stopButton = Miuix.DangerButton("");
     private readonly TextBlock _status = Miuix.Body("", true);
@@ -48,6 +49,7 @@ public sealed class MirrorView : PageBase
         var queue = DispatcherQueue;
         if (queue is { } q && !q.HasThreadAccess) { q.TryEnqueue(() => OnScrcpyExited(code)); return; }
         UpdateButtons();
+        ApplyCircleMask(); // 投屏结束：同步移除圆形遮罩
         MainWindow.Notify(L("Mirror_Exit"), InfoBarSeverity.Informational);
         _ = RestoreRuntimeOptionsAsync();
     }
@@ -69,6 +71,7 @@ public sealed class MirrorView : PageBase
         _readOnly.Content = L("Mirror_ReadOnly");
         _screenOff.Content = L("Mirror_ScreenOff");
         _stayAwake.Content = L("Mirror_StayAwake");
+        _circleMask.Content = L("Mirror_CircleMask");
         _startButton.Content = L("Mirror_Start");
         _stopButton.Content = L("Mirror_Stop");
         _status.Text = L("Mirror_NotRunning");
@@ -81,6 +84,8 @@ public sealed class MirrorView : PageBase
         _screenOff.Unchecked += async (_, _) => await ApplyScreenOffAsync();
         _stayAwake.Checked += async (_, _) => await ApplyStayAwakeAsync();
         _stayAwake.Unchecked += async (_, _) => await ApplyStayAwakeAsync();
+        _circleMask.Checked += (_, _) => ApplyCircleMask();
+        _circleMask.Unchecked += (_, _) => ApplyCircleMask();
 
         UpdateButtons();
         return Task.CompletedTask;
@@ -100,7 +105,7 @@ public sealed class MirrorView : PageBase
         _bitRate.MinWidth = 120;
         mirrorPanel.Children.Add(Miuix.Horizontal(_maxSize, _maxFps, _bitRate));
         mirrorPanel.Children.Add(Miuix.Horizontal(_noAudio, _readOnly));
-        mirrorPanel.Children.Add(Miuix.Horizontal(_screenOff, _stayAwake));
+        mirrorPanel.Children.Add(Miuix.Horizontal(_screenOff, _stayAwake, _circleMask));
         mirrorPanel.Children.Add(Miuix.Horizontal(_startButton, _stopButton, _status));
         root.Children.Add(Miuix.Card(mirrorPanel));
 
@@ -149,6 +154,9 @@ public sealed class MirrorView : PageBase
             _noAudio.IsChecked = true;
         }
 
+        // 圆形屏幕遮罩只对圆屏手表有意义：手表预设自动勾选，其它预设自动取消（仍可手动改）
+        _circleMask.IsChecked = preset == 2;
+
         var options = new ScrcpyOptions
         {
             Serial = device!.Serial,
@@ -170,9 +178,14 @@ public sealed class MirrorView : PageBase
             _stayAwakeApplied = false;
             _screenOffApplied = _screenOff.IsChecked == true; // scrcpy 原生熄屏：不弹锁屏，退出时自动恢复
             await ApplyStayAwakeAsync(); // 保持唤醒统一由本程序设置，退出时恢复设备原值
+            ApplyCircleMask();
         }
         UpdateButtons();
     }
+
+    /// <summary>同步圆形遮罩：仅投屏运行中且勾选时，在 scrcpy 窗口圆外涂浅白色。</summary>
+    private void ApplyCircleMask() =>
+        ScrcpyCircleMask.Update(AppState.Scrcpy.CurrentProcess, _circleMask.IsChecked == true);
 
     // ---------------- 运行时选项：熄灭屏幕 / 保持唤醒 ----------------
     // scrcpy 的选项只在进程启动时生效，这里让两个勾选框在投屏运行中实时切换：

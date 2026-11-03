@@ -300,6 +300,7 @@
   <data name="Mirror_ReadOnly" xml:space="preserve"><value>読み取り専用（操作を注入しない）</value></data>
   <data name="Mirror_ScreenOff" xml:space="preserve"><value>ミラーリング中に端末画面を消す</value></data>
   <data name="Mirror_StayAwake" xml:space="preserve"><value>端末をスリープさせない</value></data>
+  <data name="Mirror_CircleMask" xml:space="preserve"><value>円形スクリーンマスク（円の外側を白くする）</value></data>
   <data name="Mirror_Start" xml:space="preserve"><value>ミラーリング開始</value></data>
   <data name="Mirror_Stop" xml:space="preserve"><value>ミラーリング停止</value></data>
   <data name="Mirror_Running" xml:space="preserve"><value>ミラーリング中…</value></data>

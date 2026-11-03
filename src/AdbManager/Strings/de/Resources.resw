@@ -300,6 +300,7 @@
   <data name="Mirror_ReadOnly" xml:space="preserve"><value>Nur-Lesen (keine Eingaben)</value></data>
   <data name="Mirror_ScreenOff" xml:space="preserve"><value>Gerätebildschirm während des Mirrorings aus</value></data>
   <data name="Mirror_StayAwake" xml:space="preserve"><value>Gerät wachhalten</value></data>
+  <data name="Mirror_CircleMask" xml:space="preserve"><value>Kreisförmige Bildschirmmaske (außen weiß)</value></data>
   <data name="Mirror_Start" xml:space="preserve"><value>Mirroring starten</value></data>
   <data name="Mirror_Stop" xml:space="preserve"><value>Mirroring stoppen</value></data>
   <data name="Mirror_Running" xml:space="preserve"><value>Mirroring läuft…</value></data>

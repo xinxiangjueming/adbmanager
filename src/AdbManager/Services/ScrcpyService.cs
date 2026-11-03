@@ -24,6 +24,9 @@ public sealed class ScrcpyService
 
     public bool IsRunning => _process is { HasExited: false };
 
+    /// <summary>正在运行的 scrcpy 进程（未运行时为 null）。供圆形遮罩等需要跟踪窗口的功能使用。</summary>
+    public Process? CurrentProcess => _process;
+
     /// <summary>投屏进程退出（携带退出码）。在非 UI 线程触发，订阅方需自行切换线程。</summary>
     public event Action<int?>? Exited;
 

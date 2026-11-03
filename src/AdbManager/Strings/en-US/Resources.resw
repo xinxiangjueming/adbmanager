@@ -315,6 +315,7 @@
   <data name="Mirror_ReadOnly" xml:space="preserve"><value>Read-only (no input)</value></data>
   <data name="Mirror_ScreenOff" xml:space="preserve"><value>Turn device screen off</value></data>
   <data name="Mirror_StayAwake" xml:space="preserve"><value>Keep device awake</value></data>
+  <data name="Mirror_CircleMask" xml:space="preserve"><value>Circular screen mask (white outside the circle)</value></data>
   <data name="Mirror_Start" xml:space="preserve"><value>Start mirroring</value></data>
   <data name="Mirror_Stop" xml:space="preserve"><value>Stop mirroring</value></data>
   <data name="Mirror_Running" xml:space="preserve"><value>Mirroring…</value></data>
