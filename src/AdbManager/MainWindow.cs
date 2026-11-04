@@ -168,6 +168,9 @@ public sealed partial class MainWindow : Window
         root.Background = Miuix.Brush("MiuixPageBackground");
         _navigation.Resources["NavigationViewExpandedPaneBackground"] = Miuix.Brush("MiuixPageBackground");
         _navigation.Resources["NavigationViewContentBackground"] = Miuix.Brush("MiuixLayerBackground");
+        // WinUI 默认把内容区这张「层」的圆角硬编码为左上 8px（NavigationViewContentGridCornerRadius），
+        // 边框也只描上、左两条（1,1,0,0），与 miuix 卡片 20px 不一致；这里对齐成卡片半径。
+        _navigation.Resources["NavigationViewContentGridCornerRadius"] = new CornerRadius(Miuix.CardRadius, 0, 0, 0);
 
         root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
@@ -222,6 +225,14 @@ public sealed partial class MainWindow : Window
         _infoBar.Margin = new Thickness(24, 0, 24, 12);
         contentGrid.Children.Add(_pageScroll);
         contentGrid.Children.Add(_infoBar);
+        // InfoBar 的关闭按钮是模板里 38×38 的默认 Button：悬停/按下的高亮跟随默认
+        // ControlCornerRadius(4px)，在 16px 圆角的通知条里看着像直角。模板应用完成后
+        // 取到该按钮实例，把圆角改成与 miuix 控件一致的 16px。
+        _infoBar.Loaded += (_, _) =>
+        {
+            if (FindNamedDescendant(_infoBar, "CloseButton") is Button close)
+                close.CornerRadius = new CornerRadius(Miuix.ControlRadius);
+        };
 
         _navigation.Content = contentGrid;
         _navigation.SelectionChanged += OnNavigationSelectionChanged;
@@ -260,6 +271,19 @@ public sealed partial class MainWindow : Window
         UpdateStatus();
         ApplyThemeSetting(animate: false);
         Services.StartupLog.Write("shell:done");
+    }
+
+    /// <summary>在可视树里按 x:Name 找模板部件（含 Collapsed 子树，模板元素都在）。</summary>
+    private static DependencyObject? FindNamedDescendant(DependencyObject root, string name)
+    {
+        var count = VisualTreeHelper.GetChildrenCount(root);
+        for (var i = 0; i < count; i++)
+        {
+            var child = VisualTreeHelper.GetChild(root, i);
+            if (child is FrameworkElement { Name: var n } && n == name) return child;
+            if (FindNamedDescendant(child, name) is { } hit) return hit;
+        }
+        return null;
     }
 
     /// <summary>按用户设置应用主题（跟随系统 / 浅色 / 深色）。

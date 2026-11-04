@@ -31,10 +31,12 @@ public partial class App : Application, IXamlMetadataProvider
 
         try
         {
-            // 主题在首个窗口创建前应用（RequestedTheme 仅允许设置一次）
+            // 不在 Application 层冻结 RequestedTheme：它只允许在首窗口创建前设置一次，
+            // 之后改不了。若按启动设定冻成浅/深色，之后切「跟随系统」（元素级
+            // RequestedTheme = Default）会向上解析回这层冻结值，系统主题切换就永远失效。
+            // 初值统一交给 MainWindow.BuildShell 末尾的 ApplyThemeSetting(animate:false)
+            // 在元素级完成——窗口 Activate 前生效，无首帧闪烁。
             Services.AppSettings.Load();
-            if (Services.AppSettings.Theme == "light") RequestedTheme = ApplicationTheme.Light;
-            else if (Services.AppSettings.Theme == "dark") RequestedTheme = ApplicationTheme.Dark;
 
             // WinUI 控件主题资源 + miuix 画笔（应用级资源字典）
             Resources.MergedDictionaries.Add(new XamlControlsResources());

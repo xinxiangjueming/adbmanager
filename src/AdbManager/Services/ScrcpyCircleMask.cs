@@ -4,13 +4,19 @@ using System.Runtime.InteropServices;
 namespace AdbManager.Services;
 
 /// <summary>
-/// 圆形屏幕遮罩：在投屏窗口（scrcpy）客户区上方叠一层鼠标穿透的分层窗口，
+/// 圆形屏幕遮罩：在投屏窗口（scrcpy）上方叠一层鼠标穿透的分层窗口，
 /// 把内切圆以外的区域涂成浅白色，圆内完全透明。
 ///
 /// 圆形手表的画面是方形帧（四角是黑的），直接截图分享时观感像一块方形屏；
-/// 圆外涂白后表盘轮廓一眼可辨。遮罩用 Win32 线程定时器轮询 scrcpy 窗口的
-/// 位置与尺寸（仅 UI 线程消息循环内回调，窗口操作天然同线程），
-/// 移动/缩放实时跟随；退出投屏或取消勾选后立即销毁。
+/// 圆外涂白后表盘轮廓一眼可辨。
+///
+/// 绑定方式：遮罩创建为 scrcpy 窗口的<b>归属窗口（owned window）</b>——
+///   · 系统保证归属窗口永远位于其 owner 之上，且 z 序跟随 owner 同进退：
+///     其它窗口盖住投屏时遮罩一并被盖住，不会出现白角浮在别的窗口上；
+///   · 最小化 / 隐藏 owner 时遮罩随之隐藏。
+/// 归属窗口不会随 owner 自动移动，用 Win32 线程定时器轮询位置与尺寸
+/// （仅 UI 线程消息循环内回调，窗口操作天然同线程），移动/缩放实时跟随；
+/// 退出投屏或取消勾选后立即销毁。
 /// </summary>
 public static class ScrcpyCircleMask
 {
@@ -24,26 +30,28 @@ public static class ScrcpyCircleMask
     // 避免把 scrcpy 偶尔弹出的错误对话框（#32770）当成镜像窗口
     private const string SdlClassPrefix = "SDL";
 
+    private const uint WsPopup = 0x80000000;
     private const int WsExLayered = 0x00080000;
     private const int WsExTransparent = 0x00000020;
     private const int WsExNoActivate = 0x08000000;
     private const int WsExToolWindow = 0x00000080;
-    private const int WsExTopmost = 0x00000008;
-    private const uint WsPopup = 0x80000000;
     private const uint UlwAlpha = 2;
     private const byte AcSrcOver = 0, AcSrcAlpha = 1;
     private const int SwShowNa = 8, SwHide = 0;
-    private const uint SwpNoSize = 0x0001, SwpNoActivate = 0x0010;
+    private const uint SwpNoSize = 0x0001, SwpNoZOrder = 0x0004, SwpNoActivate = 0x0010;
     private const int ErrorClassAlreadyExists = 1410;
 
     private static bool _enabled;
     private static bool _timerRunning;
     private static Process? _process;   // 正在跟踪的 scrcpy 进程
     private static IntPtr _target;      // scrcpy 主窗口
-    private static IntPtr _overlay;     // 遮罩窗口
+    private static IntPtr _overlay;     // 遮罩窗口（owner = scrcpy 窗口）
     private static int _lastW, _lastH;  // 已绘制位图尺寸（仅尺寸变化才重绘）
 
     private static readonly WndProcDelegate WndProc = DefWndProc;
+    private static readonly TimerProcDelegate TimerProcCallback = TimerProcImpl; // 静态字段持有，防委托被 GC 回收
+    private static bool _classRegistered;
+    private const string WindowClassName = "AdbManager_CircleMask";
 
     /// <summary>
     /// 刷新遮罩状态（仅 UI 线程调用）。process 为 null / 已退出时彻底停止；
@@ -98,10 +106,13 @@ public static class ScrcpyCircleMask
         {
             _target = FindScrcpyWindow(process.Id);
             if (_target == IntPtr.Zero) return;
-            _lastW = _lastH = 0; // 新窗口，强制重绘
+            DestroyOverlay(); // 新窗口：遮罩重建（换 owner）
+            _lastW = _lastH = 0;
         }
 
+        // owner 最小化 / 隐藏时遮罩由系统一并隐藏，但兜底检查一次
         if (IsIconic(_target) || !IsWindowVisible(_target)) { HideOverlay(); return; }
+
         if (!GetClientRect(_target, out var rc)) return;
         var w = rc.Right - rc.Left;
         var h = rc.Bottom - rc.Top;
@@ -109,7 +120,7 @@ public static class ScrcpyCircleMask
         var origin = new POINT();
         if (!ClientToScreen(_target, ref origin)) return;
 
-        EnsureOverlay();
+        EnsureOverlay(w, h);
         if (_overlay == IntPtr.Zero) return;
 
         if (w != _lastW || h != _lastH)
@@ -148,7 +159,7 @@ public static class ScrcpyCircleMask
         return len <= 0 ? string.Empty : new string(buffer, 0, len);
     }
 
-    private static void EnsureOverlay()
+    private static void EnsureOverlay(int w, int h)
     {
         if (_overlay != IntPtr.Zero) return;
 
@@ -167,10 +178,10 @@ public static class ScrcpyCircleMask
             _classRegistered = true;
         }
 
-        // 分层 + 穿透 + 不抢焦点 + 不进 Alt-Tab + 置顶（盖住 scrcpy 的黑色四角即可）
-        _overlay = CreateWindowExW(
-            WsExLayered | WsExTransparent | WsExNoActivate | WsExToolWindow | WsExTopmost,
-            WindowClassName, "", WsPopup, 0, 0, 0, 0, IntPtr.Zero, IntPtr.Zero, instance, IntPtr.Zero);
+        // 归属窗口：WS_POPUP 的父句柄参数即 owner —— 跨进程不能建子窗口，但可以跨进程设 owner。
+        // 不用 WS_EX_TOPMOST：置顶会让白角浮在遮挡投屏的其它窗口上（旧方案的 bug）。
+        _overlay = CreateWindowExW(WsExLayered | WsExTransparent | WsExNoActivate | WsExToolWindow,
+            WindowClassName, "", WsPopup, 0, 0, w, h, _target, IntPtr.Zero, instance, IntPtr.Zero);
     }
 
     /// <summary>重建遮罩位图并用 UpdateLayeredWindow 定位显示。</summary>
@@ -248,8 +259,9 @@ public static class ScrcpyCircleMask
         return bytes;
     }
 
+    /// <summary>跟随 owner 移动。必须带 SWP_NOZORDER：不能动 z 序（z 序由归属关系维护）。</summary>
     private static void MoveTo(int x, int y) =>
-        SetWindowPos(_overlay, IntPtr.Zero, x, y, 0, 0, SwpNoSize | SwpNoActivate);
+        SetWindowPos(_overlay, IntPtr.Zero, x, y, 0, 0, SwpNoSize | SwpNoZOrder | SwpNoActivate);
 
     private static void ShowOverlay()
     {
@@ -269,17 +281,13 @@ public static class ScrcpyCircleMask
         _lastW = _lastH = 0;
     }
 
-    private delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
-    private delegate void TimerProcDelegate(IntPtr hWnd, uint msg, nuint idEvent, uint dwTime);
-
-    private static readonly TimerProcDelegate TimerProcCallback = TimerProcImpl; // 静态字段持有，防委托被 GC 回收
-    private static bool _classRegistered;
-    private const string WindowClassName = "AdbManager_CircleMask";
-
     private static void TimerProcImpl(IntPtr hWnd, uint msg, nuint idEvent, uint dwTime) => Tick();
 
     private static IntPtr DefWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam) =>
         DefWindowProcW(hWnd, msg, wParam, lParam);
+
+    private delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+    private delegate void TimerProcDelegate(IntPtr hWnd, uint msg, nuint idEvent, uint dwTime);
 
     // ---------------- Win32 ----------------
 
