@@ -11,7 +11,7 @@
 
 # 简体中文
 
-> 基于 WinUI 3 的 Windows 桌面 ADB / Fastboot 管理工具。单文件免安装，内置谷歌官方 platform-tools，支持有线与无线连接、应用管理、文件管理、Fastboot 刷入与镜像提取、反向网络共享等。
+> 基于 WinUI 3 的 Windows 桌面 ADB / Fastboot 管理工具。单文件免安装，内置谷歌官方 platform-tools 与 scrcpy，支持有线与无线连接、实时投屏控制、应用管理、文件管理、Fastboot 刷入与镜像提取、反向网络共享等。
 
 ## 特性
 
@@ -23,29 +23,14 @@
 - USB 一键转无线：自动查询手机 WLAN IP → `tcpip 5555` → 自动连接，全程免手输
 - 可连接 Recovery / Sideload 等特殊模式设备
 
-### 应用管理
+### 投屏与控制
 
-- 安装 APK / APKS 拆分包（`.apks` / `.xapk` / `.zip` 自动解包并按 base → split 顺序安装）
-- 提取 APK（含拆分包）到电脑
-- 卸载、冻结 / 解冻（`pm disable-user`）、强制停止、清除数据
-- 按第三方 / 系统 / 已冻结过滤，支持包名搜索
-
-### 运行中进程
-
-- 列出设备当前正在运行的应用（`ps -A` 与已安装包交叉匹配，自动剔除原生守护进程）
-- 显示应用名、图标、PID 与内存占用，前台应用自动标记并选中；可按全部 / 第三方 / 系统过滤，支持搜索
-- 顶部进度条显示设备运存占用（已用 / 总量与百分比）
-- 选中后一键强制停止并自动刷新列表
-
-### 文件管理
-
-- 浏览设备目录（正确处理 `/sdcard` 等符号链接，点击即可进入）
-- 上传 / 下载、重命名 / 删除 / 新建文件夹、复制 / 剪切 / 粘贴
-
-### Fastboot
-
-- 刷入镜像、擦除分区、`getvar` 全量信息、重启到各模式
-- 通过 adb `dd` 提取分区镜像到电脑（需 root 权限的分区会明确报错提示）
+- 内置 [scrcpy](https://github.com/Genymobile/scrcpy) v4.1：实时镜像设备屏幕，延迟约 35–70ms，直接用鼠标键盘操作设备
+- 设备预设：自动检测 / 手机 / 手表。选中「自动检测」时识别 Wear OS 手表并自动应用低分辨率、低码率预设
+- 圆形屏幕遮罩：圆屏手表的画面是方形帧（四角是黑的），遮罩自动把圆形显示区域以外涂成浅白色——截图分享时一眼可见表盘轮廓，不再是方形黑角。手表预设自动启用，运行中可随时开关
+- 运行中实时切换「熄灭设备屏幕」与「保持设备唤醒」，投屏结束自动恢复设备原设置
+- 常用按键直达：Home / 返回 / 多任务 / 电源 / 音量加减
+- 只读模式（不注入控制）、不转发声音、最大分辨率 / 帧率上限 / 码率均可自定义
 
 ### 工具箱
 
@@ -62,19 +47,45 @@
 - 电池（电量、健康度、温度、电压、当前与设计容量）、屏幕、内存、存储、网络、内核、开机时长
 - 设备连上后自动刷新，无需手动点击
 
+### Fastboot
+
+- 刷入镜像、擦除分区、`getvar` 全量信息、重启到各模式
+- 通过 adb `dd` 提取分区镜像到电脑（需 root 权限的分区会明确报错提示）
+
+### 应用管理
+
+- 安装 APK / 拆分包（`.apks` / `.xapk` / `.zip` 自动解包并按 base → split 顺序安装）
+- 提取安装包：单 APK 存为 `.apk`、拆分包存为 `.apks`、含 OBB 的存为 `.xapk`，保留原始格式
+- 卸载、冻结 / 解冻（`pm disable-user`）、强制停止、清除数据
+- 按第三方 / 系统 / 已冻结过滤，支持包名搜索
+
+### 运行中进程
+
+- 列出设备当前正在运行的应用（`ps -A` 与已安装包交叉匹配，自动剔除原生守护进程）
+- 显示应用名、图标、PID 与内存占用，前台应用自动标记并选中；可按全部 / 第三方 / 系统过滤，支持搜索
+- 顶部进度条显示设备运存占用（已用 / 总量与百分比）
+- 选中后一键强制停止并自动刷新列表
+
+### 文件管理
+
+- 浏览设备目录（正确处理 `/sdcard` 等符号链接，点击即可进入）
+- 上传 / 下载、重命名 / 删除 / 新建文件夹、复制 / 剪切 / 粘贴
+
 ### 界面
 
-- miuix / HyperOS 设计语言：大圆角卡片、胶囊按钮、成对深浅色画笔
+- miuix / HyperOS 设计语言：大圆角卡片、胶囊按钮、成对深浅色画笔，窗口原生亚克力实时模糊背景
 - 深浅色跟随系统，也可手动固定浅色 / 深色，实时切换无需重启
 - 页面切换、列表增删、长操作加载覆盖层均有过渡动画
+- 应用 / 进程 / 文件页填满视口高度的布局，列表区域最大化利用空间
 - 内置 7 种语言：简体中文 / English / 日本語 / 한국어 / Deutsch / Français / Español（跟随系统自动选择，可在设置中手动指定）
+- 日志页实时滚动 adb / scrcpy / 操作日志，便于诊断问题
 
 ## 下载
 
-前往 [Releases](../../releases) 页面下载 `AdbManager.exe`（约 276 MB）：
+前往 [Releases](../../releases) 页面下载 `AdbManager.exe`（约 280 MB）：
 
 - 单文件、免安装、双击即用（自包含 .NET 8 + WinUI 运行时，无需安装任何依赖）
-- 内置谷歌官方 platform-tools（adb 37.0.1 + fastboot），首次运行时释放到 `%LOCALAPPDATA%\AdbManager\adb\`
+- 内置谷歌官方 platform-tools（adb 37.0.1 + fastboot）与 scrcpy v4.1，首次运行时释放到 `%LOCALAPPDATA%\AdbManager\`（adb 释放到 `adb\`、scrcpy 释放到 `scrcpy\`）
 - 首次启动需自解压，略慢属正常现象
 - 个别杀毒软件可能对单文件自解压程序误报，请加入白名单或从源码自行构建
 
@@ -92,6 +103,12 @@
 
 设备页选中 USB 连接的设备 → 切换到 TCP 模式(5555) → 拔线 → 连接 `IP:5555`。
 
+### 投屏手表
+
+- 手表通过 USB（或无线）连接后，「投屏与控制」页选择「自动检测」预设并启动投屏：检测到 Wear OS 手表会自动应用低分辨率预设并开启圆形屏幕遮罩
+- 圆形屏幕遮罩只对圆屏手表有意义；连接方形屏幕设备时取消勾选即可
+- 「熄灭设备屏幕」启动时走 scrcpy 原生熄屏（不弹锁屏）；投屏运行中切换会模拟电源键，重新亮屏需要解锁
+
 ### Fastboot
 
 手机重启到 Bootloader（Fastboot 模式）后，「Fastboot」页会列出设备；选择分区、选择镜像文件后刷入。**刷机有风险，操作前请确认分区与镜像匹配。**
@@ -104,16 +121,18 @@
 - [.NET SDK 8.0+](https://dotnet.microsoft.com/download)（Windows App SDK 与依赖包由 NuGet 自动还原）
 - **无需安装 Windows SDK / Visual Studio**：本项目的 UI 全部以纯 C# 代码构建，不使用 XAML 文件，XAML 编译器不参与构建
 
-### 准备官方 platform-tools（构建前置）
+### 准备二进制依赖（构建前置）
 
-adb / fastboot 二进制不随仓库分发，需自行从谷歌官方下载并放入 `tools/adb/`：
+- **platform-tools**：adb / fastboot 二进制不随仓库分发，需自行从谷歌官方下载并放入 `tools/adb/`：
 
-```powershell
-# 下载
-Invoke-WebRequest https://dl.google.com/android/repository/platform-tools-latest-windows.zip -OutFile platform-tools.zip
-# 解压后，将以下 5 个文件复制到 tools/adb/
-# adb.exe、AdbWinApi.dll、AdbWinUsbApi.dll、fastboot.exe、libwinpthread-1.dll
-```
+  ```powershell
+  # 下载
+  Invoke-WebRequest https://dl.google.com/android/repository/platform-tools-latest-windows.zip -OutFile platform-tools.zip
+  # 解压后，将以下 5 个文件复制到 tools/adb/
+  # adb.exe、AdbWinApi.dll、AdbWinUsbApi.dll、fastboot.exe、libwinpthread-1.dll
+  ```
+
+- **scrcpy**：解压后的 scrcpy 运行文件已随仓库分发（`tools/scrcpy/win64/scrcpy-win64-v4.1/`），无需额外操作；仅源压缩包不入库（`.gitignore` 忽略 `tools/scrcpy/*.zip`）
 
 ### 构建
 
@@ -130,22 +149,26 @@ dotnet publish src/AdbManager -c Release -r win-x64 --self-contained true -o dis
 ```
 repo/
 ├─ src/AdbManager/        应用源码（WinUI 3，纯 C# 构建 UI）
-│  ├─ Services/           adb / fastboot 调用、mDNS 发现、多语言、反向共享代理等
-│  ├─ Views/              各页面（设备 / 信息 / 工具 / 应用 / 运行中进程 / 文件 / Fastboot / 日志 / 设置）
+│  ├─ Services/           adb / fastboot 调用、scrcpy 托管与圆形遮罩、mDNS 发现、多语言、反向共享代理等
+│  ├─ Views/              各页面（设备 / 投屏 / 工具 / 信息 / Fastboot / 应用 / 进程 / 文件 / 日志 / 设置）
 │  ├─ Models/             设备、文件、应用包等数据模型
-│  ├─ Ui/                 miuix 设计体系：配色画笔与控件工厂
+│  ├─ Ui/                 miuix 设计体系：配色画笔、控件工厂、亚克力背景、圆形遮罩等
 │  └─ Strings/            7 种语言的 resw 资源
 ├─ tools/adb/             谷歌官方 platform-tools（自行下载，见上）
+├─ tools/scrcpy/          scrcpy v4.1（解压目录随仓库分发）
+├─ tools/labeldex/        应用名 / 图标读取 dex 的源码与构建脚本
 ├─ publish.ps1            一键发布脚本
-└─ dist/                  发布输出
+└─ dist/                  发布输出（不入库）
 ```
 
 ## 技术要点
 
 - **无 XAML 的 WinUI 3**：全部 UI 由 C# 代码构建（`App` 实现 `IXamlMetaDataProvider` 并在 `OnLaunched` 挂载 `XamlControlsResources`），彻底绕开 XAML 编译器与 Windows SDK winmd 依赖，任何装了 .NET SDK 的机器都能直接构建
 - **单文件发布的关键配置**：`WindowsAppSDKSelfContained` + `EnableMsixTooling`（把 resources.pri 嵌入 exe）+ `IncludeNativeLibrariesForSelfExtract`；入口需设置 `MICROSOFT_WINDOWSAPPRUNTIME_BASE_DIRECTORY` 指向单文件解压目录，否则 MRM 找不到框架资源
+- **scrcpy 托管**：scrcpy 以嵌入资源随 exe 分发、运行时释放；启动时把内置 adb 复制到 scrcpy 目录并注入子进程 PATH——scrcpy 没有 `--adb` 选项，按「同目录 → PATH」找 adb，双保险杜绝系统 PATH 上其它版本 adb 劫持导致的 server 版本冲突
+- **圆形屏幕遮罩**：鼠标穿透的分层窗口（`UpdateLayeredWindow` 逐像素 alpha，边缘抗锯齿），创建为 scrcpy 窗口的**归属窗口（owned window）**——系统保证遮罩永远高于投屏窗口且 z 序同进退，其它窗口盖住投屏时遮罩一并被盖住；跨进程不能创建子窗口，但可以跨进程设 owner。位置与尺寸由 UI 线程线程定时器轮询同步，销毁时机跟随 scrcpy 进程
 - **多语言实现**：resw 以嵌入资源随程序分发，运行时直接解析 XML（不依赖 PRI/MRT）；MSBuild 会把资源目录名 `zh-CN` 规范化为 `zh_CN`，加载时已做归一化；同语言多 resw 文件逐键合并
-- **mDNS 发现**：Zeroconf 直接在局域网查询 `_adb-tls-connect` / `_adb-tls-pairing`，与 Android 端 NsdManager 同思路；`adb mdns check` 在多数 Windows 环境返回 `0.0.0`（不可用），因此不作为主要发现手段
+- **mDNS 发现**：Zeroconf 直接在局域网查询 `_adb-tls-connect` / `_adb-tls-pairing`，与 Android 端 NsdManager 同思路；`adb mdns check` 在多数 Windows 环境返回 `0.0`（不可用），因此不作为主要发现手段
 - **NavigationView 左栏闪屏规避**：官方缺陷 [microsoft-ui-xaml#9370](https://github.com/microsoft/microsoft-ui-xaml/issues/9370)（窗格与内容宽度动画不同步），通过统一窗格 / 内容 / 窗体为同一不透明底色规避
 
 ## FAQ
@@ -153,6 +176,10 @@ repo/
 **Q：扫描不到无线设备？**
 
 手机必须打开「无线调试」开关（它与 USB 调试是两个独立开关，开关不开就不会广播 mDNS）；电脑与手机需在同一 Wi-Fi，路由器不能开 AP 隔离；首次扫描请在 Windows 防火墙弹窗中选择「允许」（mDNS 依赖 UDP 5353 组播）。USB 已连接时直接用「USB 一键转无线」。
+
+**Q：投屏没检测出手表？**
+
+手表检测读取 `ro.build.characteristics`，主流 Wear OS 手表（含小米 Watch S 系列）都返回 `watch`。个别设备若未命中，直接在「设备预设」里手动选「手表（低分辨率）」，圆形屏幕遮罩同样会自动启用。
 
 **Q：和 Android Studio 或其它 adb 冲突？**
 
@@ -174,13 +201,13 @@ repo/
 
 [MIT](LICENSE)
 
-内置的 Google platform-tools（adb / fastboot）遵循 [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)；Zeroconf、Windows App SDK、.NET 等第三方组件遵循其各自的开源协议。
+内置的 Google platform-tools（adb / fastboot）遵循 [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)；内置的 scrcpy 遵循 [Apache-2.0](https://github.com/Genymobile/scrcpy/blob/master/LICENSE)；Zeroconf、Windows App SDK、.NET 等第三方组件遵循其各自的开源协议。
 
 ---
 
 # English
 
-> A Windows desktop ADB / Fastboot manager built with WinUI 3. Ships as a single install-free executable with Google's official platform-tools bundled — wired and wireless connections, app management, file management, Fastboot flashing with partition image extraction, reverse tethering, and more.
+> A Windows desktop ADB / Fastboot manager built with WinUI 3. Ships as a single install-free executable with Google's official platform-tools and scrcpy bundled — wired and wireless connections, live mirroring with mouse/keyboard control, app management, file management, Fastboot flashing with partition image extraction, reverse tethering, and more.
 
 ## Features
 
@@ -192,29 +219,14 @@ repo/
 - One-click USB-to-Wi-Fi: detects the phone's WLAN IP automatically → `tcpip 5555` → auto-connect, no manual typing
 - Connects to devices in special modes such as Recovery / Sideload
 
-### App management
+### Mirroring & control
 
-- Install APK / split APKS bundles (`.apks` / `.xapk` / `.zip` auto-unpacked and installed base → split)
-- Extract APK (including splits) to the PC
-- Uninstall, freeze / unfreeze (`pm disable-user`), force stop, clear data
-- Filter by third-party / system / disabled, with package name search
-
-### Running processes
-
-- List apps currently running on the device (`ps -A` cross-matched with installed packages, native daemons excluded)
-- Shows app name, icon, PIDs and memory usage; the foreground app is marked and auto-selected; filter by all / third-party / system, with search
-- Memory bar next to the refresh button shows device RAM usage (used / total and percentage)
-- One-click force stop on the selected app with automatic list refresh
-
-### File management
-
-- Browse device directories (handles symlinks like `/sdcard` correctly — click to enter)
-- Upload / download, rename / delete / new folder, copy / cut / paste
-
-### Fastboot
-
-- Flash images, erase partitions, full `getvar` dump, reboot to every mode
-- Extract partition images to the PC via adb `dd` (root-only partitions report a clear error)
+- Built-in [scrcpy](https://github.com/Genymobile/scrcpy) v4.1: mirror the device screen in real time (~35–70 ms latency) and control it with mouse and keyboard
+- Device presets: auto-detect / phone / watch. "Auto-detect" recognizes Wear OS watches and applies a low-resolution, low-bitrate preset automatically
+- Circular screen mask: a round watch's picture is a square frame (black corners); the mask paints everything outside the circular display area light white — shared screenshots clearly show the round dial instead of square black corners. Enabled automatically with the watch preset, can be toggled any time while mirroring
+- Live toggles for "turn device screen off" and "keep device awake" while mirroring; original device settings are restored on exit
+- Quick keys: Home / Back / Recents / Power / Volume up & down
+- Read-only mode (no input injection), no-audio forwarding, and custom max resolution / fps / bitrate
 
 ### Toolbox
 
@@ -231,19 +243,45 @@ repo/
 - Battery (level, health, temperature, voltage, current & design capacity), display, memory, storage, network, kernel, uptime
 - Refreshes automatically when a device connects — no manual clicking
 
+### Fastboot
+
+- Flash images, erase partitions, full `getvar` dump, reboot to every mode
+- Extract partition images to the PC via adb `dd` (root-only partitions report a clear error)
+
+### App management
+
+- Install APK / split bundles (`.apks` / `.xapk` / `.zip` auto-unpacked and installed base → split)
+- Extract packages: single APK saved as `.apk`, splits as `.apks`, with OBB as `.xapk` — original format preserved
+- Uninstall, freeze / unfreeze (`pm disable-user`), force stop, clear data
+- Filter by third-party / system / disabled, with package name search
+
+### Running processes
+
+- List apps currently running on the device (`ps -A` cross-matched with installed packages, native daemons excluded)
+- Shows app name, icon, PIDs and memory usage; the foreground app is marked and auto-selected; filter by all / third-party / system, with search
+- Memory bar next to the refresh button shows device RAM usage (used / total and percentage)
+- One-click force stop on the selected app with automatic list refresh
+
+### File management
+
+- Browse device directories (handles symlinks like `/sdcard` correctly — click to enter)
+- Upload / download, rename / delete / new folder, copy / cut / paste
+
 ### Interface
 
-- miuix / HyperOS design language: large-radius cards, pill buttons, paired light/dark brushes
+- miuix / HyperOS design language: large-radius cards, pill buttons, paired light/dark brushes, native acrylic live-blur window backdrop
 - Theme follows the system, or pin light / dark manually — switches instantly, no restart
 - Animated page transitions, list add/remove animations, and a busy overlay for long operations
+- Viewport-filling layout on the apps / processes / files pages so lists use all available space
 - 7 built-in languages: 简体中文 / English / 日本語 / 한국어 / Deutsch / Français / Español (follows the system, manually selectable in Settings)
+- Logs page with live-scrolling adb / scrcpy / operation output for easy diagnosis
 
 ## Download
 
-Grab `AdbManager.exe` (~276 MB) from the [Releases](../../releases) page:
+Grab `AdbManager.exe` (~280 MB) from the [Releases](../../releases) page:
 
 - Single file, no installation, just double-click (self-contained .NET 8 + WinUI runtime, no dependencies to install)
-- Bundles Google's official platform-tools (adb 37.0.1 + fastboot), extracted to `%LOCALAPPDATA%\AdbManager\adb\` on first run
+- Bundles Google's official platform-tools (adb 37.0.1 + fastboot) and scrcpy v4.1, extracted to `%LOCALAPPDATA%\AdbManager\` on first run (adb into `adb\`, scrcpy into `scrcpy\`)
 - First launch is slower due to self-extraction — this is normal
 - Some antivirus products may flag single-file self-extracting executables; whitelist it or build from source
 
@@ -261,6 +299,12 @@ Grab `AdbManager.exe` (~276 MB) from the [Releases](../../releases) page:
 
 Select the USB-connected device on the Devices page → switch to TCP mode (5555) → unplug the cable → connect to `IP:5555`.
 
+### Mirroring a watch
+
+- Connect the watch via USB (or Wi-Fi), pick the "Auto-detect" preset on the "Mirroring & control" page and start: Wear OS watches get the low-resolution preset and the circular screen mask automatically
+- The circular mask only makes sense for round watches — uncheck it when mirroring a device with a square screen
+- "Turn device screen off" uses scrcpy's native screen-off at start (no lockscreen popup); toggling it mid-mirroring simulates the power key, so waking up again requires unlocking
+
 ### Fastboot
 
 After rebooting the phone to the Bootloader (Fastboot mode), devices appear on the "Fastboot" page; pick a partition and an image file, then flash. **Flashing is risky — double-check that the partition matches the image before proceeding.**
@@ -273,16 +317,18 @@ After rebooting the phone to the Bootloader (Fastboot mode), devices appear on t
 - [.NET SDK 8.0+](https://dotnet.microsoft.com/download) (Windows App SDK and NuGet packages restore automatically)
 - **No Windows SDK / Visual Studio required**: the entire UI is built in pure C# without XAML files — the XAML compiler never runs
 
-### Prepare the official platform-tools (build prerequisite)
+### Prepare binary dependencies (build prerequisite)
 
-The adb / fastboot binaries are not committed to the repository. Download them from Google and place them in `tools/adb/`:
+- **platform-tools**: the adb / fastboot binaries are not committed to the repository. Download them from Google and place them in `tools/adb/`:
 
-```powershell
-# Download
-Invoke-WebRequest https://dl.google.com/android/repository/platform-tools-latest-windows.zip -OutFile platform-tools.zip
-# After extracting, copy these 5 files into tools/adb/:
-# adb.exe, AdbWinApi.dll, AdbWinUsbApi.dll, fastboot.exe, libwinpthread-1.dll
-```
+  ```powershell
+  # Download
+  Invoke-WebRequest https://dl.google.com/android/repository/platform-tools-latest-windows.zip -OutFile platform-tools.zip
+  # After extracting, copy these 5 files into tools/adb/:
+  # adb.exe, AdbWinApi.dll, AdbWinUsbApi.dll, fastboot.exe, libwinpthread-1.dll
+  ```
+
+- **scrcpy**: the extracted scrcpy runtime files ship with the repository (`tools/scrcpy/win64/scrcpy-win64-v4.1/`) — nothing to do; only the source zip is ignored (`.gitignore` excludes `tools/scrcpy/*.zip`)
 
 ### Build
 
@@ -299,20 +345,24 @@ Output: `dist/AdbManager.exe` (single file).
 ```
 repo/
 ├─ src/AdbManager/        App source (WinUI 3, pure C# UI)
-│  ├─ Services/           adb / fastboot invocation, mDNS discovery, localization, reverse-tether proxy, etc.
-│  ├─ Views/              Pages (Devices / Info / Tools / Apps / Running / Files / Fastboot / Logs / Settings)
+│  ├─ Services/           adb / fastboot invocation, scrcpy hosting & circle mask, mDNS discovery, localization, reverse-tether proxy, etc.
+│  ├─ Views/              Pages (Devices / Mirror / Tools / Info / Fastboot / Apps / Processes / Files / Logs / Settings)
 │  ├─ Models/             Data models: devices, files, packages
-│  ├─ Ui/                 miuix design system: palette brushes and control factory
+│  ├─ Ui/                 miuix design system: palette brushes, control factory, acrylic backdrop, circle mask, etc.
 │  └─ Strings/            resw resources for 7 languages
 ├─ tools/adb/             Google's official platform-tools (download yourself, see above)
+├─ tools/scrcpy/          scrcpy v4.1 (extracted files ship with the repo)
+├─ tools/labeldex/        Source & build script for the app-label/icon probe dex
 ├─ publish.ps1            One-click publish script
-└─ dist/                  Publish output
+└─ dist/                  Publish output (not committed)
 ```
 
 ## Technical notes
 
 - **No-XAML WinUI 3**: the whole UI is built from C# code (`App` implements `IXamlMetaDataProvider` and attaches `XamlControlsResources` in `OnLaunched`), completely bypassing the XAML compiler and Windows SDK winmd dependencies — any machine with the .NET SDK can build it
 - **Key single-file publish settings**: `WindowsAppSDKSelfContained` + `EnableMsixTooling` (embeds resources.pri into the exe) + `IncludeNativeLibrariesForSelfExtract`; the entry point must set `MICROSOFT_WINDOWSAPPRUNTIME_BASE_DIRECTORY` to the single-file extraction directory, otherwise MRM cannot locate framework resources
+- **scrcpy hosting**: scrcpy ships as an embedded resource and is extracted at runtime; on start, the bundled adb is copied into the scrcpy directory and its folder is injected into the child PATH — scrcpy has no `--adb` option and looks up adb as "same directory → PATH", so this double-guard prevents adb version hijacking by other installs on the system PATH (server version mismatch)
+- **Circular screen mask**: a click-through layered window (`UpdateLayeredWindow` with per-pixel alpha and anti-aliased edges) created as an **owned window** of the scrcpy window — the system keeps the mask above the mirror window with matching z-order, so it gets covered together with the mirror when other windows overlap. Cross-process child windows are not allowed, but cross-process ownership is. Position/size are synced by a UI-thread Win32 timer; teardown follows the scrcpy process
 - **Localization**: resw files ship as embedded resources and are parsed at runtime (no PRI/MRT dependency); MSBuild normalizes the folder name `zh-CN` to `zh_CN`, which is converted back at load time; multiple resw files per language are merged key by key
 - **mDNS discovery**: Zeroconf queries `_adb-tls-connect` / `_adb-tls-pairing` directly on the LAN — the same idea as NsdManager on Android; `adb mdns check` returns `0.0.0` (unavailable) on most Windows setups, so it is not used as the primary discovery path
 - **NavigationView pane-flicker workaround**: upstream bug [microsoft-ui-xaml#9370](https://github.com/microsoft/microsoft-ui-xaml/issues/9370) (pane and content width animations out of sync), mitigated by using one opaque background color for the pane, the content area, and the window
@@ -322,6 +372,10 @@ repo/
 **Q: Wireless scan finds nothing?**
 
 The phone's "Wireless debugging" switch must be on (it is a separate switch from USB debugging — no broadcast without it); the PC and phone must be on the same Wi-Fi with no AP isolation on the router; click "Allow" on the first Windows Firewall prompt (mDNS needs UDP 5353 multicast). If the phone is plugged into USB, just use the "USB to Wi-Fi" one-click button.
+
+**Q: Mirroring doesn't detect my watch?**
+
+Detection reads `ro.build.characteristics`; mainstream Wear OS watches (including Xiaomi Watch S series) all report `watch`. If a device slips through, just pick "Watch (low resolution)" manually in the preset list — the circular screen mask is enabled automatically all the same.
 
 **Q: Conflicts with Android Studio or another adb?**
 
@@ -343,4 +397,4 @@ Flashing or erasing partitions can leave a device unbootable; freezing or uninst
 
 [MIT](LICENSE)
 
-The bundled Google platform-tools (adb / fastboot) are licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0); third-party components such as Zeroconf, Windows App SDK, and .NET remain under their respective licenses.
+The bundled Google platform-tools (adb / fastboot) are licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0); the bundled scrcpy is licensed under the [Apache License 2.0](https://github.com/Genymobile/scrcpy/blob/master/LICENSE); third-party components such as Zeroconf, Windows App SDK, and .NET remain under their respective licenses.
