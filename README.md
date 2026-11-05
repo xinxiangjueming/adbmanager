@@ -27,14 +27,14 @@
 
 - 内置 [scrcpy](https://github.com/Genymobile/scrcpy) v4.1：实时镜像设备屏幕，延迟约 35–70ms，直接用鼠标键盘操作设备
 - 设备预设：自动检测 / 手机 / 手表。选中「自动检测」时识别 Wear OS 手表并自动应用低分辨率、低码率预设
-- 圆形屏幕遮罩：圆屏手表的画面是方形帧（四角是黑的），遮罩自动把圆形显示区域以外涂成浅白色——截图分享时一眼可见表盘轮廓，不再是方形黑角。手表预设自动启用，运行中可随时开关
+- 圆形屏幕遮罩：圆屏手表的画面是方形帧（四角是黑的），遮罩自动把圆形显示区域以外涂成浅白色——截图分享时一眼可见表盘轮廓，不再是方形黑角。投屏时手表预设自动启用、运行中可随时开关；工具箱截图对手表设备同样自动应用
 - 运行中实时切换「熄灭设备屏幕」与「保持设备唤醒」，投屏结束自动恢复设备原设置
 - 常用按键直达：Home / 返回 / 多任务 / 电源 / 音量加减
 - 只读模式（不注入控制）、不转发声音、最大分辨率 / 帧率上限 / 码率均可自定义
 
 ### 工具箱
 
-- 截图直接保存到电脑；录屏（最长 180 秒）结束后自动回传
+- 截图直接保存到电脑——圆表设备自动把表盘以外涂成浅白色（与投屏遮罩同款）；录屏（最长 180 秒）结束后自动回传
 - Shell 命令执行，输出实时回显
 - 反向共享电脑网络：HTTP 代理 + `adb reverse` + 自动设置设备系统代理
 - 一键激活 Shizuku / Scene
@@ -107,6 +107,7 @@
 
 - 手表通过 USB（或无线）连接后，「投屏与控制」页选择「自动检测」预设并启动投屏：检测到 Wear OS 手表会自动应用低分辨率预设并开启圆形屏幕遮罩
 - 圆形屏幕遮罩只对圆屏手表有意义；连接方形屏幕设备时取消勾选即可
+- 工具箱的「截图」对手表设备同样自动加工：保存前把表盘以外涂浅白，无需手动处理
 - 「熄灭设备屏幕」启动时走 scrcpy 原生熄屏（不弹锁屏）；投屏运行中切换会模拟电源键，重新亮屏需要解锁
 
 ### Fastboot
@@ -166,7 +167,7 @@ repo/
 - **无 XAML 的 WinUI 3**：全部 UI 由 C# 代码构建（`App` 实现 `IXamlMetaDataProvider` 并在 `OnLaunched` 挂载 `XamlControlsResources`），彻底绕开 XAML 编译器与 Windows SDK winmd 依赖，任何装了 .NET SDK 的机器都能直接构建
 - **单文件发布的关键配置**：`WindowsAppSDKSelfContained` + `EnableMsixTooling`（把 resources.pri 嵌入 exe）+ `IncludeNativeLibrariesForSelfExtract`；入口需设置 `MICROSOFT_WINDOWSAPPRUNTIME_BASE_DIRECTORY` 指向单文件解压目录，否则 MRM 找不到框架资源
 - **scrcpy 托管**：scrcpy 以嵌入资源随 exe 分发、运行时释放；启动时把内置 adb 复制到 scrcpy 目录并注入子进程 PATH——scrcpy 没有 `--adb` 选项，按「同目录 → PATH」找 adb，双保险杜绝系统 PATH 上其它版本 adb 劫持导致的 server 版本冲突
-- **圆形屏幕遮罩**：鼠标穿透的分层窗口（`UpdateLayeredWindow` 逐像素 alpha，边缘抗锯齿），创建为 scrcpy 窗口的**归属窗口（owned window）**——系统保证遮罩永远高于投屏窗口且 z 序同进退，其它窗口盖住投屏时遮罩一并被盖住；跨进程不能创建子窗口，但可以跨进程设 owner。位置与尺寸由 UI 线程线程定时器轮询同步，销毁时机跟随 scrcpy 进程
+- **圆形屏幕遮罩**：鼠标穿透的分层窗口（`UpdateLayeredWindow` 逐像素 alpha，边缘抗锯齿），创建为 scrcpy 窗口的**归属窗口（owned window）**——系统保证遮罩永远高于投屏窗口且 z 序同进退，其它窗口盖住投屏时遮罩一并被盖住；跨进程不能创建子窗口，但可以跨进程设 owner。位置与尺寸由 UI 线程线程定时器轮询同步，销毁时机跟随 scrcpy 进程。同一套几何与浅白配色也用于工具箱截图：`WatchImageMask` 用系统 WIC 解码 PNG → 内切圆以外混向浅白 → 回编，加工失败时降级保存原图
 - **多语言实现**：resw 以嵌入资源随程序分发，运行时直接解析 XML（不依赖 PRI/MRT）；MSBuild 会把资源目录名 `zh-CN` 规范化为 `zh_CN`，加载时已做归一化；同语言多 resw 文件逐键合并
 - **mDNS 发现**：Zeroconf 直接在局域网查询 `_adb-tls-connect` / `_adb-tls-pairing`，与 Android 端 NsdManager 同思路；`adb mdns check` 在多数 Windows 环境返回 `0.0`（不可用），因此不作为主要发现手段
 - **NavigationView 左栏闪屏规避**：官方缺陷 [microsoft-ui-xaml#9370](https://github.com/microsoft/microsoft-ui-xaml/issues/9370)（窗格与内容宽度动画不同步），通过统一窗格 / 内容 / 窗体为同一不透明底色规避
@@ -223,14 +224,14 @@ repo/
 
 - Built-in [scrcpy](https://github.com/Genymobile/scrcpy) v4.1: mirror the device screen in real time (~35–70 ms latency) and control it with mouse and keyboard
 - Device presets: auto-detect / phone / watch. "Auto-detect" recognizes Wear OS watches and applies a low-resolution, low-bitrate preset automatically
-- Circular screen mask: a round watch's picture is a square frame (black corners); the mask paints everything outside the circular display area light white — shared screenshots clearly show the round dial instead of square black corners. Enabled automatically with the watch preset, can be toggled any time while mirroring
+- Circular screen mask: a round watch's picture is a square frame (black corners); the mask paints everything outside the circular display area light white — shared screenshots clearly show the round dial instead of square black corners. Enabled automatically with the watch preset while mirroring (toggle any time); toolbox screenshots of watch devices get the same treatment automatically
 - Live toggles for "turn device screen off" and "keep device awake" while mirroring; original device settings are restored on exit
 - Quick keys: Home / Back / Recents / Power / Volume up & down
 - Read-only mode (no input injection), no-audio forwarding, and custom max resolution / fps / bitrate
 
 ### Toolbox
 
-- Screenshots saved straight to the PC; screen recording (up to 180 s) pulled back automatically when finished
+- Screenshots saved straight to the PC — round watches get everything outside the dial painted light white automatically (same as the mirroring mask); screen recording (up to 180 s) pulled back automatically when finished
 - Shell command execution with live output
 - Reverse tethering: HTTP proxy + `adb reverse` + automatic device system-proxy setup
 - One-click Shizuku / Scene activation
@@ -303,6 +304,7 @@ Select the USB-connected device on the Devices page → switch to TCP mode (5555
 
 - Connect the watch via USB (or Wi-Fi), pick the "Auto-detect" preset on the "Mirroring & control" page and start: Wear OS watches get the low-resolution preset and the circular screen mask automatically
 - The circular mask only makes sense for round watches — uncheck it when mirroring a device with a square screen
+- The Toolbox "Screenshot" processes watch devices the same way: everything outside the dial is painted light white before saving — no manual editing needed
 - "Turn device screen off" uses scrcpy's native screen-off at start (no lockscreen popup); toggling it mid-mirroring simulates the power key, so waking up again requires unlocking
 
 ### Fastboot
@@ -362,7 +364,7 @@ repo/
 - **No-XAML WinUI 3**: the whole UI is built from C# code (`App` implements `IXamlMetaDataProvider` and attaches `XamlControlsResources` in `OnLaunched`), completely bypassing the XAML compiler and Windows SDK winmd dependencies — any machine with the .NET SDK can build it
 - **Key single-file publish settings**: `WindowsAppSDKSelfContained` + `EnableMsixTooling` (embeds resources.pri into the exe) + `IncludeNativeLibrariesForSelfExtract`; the entry point must set `MICROSOFT_WINDOWSAPPRUNTIME_BASE_DIRECTORY` to the single-file extraction directory, otherwise MRM cannot locate framework resources
 - **scrcpy hosting**: scrcpy ships as an embedded resource and is extracted at runtime; on start, the bundled adb is copied into the scrcpy directory and its folder is injected into the child PATH — scrcpy has no `--adb` option and looks up adb as "same directory → PATH", so this double-guard prevents adb version hijacking by other installs on the system PATH (server version mismatch)
-- **Circular screen mask**: a click-through layered window (`UpdateLayeredWindow` with per-pixel alpha and anti-aliased edges) created as an **owned window** of the scrcpy window — the system keeps the mask above the mirror window with matching z-order, so it gets covered together with the mirror when other windows overlap. Cross-process child windows are not allowed, but cross-process ownership is. Position/size are synced by a UI-thread Win32 timer; teardown follows the scrcpy process
+- **Circular screen mask**: a click-through layered window (`UpdateLayeredWindow` with per-pixel alpha and anti-aliased edges) created as an **owned window** of the scrcpy window — the system keeps the mask above the mirror window with matching z-order, so it gets covered together with the mirror when other windows overlap. Cross-process child windows are not allowed, but cross-process ownership is. Position/size are synced by a UI-thread Win32 timer; teardown follows the scrcpy process. The same geometry and light-white fill also apply to Toolbox screenshots: `WatchImageMask` decodes the PNG with the system WIC, blends everything outside the inscribed circle toward light white, and re-encodes — falling back to the raw image on failure
 - **Localization**: resw files ship as embedded resources and are parsed at runtime (no PRI/MRT dependency); MSBuild normalizes the folder name `zh-CN` to `zh_CN`, which is converted back at load time; multiple resw files per language are merged key by key
 - **mDNS discovery**: Zeroconf queries `_adb-tls-connect` / `_adb-tls-pairing` directly on the LAN — the same idea as NsdManager on Android; `adb mdns check` returns `0.0.0` (unavailable) on most Windows setups, so it is not used as the primary discovery path
 - **NavigationView pane-flicker workaround**: upstream bug [microsoft-ui-xaml#9370](https://github.com/microsoft/microsoft-ui-xaml/issues/9370) (pane and content width animations out of sync), mitigated by using one opaque background color for the pane, the content area, and the window
