@@ -418,6 +418,22 @@ public sealed partial class AdbService
             .ConfigureAwait(false);
         if (bytes.Length == 0) return (false, L("Adb_Err_ScreenshotEmpty"));
 
+        // 圆形手表：帧缓冲是方形（圆盘以外四角是黑的），把内切圆以外涂浅白，
+        // 与投屏的圆形遮罩同款，截图分享时表盘轮廓一眼可辨
+        var characteristics = await RunAsync($"-s \"{serial}\" shell getprop ro.build.characteristics",
+            null, TimeSpan.FromSeconds(15)).ConfigureAwait(false);
+        if (characteristics.StdOut.Contains("watch", StringComparison.OrdinalIgnoreCase))
+        {
+            try
+            {
+                bytes = await WatchImageMask.ApplyToPngAsync(bytes).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                AppState.Log.Info("screenshot circle mask failed, saving raw: " + ex.Message);
+            }
+        }
+
         Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
         await File.WriteAllBytesAsync(savePath, bytes).ConfigureAwait(false);
         return (true, savePath);
