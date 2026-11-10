@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using AdbManager.Services;
 using AdbManager.Ui;
 using Microsoft.UI.Xaml;
@@ -38,6 +39,13 @@ public sealed class ToolsView : PageBase
     private readonly Button _tetherButton = Miuix.PrimaryButton("");
     private int _tetherPortActive;
     private bool _tetherRunning;
+
+    // 输入框已由 ShellAsync 自动附加 "adb -s <serial> shell"；用户常把 host 侧完整命令
+    // 粘贴进来，需剥掉这层前缀，否则设备端 /system/bin/sh 会去找并不存在的 adb 可执行文件。
+    // 只匹配行首，不触碰命令内部的字符串（如 echo "adb shell ..."）。
+    private static readonly Regex AdbShellPrefix = new(
+        @"^\s*adb(?:\.exe)?(?:\s+-s\s+(?:""[^""]*""|'[^']*'|\S+))?\s+shell(?:\s+|$)",
+        RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
     public ToolsView()
     {
@@ -289,12 +297,14 @@ public sealed class ToolsView : PageBase
     {
         if (!TryGetDevice(out var device)) return;
 
-        var command = _command.Text.Trim();
+        var command = AdbShellPrefix.Replace(_command.Text.Trim(), "").Trim();
         if (string.IsNullOrEmpty(command)) return;
 
         _output.Text = "";
         // adb 输出在后台线程，需调度回 UI 线程
         var queue = DispatcherQueue;
+        // 回显实际执行的完整命令，便于自查「多写了 adb shell」这类误输入
+        AppendText(queue, $"adb -s \"{device!.Serial}\" shell {command}");
         var streamed = false;
         var result = await AppState.Adb.ShellAsync(device!.Serial, command, line =>
         {
