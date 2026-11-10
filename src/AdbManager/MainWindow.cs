@@ -34,7 +34,7 @@ public sealed partial class MainWindow : Window
         IsOpen = false,
         IsClosable = true,
         CornerRadius = new CornerRadius(16),
-        Margin = new Thickness(0, 12, 0, 0)
+        VerticalAlignment = VerticalAlignment.Bottom
     };
     private readonly TextBlock _statusText = new() { FontSize = 12, VerticalAlignment = VerticalAlignment.Center };
     private readonly Dictionary<string, PageBase> _pages = new();
@@ -218,13 +218,25 @@ public sealed partial class MainWindow : Window
         _pageScroll = new ScrollViewer { Content = _pageHost, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
 
         var contentGrid = new Grid();
-        contentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-        contentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         Grid.SetRow(_pageScroll, 0);
-        Grid.SetRow(_infoBar, 1);
+        // 通知条与内容同格（后加入者在上层绘制）：悬浮在页面卡片上方，弹出时不再
+        // 挤占内容高度。贴内容区底部摆放，配合 ThemeShadow 阴影呈现「浮起」层次。
+        Grid.SetRow(_infoBar, 0);
         _infoBar.Margin = new Thickness(24, 0, 24, 12);
         contentGrid.Children.Add(_pageScroll);
         contentGrid.Children.Add(_infoBar);
+        try
+        {
+            var notifyShadow = new Microsoft.UI.Xaml.Media.ThemeShadow();
+            notifyShadow.Receivers.Add(_pageScroll);
+            _infoBar.Shadow = notifyShadow;
+            _infoBar.Translation = new System.Numerics.Vector3(0, 0, 24);
+        }
+        catch (Exception ex)
+        {
+            // 阴影失败不影响通知功能本身，只是少了悬浮层次
+            Services.StartupLog.Write("notify shadow failed: " + ex.Message);
+        }
         // InfoBar 的关闭按钮是模板里 38×38 的默认 Button：悬停/按下的高亮跟随默认
         // ControlCornerRadius(4px)，在 16px 圆角的通知条里看着像直角。模板应用完成后
         // 取到该按钮实例，把圆角改成与 miuix 控件一致的 16px。
